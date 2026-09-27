@@ -1,1 +1,65 @@
 @import "tailwindcss";
+@import "../styles/tokens.css";
+
+@theme inline {
+  --color-frame-bg: var(--frame-bg);
+  --color-frame-ink: var(--frame-ink);
+  --color-frame-muted: var(--frame-muted);
+  --color-frame-line: var(--frame-line);
+  --color-focus: var(--focus);
+
+  --color-game-bg: var(--game-bg);
+  --color-game-ink: var(--game-ink);
+  --color-game-accent-1: var(--game-accent-1);
+  --color-game-accent-2: var(--game-accent-2);
+  --color-game-accent-3: var(--game-accent-3);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--game-font-display, var(--font-inter)), ui-sans-serif, system-ui, sans-serif;
+
+  --radius-control: var(--frame-radius-control);
+  --radius-sheet: var(--frame-radius-sheet);
+
+  --ease-out: var(--frame-ease-out);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background: var(--frame-bg);
+    color: var(--frame-ink);
+    font-family: var(--font-sans);
+    min-height: 100dvh;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  /* Native <dialog> sheets lock page scroll while open. */
+  html:has(dialog[open]) {
+    overflow: hidden;
+  }
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+@utility duration-fast {
+  transition-duration: var(--frame-motion-fast);
+}
+
+@utility duration-base {
+  transition-duration: var(--frame-motion-base);
+}
+
+@utility duration-slow {
+  transition-duration: var(--frame-motion-slow);
+}
