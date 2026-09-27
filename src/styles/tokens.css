@@ -54,6 +54,15 @@
   color-scheme: dark;
 }
 
+/* Defaults for a game world without a theme yet (zero specificity, so a game theme always wins). */
+:where([data-game]) {
+  --game-bg: var(--frame-bg);
+  --game-ink: var(--frame-ink);
+  --game-accent-1: var(--frame-ink);
+  --game-accent-2: var(--frame-muted);
+  --game-accent-3: var(--focus);
+}
+
 @media (prefers-reduced-motion: reduce) {
   :root {
     --frame-motion-fast: 0ms;

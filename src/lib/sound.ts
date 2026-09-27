@@ -35,11 +35,19 @@ export class SoundEngine {
 
   setEnabled(enabled: boolean): void {
     this.enabled = enabled;
+    if (enabled && this.unlocked) this.ensureContext();
   }
 
-  /** Call from a user gesture (click, key press). Creates or resumes the AudioContext. */
+  /**
+   * Call from a user gesture (click, key press). Audio stays silent until this has happened; the
+   * AudioContext itself is only created once sound is also enabled.
+   */
   unlock(): void {
     this.unlocked = true;
+    if (this.enabled) this.ensureContext();
+  }
+
+  private ensureContext(): void {
     try {
       this.ctx ??= this.createContext();
       if (this.ctx?.state === "suspended") void this.ctx.resume();
@@ -49,7 +57,9 @@ export class SoundEngine {
   }
 
   async play(name: string, volume = 0.6): Promise<void> {
-    if (!this.enabled || !this.unlocked || !this.ctx) return;
+    if (!this.enabled || !this.unlocked) return;
+    this.ensureContext();
+    if (!this.ctx) return;
     const source = this.sources.get(name);
     if (!source) return;
     const ctx = this.ctx;

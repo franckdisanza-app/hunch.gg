@@ -6,7 +6,7 @@ export const STORAGE_PREFIX = `plimp:v${STORAGE_VERSION}`;
 
 export const META_KEY = `${STORAGE_PREFIX}:meta`;
 
-export type GameStorageSlot = "stats" | "history" | "unlimited";
+export type GameStorageSlot = "stats" | "history" | "unlimited" | "polls";
 
 export function gameKey(game: string, slot: GameStorageSlot): string {
   return `${STORAGE_PREFIX}:${game}:${slot}`;

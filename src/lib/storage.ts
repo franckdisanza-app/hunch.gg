@@ -7,6 +7,7 @@ import { META_KEY, STORAGE_PREFIX, gameKey } from "./storage-keys";
 //   plimp:v1:<game>:stats     daily stats and streaks
 //   plimp:v1:<game>:history   per puzzle number: answers, score, finish time
 //   plimp:v1:<game>:unlimited best run, runs played
+//   plimp:v1:<game>:polls     the option this device picked in each one-tap poll
 // Every read is validated with Zod; a corrupt key is reset on its own. When storage is blocked
 // (private mode, disabled cookies, quota) everything keeps working in memory for the session.
 
@@ -66,6 +67,10 @@ export const unlimitedSchema = z.object({
 });
 export type Unlimited = z.infer<typeof unlimitedSchema>;
 
+/** Poll ID -> option picked on this device. */
+export const pollVotesSchema = z.record(z.string(), z.string());
+export type PollVotes = z.infer<typeof pollVotesSchema>;
+
 export const EMPTY_STATS: Stats = Object.freeze({
   played: 0,
   completed: 0,
@@ -78,6 +83,7 @@ export const EMPTY_STATS: Stats = Object.freeze({
 
 export const EMPTY_HISTORY: History = Object.freeze({}) as History;
 export const EMPTY_UNLIMITED: Unlimited = Object.freeze({ bestRun: 0, runsPlayed: 0 }) as Unlimited;
+export const EMPTY_POLL_VOTES: PollVotes = Object.freeze({}) as PollVotes;
 
 // ---------------------------------------------------------------------------------------------
 // Backend: localStorage with an in-memory fallback
@@ -285,9 +291,13 @@ export function createPlayerStorage(options: PlayerStorageOptions) {
     };
   }
 
+  /** Meta if it exists, without creating it (safe to call while React renders). */
+  function peekMeta(): Meta | null {
+    return read(META_KEY, metaSchema, null);
+  }
+
   function getMeta(): Meta {
-    const existing = read(META_KEY, metaSchema, null);
-    return existing ?? write(META_KEY, freshMeta());
+    return peekMeta() ?? write(META_KEY, freshMeta());
   }
 
   function updateMeta(patch: Partial<Meta> | ((meta: Meta) => Partial<Meta>)): Meta {
@@ -300,6 +310,15 @@ export function createPlayerStorage(options: PlayerStorageOptions) {
   const getHistory = (game: string) => read(gameKey(game, "history"), historySchema, EMPTY_HISTORY);
   const getUnlimited = (game: string) =>
     read(gameKey(game, "unlimited"), unlimitedSchema, EMPTY_UNLIMITED);
+  const getPollVotes = (game: string) =>
+    read(gameKey(game, "polls"), pollVotesSchema, EMPTY_POLL_VOTES);
+
+  /** Remembers this device's pick in a one-tap poll. The first vote sticks, like on the server. */
+  function recordPollVote(game: string, pollId: string, option: string): PollVotes {
+    const votes = getPollVotes(game);
+    if (votes[pollId] !== undefined) return votes;
+    return write(gameKey(game, "polls"), { ...votes, [pollId]: option });
+  }
 
   /** Counts a daily puzzle as played, once per puzzle. */
   function recordDailyStart(game: string, puzzle: number): Stats {
@@ -392,11 +411,14 @@ export function createPlayerStorage(options: PlayerStorageOptions) {
 
   return {
     backend,
+    peekMeta,
     getMeta,
     updateMeta,
     getStats,
     getHistory,
     getUnlimited,
+    getPollVotes,
+    recordPollVote,
     recordDailyStart,
     saveDailyProgress,
     recordDailyCompletion,
