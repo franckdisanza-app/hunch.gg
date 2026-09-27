@@ -7,9 +7,10 @@ import { Sheet } from "./ui/Dialog";
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex flex-col items-center gap-1 text-center">
-      <dd className="text-2xl font-bold tabular">{value}</dd>
+    // dt must come before dd; flex-col-reverse puts the number on top visually.
+    <div className="flex flex-col-reverse items-center gap-1 text-center">
       <dt className="text-xs text-frame-muted">{label}</dt>
+      <dd className="text-2xl font-bold tabular">{value}</dd>
     </div>
   );
 }

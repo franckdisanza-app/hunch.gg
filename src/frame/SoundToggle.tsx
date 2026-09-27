@@ -43,7 +43,7 @@ export function SoundToggle({ className }: { className?: string }) {
       >
         <span
           className={cx(
-            "absolute top-1 size-4 rounded-full bg-frame-bg transition-transform duration-fast ease-out",
+            "absolute top-1 left-0 size-4 rounded-full bg-frame-bg transition-transform duration-fast ease-out",
             on ? "translate-x-5" : "translate-x-1",
           )}
         />
