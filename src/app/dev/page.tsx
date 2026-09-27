@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { strings } from "@/frame/strings";
 import { devRoutesEnabled } from "@/lib/dev-routes";
 import { DevGallery } from "./DevGallery";
 
-export const metadata: Metadata = {
-  title: "Component gallery",
-  robots: { index: false, follow: false },
-};
+export function generateMetadata(): Metadata {
+  return {
+    title: devRoutesEnabled() ? "Component gallery" : strings.notFound.title,
+    robots: { index: false, follow: false },
+  };
+}
 
 // Never in production unless ENABLE_DEV_ROUTES=1.
 export default function DevPage() {

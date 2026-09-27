@@ -5,6 +5,10 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   typedRoutes: true,
+  // The puzzle API reads daily content from disk at request time; ship those files with it.
+  outputFileTracingIncludes: {
+    "/api/puzzle/\\[game\\]/\\[n\\]": ["./content/*/daily/*.json"],
+  },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders(process.env) }];
   },
