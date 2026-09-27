@@ -1,0 +1,90 @@
+import type { ShareMethod } from "./analytics/events";
+import { SHARE_REF } from "./analytics/share-arrival";
+import { siteUrl } from "./site";
+
+// The share text format is shared by every game (the share image is each game's own):
+//   <Game> #<n> · <score>
+//   <emoji grid>
+//   <one teaser question>
+//   <link>?ref=share
+// No spoilers: a share never contains the day's answers. The score is always written in numbers.
+
+export interface ShareScore {
+  value: number;
+  /** When set, the score reads "value/max". */
+  max?: number;
+}
+
+export interface ShareInput {
+  gameName: string;
+  slug: string;
+  puzzle: number;
+  score: ShareScore;
+  /** One line of emoji, e.g. "🟩🟥🟩🟩🟨". */
+  grid: string;
+  /** One question that makes people curious without giving anything away. */
+  teaser: string;
+  /** The day's answers. Any line that contains one is dropped (and throws outside production). */
+  spoilers?: readonly string[];
+  /** Base URL; defaults to NEXT_PUBLIC_SITE_URL. */
+  baseUrl?: string;
+}
+
+export class SpoilerError extends Error {}
+
+export function formatShareScore(score: ShareScore): string {
+  return score.max === undefined ? `${score.value}` : `${score.value}/${score.max}`;
+}
+
+export function shareUrl(slug: string, baseUrl = siteUrl()): string {
+  const url = new URL(`/${slug}`, `${baseUrl}/`);
+  url.searchParams.set("ref", SHARE_REF);
+  return url.toString();
+}
+
+function containsSpoiler(line: string, spoilers: readonly string[]): string | undefined {
+  const haystack = line.toLocaleLowerCase();
+  return spoilers
+    .map((s) => s.trim())
+    .filter((s) => s.length >= 2)
+    .find((s) => haystack.includes(s.toLocaleLowerCase()));
+}
+
+export function buildShareText(input: ShareInput): string {
+  const header = `${input.gameName} #${input.puzzle} · ${formatShareScore(input.score)}`;
+  const link = shareUrl(input.slug, input.baseUrl);
+  const body = [input.grid, input.teaser].map((line) => line.trim()).filter(Boolean);
+
+  const spoilers = input.spoilers ?? [];
+  const safeBody = body.filter((line) => {
+    const hit = containsSpoiler(line, spoilers);
+    if (hit && process.env.NODE_ENV !== "production") {
+      throw new SpoilerError(`Share text would reveal an answer ("${hit}") in: ${line}`);
+    }
+    return !hit;
+  });
+
+  return [header, ...safeBody, link].join("\n");
+}
+
+export type ShareOutcome = ShareMethod | "cancelled" | "failed";
+
+/** Web Share API when available, otherwise the clipboard. */
+export async function shareText(text: string): Promise<ShareOutcome> {
+  const nav = typeof navigator === "undefined" ? undefined : navigator;
+  if (nav && typeof nav.share === "function" && (!nav.canShare || nav.canShare({ text }))) {
+    try {
+      await nav.share({ text });
+      return "native";
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") return "cancelled";
+      // Otherwise fall back to the clipboard.
+    }
+  }
+  try {
+    await nav?.clipboard.writeText(text);
+    return nav?.clipboard ? "clipboard" : "failed";
+  } catch {
+    return "failed";
+  }
+}
