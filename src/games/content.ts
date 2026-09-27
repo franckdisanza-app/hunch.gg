@@ -32,3 +32,26 @@ export function factSchema<Shape extends z.ZodRawShape>(shape: Shape) {
 }
 
 export type Fact = z.infer<ReturnType<typeof factSchema<Record<never, never>>>>;
+
+/** Anything carrying a source; what `pnpm content:validate` checks on every fact. */
+export type Sourced = Partial<Source> & { id?: string };
+
+export interface ContentFile<T> {
+  schema: z.ZodType<T>;
+  /** Every sourced fact in the file, so the validator can check sources, dates and licences. */
+  facts(data: T): readonly Sourced[];
+}
+
+/**
+ * What each game exports from src/games/<slug>/content.schema.ts as `contentSpec`.
+ * `daily` describes content/<slug>/daily/<nnnn>.json; `files` describes any other JSON files in
+ * content/<slug>/ (for example an unlimited-mode pool), keyed by path relative to that folder.
+ */
+export interface ContentSpec<Daily = unknown> {
+  daily: ContentFile<Daily>;
+  files?: Record<string, ContentFile<unknown>>;
+}
+
+export function defineContentSpec<Daily>(spec: ContentSpec<Daily>): ContentSpec<Daily> {
+  return spec;
+}
