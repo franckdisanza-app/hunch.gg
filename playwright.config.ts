@@ -18,7 +18,8 @@ export default defineConfig({
     trace: "retain-on-failure",
   },
   projects: [
-    { name: "mobile", use: { ...devices["Pixel 7"] } },
+    // API smoke tests are not viewport-specific; run them once.
+    { name: "mobile", use: { ...devices["Pixel 7"] }, testIgnore: /api\.spec\.ts$/ },
     { name: "desktop", use: { ...devices["Desktop Chrome"] } },
   ],
   webServer: {
