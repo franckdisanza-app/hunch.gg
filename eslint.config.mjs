@@ -33,6 +33,18 @@ export default defineConfig([
     // eslint-plugin-react cannot auto-detect the React version under ESLint 10.
     settings: { react: { version: "19.3" } },
     rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "zod",
+              message:
+                'Use `import * as z from "zod/mini"`. Classic Zod adds ~90 KB gzipped to any browser bundle that touches it.',
+            },
+          ],
+        },
+      ],
       "import/no-restricted-paths": [
         "error",
         {

@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { SiteChrome } from "@/frame/SiteChrome";
-import { strings } from "@/frame/strings";
+import { siteStrings } from "@/frame/site-strings";
 import { resolveAnalyticsConfig } from "@/lib/analytics/config";
 import { formatIsoDate } from "@/lib/format";
 
-const t = strings.privacy;
+const t = siteStrings.privacy;
 
 /** Bump when this page's content changes. */
 const UPDATED = "2026-09-27";

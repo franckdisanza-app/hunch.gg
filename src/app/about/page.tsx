@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { SiteChrome } from "@/frame/SiteChrome";
-import { strings } from "@/frame/strings";
+import { siteStrings } from "@/frame/site-strings";
 
-const t = strings.about;
+const t = siteStrings.about;
 
 export const metadata: Metadata = {
   title: t.title,

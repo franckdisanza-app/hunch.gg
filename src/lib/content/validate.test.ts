@@ -1,7 +1,7 @@
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { z } from "zod";
+import * as z from "zod/mini";
 import { defineContentSpec, factSchema, type ContentSpec } from "@/games/content";
 import { PLACEHOLDER_GAME, PLACEHOLDER_MASCOT, PLACEHOLDER_THEME } from "@/frame/placeholders";
 import type { GameDefinition } from "@/games/types";
@@ -26,9 +26,9 @@ const itemSchema = factSchema({ label: z.string() });
 const strictSpec = defineContentSpec({
   daily: {
     schema: z.strictObject({
-      puzzle: z.number().int(),
-      items: z.array(itemSchema).min(1),
-      sample: z.boolean().optional(),
+      puzzle: z.int(),
+      items: z.array(itemSchema).check(z.minLength(1)),
+      sample: z.optional(z.boolean()),
     }),
     facts: (p) => p.items,
   },

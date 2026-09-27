@@ -1,4 +1,4 @@
-import { z } from "zod";
+import * as z from "zod/mini";
 
 // Spreadsheet import: an RFC 4180 CSV parser and a per-game column mapping that turns rows into
 // JSON content. Used by scripts/csv-to-json.ts. No dependencies.
@@ -51,25 +51,25 @@ export function parseCsv(text: string): string[][] {
 
 const columnSchema = z.strictObject({
   /** Dot path in the output object, e.g. "price.amount". */
-  path: z.string().regex(/^[A-Za-z_][\w]*(\.[A-Za-z_][\w]*)*$/),
-  type: z.enum(["string", "number", "integer", "boolean", "date", "json"]).default("string"),
+  path: z.string().check(z.regex(/^[A-Za-z_][\w]*(\.[A-Za-z_][\w]*)*$/)),
+  type: z._default(z.enum(["string", "number", "integer", "boolean", "date", "json"]), "string"),
   /** Empty cells are omitted instead of rejected. */
-  optional: z.boolean().default(false),
+  optional: z._default(z.boolean(), false),
 });
 
 export const csvMappingSchema = z.strictObject({
   /** CSV header -> where and how to put the value. */
   columns: z.record(z.string(), columnSchema),
   /** CSV headers to skip (e.g. editor notes). Any other unmapped header is an error. */
-  ignore: z.array(z.string()).default([]),
+  ignore: z._default(z.array(z.string()), []),
   /**
    * "daily": group rows by `groupBy` (a mapped integer column) and write one
    * content/<game>/daily/<nnnn>.json per group as { <groupBy path>: n, <itemsKey>: rows }.
    * "list": write all rows as one JSON array.
    */
   output: z.enum(["daily", "list"]),
-  groupBy: z.string().optional(),
-  itemsKey: z.string().default("items"),
+  groupBy: z.optional(z.string()),
+  itemsKey: z._default(z.string(), "items"),
 });
 export type CsvMapping = z.infer<typeof csvMappingSchema>;
 

@@ -49,6 +49,16 @@ export function Dialog({
     }
   }, [open]);
 
+  // Sheets are often unmounted as soon as they close, which fires no close event: still hand
+  // focus back to whatever opened the dialog.
+  useEffect(
+    () => () => {
+      const target = returnFocusTo.current;
+      if (target?.isConnected) target.focus();
+    },
+    [],
+  );
+
   // Fires for every way of closing: Esc, the close button, a backdrop click, or `open` turning false.
   function handleNativeClose() {
     const target = returnFocusTo.current;

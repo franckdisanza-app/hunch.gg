@@ -1,4 +1,4 @@
-import { z } from "zod";
+import * as z from "zod/mini";
 import { itemIdSchema } from "@/games/content";
 import { slugSchema } from "@/games/registry.schema";
 import { requireCrowdGame, requireReleasedPuzzle } from "@/lib/crowd/games";
@@ -12,7 +12,7 @@ const CACHE = "public, s-maxage=60, stale-while-revalidate=300";
 
 const querySchema = z.object({
   game: slugSchema,
-  puzzle: z.coerce.number().int().min(1).max(100_000),
+  puzzle: z.pipe(z.coerce.number(), z.int().check(z.minimum(1), z.maximum(100_000))),
   item: itemIdSchema,
 });
 

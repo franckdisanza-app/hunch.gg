@@ -1,7 +1,6 @@
 "use client";
 
 import type { Route } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import type { GameDefinition } from "@/games/types";
 import { GameThemeStyle } from "./GameThemeStyle";
@@ -25,12 +24,14 @@ export function ShelfTile({ game, compact = false }: { game: GameDefinition; com
       <Mascot mascot={game.mascot} size={compact ? 48 : 88} />
       <span className="flex min-w-0 flex-col items-center gap-1">
         {game.theme?.wordmark ? (
-          <Image
+          // The wordmark is an SVG of the name in the game's display font.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
             src={game.theme.wordmark}
             alt={game.name}
             width={compact ? 120 : 180}
             height={compact ? 28 : 40}
-            unoptimized
+            decoding="async"
             className="h-auto max-w-full"
           />
         ) : (

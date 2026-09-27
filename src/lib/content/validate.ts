@@ -1,6 +1,6 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join, relative } from "node:path";
-import { z } from "zod";
+import * as z from "zod/mini";
 import { sourceSchema, type ContentFile, type ContentSpec } from "@/games/content";
 import { validateRegistry } from "@/games/registry.schema";
 import type { GameDefinition } from "@/games/types";
@@ -92,7 +92,7 @@ export async function validateContent(options: ValidateOptions): Promise<Validat
         if (mode === "production") error(`${rel}: ${path} is flagged sample: true`);
       }
 
-      const result = contentFile.schema.safeParse(parsed.data);
+      const result = z.safeParse(contentFile.schema, parsed.data);
       if (!result.success) return error(`${rel}: ${z.prettifyError(result.error)}`);
 
       const data = result.data as { puzzle?: unknown };

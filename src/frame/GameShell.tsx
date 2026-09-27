@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import type { GameDefinition, GameMode } from "@/games/types";
 import { track } from "@/lib/analytics/track";
 import { sound } from "@/lib/sound";
@@ -8,10 +8,9 @@ import { effectiveStreak, playerStorage } from "@/lib/storage";
 import { GameContext, type FrameSheet, type GameContextValue } from "./GameContext";
 import { GameThemeStyle } from "./GameThemeStyle";
 import { useHistory, useMeta, usePuzzleNumber, useStats, useUnlimited } from "./hooks";
-import { HowToPlaySheet, type HowToPlayContent } from "./HowToPlaySheet";
-import { SettingsSheet } from "./SettingsSheet";
+import type { HowToPlayContent } from "./HowToPlaySheet";
+import { LazyHowToPlaySheet, LazySettingsSheet, LazyStatsSheet, prefetchWhenIdle } from "./lazy";
 import { SkipLink } from "./SkipLink";
-import { StatsSheet } from "./StatsSheet";
 import { TopBar } from "./TopBar";
 import { cx } from "./ui/cx";
 
@@ -53,6 +52,8 @@ export function GameShell({
   // First visit: show how to play once, before anything else.
   const firstVisit = meta !== null && !meta.howToSeen.includes(slug) && !howToDismissed;
   const helpOpen = sheet === "help" || firstVisit;
+
+  useEffect(() => prefetchWhenIdle("howTo", "stats", "settings"), []);
 
   function closeHelp() {
     setSheet(null);
@@ -117,20 +118,20 @@ export function GameShell({
           {children}
         </main>
       </div>
-      <HowToPlaySheet open={helpOpen} onClose={closeHelp} content={howTo} />
-      <StatsSheet
-        open={sheet === "stats"}
-        onClose={() => setSheet(null)}
-        stats={stats}
-        unlimited={game.modes.includes("unlimited") ? unlimited : undefined}
-        todayPuzzle={puzzle}
-        formatScore={formatScore}
-      />
-      <SettingsSheet
-        open={sheet === "settings"}
-        onClose={() => setSheet(null)}
-        gameSettings={gameSettings}
-      />
+      {helpOpen && <LazyHowToPlaySheet open onClose={closeHelp} content={howTo} />}
+      {sheet === "stats" && (
+        <LazyStatsSheet
+          open
+          onClose={() => setSheet(null)}
+          stats={stats}
+          unlimited={game.modes.includes("unlimited") ? unlimited : undefined}
+          todayPuzzle={puzzle}
+          formatScore={formatScore}
+        />
+      )}
+      {sheet === "settings" && (
+        <LazySettingsSheet open onClose={() => setSheet(null)} gameSettings={gameSettings} />
+      )}
     </GameContext.Provider>
   );
 }

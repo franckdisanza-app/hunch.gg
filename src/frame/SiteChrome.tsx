@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState, type ReactNode } from "react";
-import { SettingsSheet } from "./SettingsSheet";
+import { useEffect, useState, type ReactNode } from "react";
+import { LazySettingsSheet, prefetchWhenIdle } from "./lazy";
 import { SkipLink } from "./SkipLink";
 import { strings } from "./strings";
 import { TopBar } from "./TopBar";
@@ -10,6 +10,7 @@ import { TopBar } from "./TopBar";
 /** The frame around every page that is not a game: shelf, about, privacy, errors. */
 export function SiteChrome({ children }: { children: ReactNode }) {
   const [settingsOpen, setSettingsOpen] = useState(false);
+  useEffect(() => prefetchWhenIdle("settings"), []);
   return (
     <div className="flex min-h-dvh flex-col">
       <SkipLink />
@@ -27,7 +28,7 @@ export function SiteChrome({ children }: { children: ReactNode }) {
           </Link>
         </nav>
       </footer>
-      <SettingsSheet open={settingsOpen} onClose={() => setSettingsOpen(false)} />
+      {settingsOpen && <LazySettingsSheet open onClose={() => setSettingsOpen(false)} />}
     </div>
   );
 }

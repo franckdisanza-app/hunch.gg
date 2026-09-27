@@ -1,4 +1,4 @@
-import { z } from "zod";
+import * as z from "zod/mini";
 import { deviceTimeZone, localIsoDate } from "./daily";
 import { META_KEY, STORAGE_PREFIX, gameKey } from "./storage-keys";
 
@@ -15,7 +15,8 @@ import { META_KEY, STORAGE_PREFIX, gameKey } from "./storage-keys";
 // Schemas
 
 const isoDate = z.iso.date();
-const count = z.number().int().nonnegative();
+const count = z.int().check(z.nonnegative());
+const puzzleNumber = z.int().check(z.positive());
 
 export const themePreferenceSchema = z.enum(["system", "light", "dark"]);
 export type ThemePreference = z.infer<typeof themePreferenceSchema>;
@@ -31,7 +32,7 @@ export const metaSchema = z.object({
   /** Games whose how-to sheet has been shown. */
   howToSeen: z.array(z.string()),
   /** return_day milestones already reported (1, 7, 30). */
-  returnMilestones: z.array(z.number().int()),
+  returnMilestones: z.array(z.int()),
 });
 export type Meta = z.infer<typeof metaSchema>;
 
@@ -40,9 +41,9 @@ export const statsSchema = z.object({
   completed: count,
   currentStreak: count,
   bestStreak: count,
-  lastCompleted: z.number().int().positive().nullable(),
+  lastCompleted: z.nullable(puzzleNumber),
   /** Last puzzle counted as played, so replays of the same puzzle do not add up. */
-  lastPlayed: z.number().int().positive().nullable(),
+  lastPlayed: z.nullable(puzzleNumber),
   /** Score -> number of completed puzzles with that score. */
   histogram: z.record(z.string(), count),
 });
@@ -51,14 +52,14 @@ export type Stats = z.infer<typeof statsSchema>;
 export const historyEntrySchema = z.object({
   /** Game-specific answers, in order. */
   answers: z.array(z.unknown()),
-  score: z.number().optional(),
+  score: z.optional(z.number()),
   startedAt: z.iso.datetime(),
-  finishedAt: z.iso.datetime().optional(),
+  finishedAt: z.optional(z.iso.datetime()),
 });
 export type HistoryEntry = z.infer<typeof historyEntrySchema>;
 
 /** Keyed by puzzle number. */
-export const historySchema = z.record(z.string().regex(/^\d+$/), historyEntrySchema);
+export const historySchema = z.record(z.string().check(z.regex(/^\d+$/)), historyEntrySchema);
 export type History = z.infer<typeof historySchema>;
 
 export const unlimitedSchema = z.object({
@@ -250,7 +251,7 @@ export function createPlayerStorage(options: PlayerStorageOptions) {
     for (const listener of listeners) listener();
   }
 
-  function read<T, F = T>(key: string, schema: z.ZodType<T>, fallback: F): T | F {
+  function read<T, F = T>(key: string, schema: z.ZodMiniType<T>, fallback: F): T | F {
     const raw = backend.getItem(key);
     if (raw === null) return fallback;
     const cached = cache.get(key);

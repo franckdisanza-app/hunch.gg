@@ -3,7 +3,7 @@
 import { useState, type ReactNode } from "react";
 import type { Source } from "@/games/content";
 import { formatIsoDate } from "@/lib/format";
-import { ReportDialog } from "./ReportDialog";
+import { LazyReportDialog } from "./lazy";
 import { strings } from "./strings";
 import { cx } from "./ui/cx";
 import { IconFlag } from "./ui/Icons";
@@ -65,12 +65,9 @@ export function RevealCard({
           {strings.reveal.report}
         </button>
       </footer>
-      <ReportDialog
-        open={reporting}
-        onClose={() => setReporting(false)}
-        game={game}
-        itemId={itemId}
-      />
+      {reporting && (
+        <LazyReportDialog open onClose={() => setReporting(false)} game={game} itemId={itemId} />
+      )}
     </article>
   );
 }

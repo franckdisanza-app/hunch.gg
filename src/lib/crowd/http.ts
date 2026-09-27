@@ -1,6 +1,6 @@
 import "server-only";
 import { createHash, timingSafeEqual } from "node:crypto";
-import type { z } from "zod";
+import * as z from "zod/mini";
 import { WRITE_RATE_LIMIT } from "./limits";
 import { CrowdStoreUnavailableError, getCrowdStore, type CrowdStore } from "./store";
 
@@ -59,8 +59,8 @@ export async function readJsonBody(request: Request, maxBytes: number): Promise<
   }
 }
 
-export function parseWith<T>(schema: z.ZodType<T>, data: unknown): T {
-  const result = schema.safeParse(data);
+export function parseWith<T>(schema: z.core.$ZodType<T>, data: unknown): T {
+  const result = z.safeParse(schema, data);
   if (!result.success) throw new HttpError(400, "Invalid payload.");
   return result.data;
 }
