@@ -9,6 +9,9 @@ export const en = {
     description:
       "Small daily browser games. Make a gut guess about something true, then see the sourced answer.",
   },
+  ui: {
+    close: "Close",
+  },
 } as const;
 
 type Widen<T> = { -readonly [K in keyof T]: T[K] extends string ? string : Widen<T[K]> };
