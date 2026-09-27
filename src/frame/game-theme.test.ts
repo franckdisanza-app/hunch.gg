@@ -11,5 +11,6 @@ describe("gameThemeCss", () => {
     expect(css).toContain("--game-paper:#FFFFFF;");
     expect(css).toContain(':root:not([data-theme="light"]) [data-game="demo"]{--game-bg:#1C1B19;');
     expect(css).toContain(':root[data-theme="dark"] [data-game="demo"]{--game-bg:#1C1B19;');
+    expect(css).toContain(':root [data-theme-scope="light"] [data-game="demo"]{--game-bg:#F4F1EA;');
   });
 });

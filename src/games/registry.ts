@@ -1,3 +1,4 @@
+import { devRoutesEnabled } from "@/lib/dev-routes";
 import type { GameDefinition, LiveGameDefinition } from "./types";
 
 // Every game's metadata, in shelf order. Metadata only: never import game components here, so the
@@ -118,6 +119,5 @@ export function shelfGames(): GameDefinition[] {
  * static pages).
  */
 export function isGameReachable(game: GameDefinition): boolean {
-  if (game.status === "live") return true;
-  return process.env.NODE_ENV !== "production" || process.env.ENABLE_DEV_ROUTES === "1";
+  return game.status === "live" || devRoutesEnabled();
 }

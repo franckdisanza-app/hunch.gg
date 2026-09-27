@@ -30,5 +30,8 @@ export function gameThemeCss(slug: string, theme: GameTheme): string {
     `${scope}{${light}}`,
     `@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) ${scope}{${dark}}}`,
     `:root[data-theme="dark"] ${scope}{${dark}}`,
+    // Forced scopes (the /dev gallery) come last, so they win at equal specificity.
+    `:root [data-theme-scope="dark"] ${scope}{${dark}}`,
+    `:root [data-theme-scope="light"] ${scope}{${light}}`,
   ].join("\n");
 }
