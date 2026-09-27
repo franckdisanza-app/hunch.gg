@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Placeholder mascot">
+  <path d="M60 12c26 0 46 18 46 46 0 30-20 50-46 50S14 88 14 58c0-28 20-46 46-46z" fill="#A1A1AA"/>
+  <circle cx="45" cy="54" r="7" fill="#27272A"/>
+  <circle cx="75" cy="54" r="7" fill="#27272A"/>
+  <path d="M46 78q14 10 28 0" fill="none" stroke="#27272A" stroke-width="5" stroke-linecap="round"/>
+</svg>
