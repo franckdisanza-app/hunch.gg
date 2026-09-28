@@ -7,6 +7,8 @@ import { siteUrl } from "./site";
 //   <emoji grid>
 //   <one teaser question>
 //   <link>?ref=share
+// An unlimited run shares one line and the link:
+//   <Game> <mode> · <result>        e.g. "Sticker Shock Endless · streak 14"
 // No spoilers: a share never contains the day's answers. The score is always written in numbers.
 
 export interface ShareScore {
@@ -15,7 +17,7 @@ export interface ShareScore {
   max?: number;
 }
 
-export interface ShareInput {
+export interface DailyShareInput {
   gameName: string;
   slug: string;
   puzzle: number;
@@ -29,6 +31,21 @@ export interface ShareInput {
   /** Base URL; defaults to NEXT_PUBLIC_SITE_URL. */
   baseUrl?: string;
 }
+
+/** An unlimited run: no puzzle number, no grid, no teaser. */
+export interface RunShareInput {
+  gameName: string;
+  slug: string;
+  run: {
+    /** The game's name for its unlimited mode, e.g. "Endless". */
+    mode: string;
+    /** The result, e.g. "streak 14". Always numbers. */
+    result: string;
+  };
+  baseUrl?: string;
+}
+
+export type ShareInput = DailyShareInput | RunShareInput;
 
 export class SpoilerError extends Error {}
 
@@ -51,6 +68,10 @@ function containsSpoiler(line: string, spoilers: readonly string[]): string | un
 }
 
 export function buildShareText(input: ShareInput): string {
+  if ("run" in input) {
+    const header = `${input.gameName} ${input.run.mode} · ${input.run.result}`;
+    return [header, shareUrl(input.slug, input.baseUrl)].join("\n");
+  }
   const header = `${input.gameName} #${input.puzzle} · ${formatShareScore(input.score)}`;
   const link = shareUrl(input.slug, input.baseUrl);
   const body = [input.grid, input.teaser].map((line) => line.trim()).filter(Boolean);

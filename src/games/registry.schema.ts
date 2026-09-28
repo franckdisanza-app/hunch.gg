@@ -49,6 +49,13 @@ export const mascotSchema = z.strictObject({
   ),
 });
 
+const creditSchema = z.strictObject({
+  what: z.string().check(z.minLength(1), z.maxLength(80)),
+  work: z.string().check(z.minLength(1), z.maxLength(160)),
+  licence: z.string().check(z.minLength(1), z.maxLength(80)),
+  url: z.url({ protocol: /^https$/ }),
+});
+
 const base = {
   slug: slugSchema,
   name: z.string().check(z.minLength(1), z.maxLength(40)),
@@ -56,6 +63,7 @@ const base = {
   modes: z.array(z.enum(GAME_MODES)).check(z.minLength(1)),
   engine: z.enum(GAME_ENGINES),
   usesCrowdApi: z.array(z.enum(CROWD_FEATURES)),
+  credits: z.optional(z.array(creditSchema)),
 };
 
 export const gameDefinitionSchema = z.discriminatedUnion("status", [

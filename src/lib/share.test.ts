@@ -20,6 +20,19 @@ describe("buildShareText", () => {
     ]);
   });
 
+  it("shares an unlimited run as one line and the link", () => {
+    const text = buildShareText({
+      gameName: "Demo Game",
+      slug: "demo-game",
+      run: { mode: "Endless", result: "streak 14" },
+      baseUrl: "https://example.test",
+    });
+    expect(text.split("\n")).toEqual([
+      "Demo Game Endless · streak 14",
+      "https://example.test/demo-game?ref=share",
+    ]);
+  });
+
   it("always writes the score in numbers", () => {
     const text = buildShareText({ ...input, score: { value: 812 } });
     expect(text.split("\n")[0]).toBe("Demo Game #12 · 812");

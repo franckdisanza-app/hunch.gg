@@ -21,6 +21,10 @@ export const en = {
     stats: "Statistics",
     settings: "Settings",
   },
+  game: {
+    newPuzzle: "A new puzzle is out.",
+    reload: "Reload to play it",
+  },
   howTo: {
     title: "How to play",
     example: "Example",
@@ -54,11 +58,13 @@ export const en = {
     streak: "Streak",
     nextPuzzle: "Next puzzle in",
     playUnlimited: "Play unlimited",
+    playMode: (mode: string) => `Play ${mode}`,
     moreFrom: "More from Plimp",
   },
   reveal: {
     turnsOut: "Turns out…",
     source: "Source",
+    sources: "Sources",
     checkedOn: "checked",
     report: "Report a mistake",
   },

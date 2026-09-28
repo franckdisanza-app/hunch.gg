@@ -38,6 +38,13 @@ describe("registry", () => {
     expect(gameDefinitionSchema.safeParse({ ...PLACEHOLDER_GAME, theme }).success).toBe(false);
   });
 
+  it("accepts credits with https links only", () => {
+    const credit = { what: "Fake art", work: "Fake Set by Nobody", licence: "Fake licence" };
+    const withCredit = (url: string) => ({ ...PLACEHOLDER_GAME, credits: [{ ...credit, url }] });
+    expect(gameDefinitionSchema.safeParse(withCredit("https://example.test/")).success).toBe(true);
+    expect(gameDefinitionSchema.safeParse(withCredit("http://example.test/")).success).toBe(false);
+  });
+
   it("makes unreleased games reachable only in development or with ENABLE_DEV_ROUTES", () => {
     const hidden = PLACEHOLDER_GAME;
     vi.stubEnv("NODE_ENV", "production");

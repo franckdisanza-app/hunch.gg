@@ -99,6 +99,35 @@ describe("GameShell", () => {
     expect(container.querySelector('[data-game="placeholder"]')).not.toBeNull();
   });
 
+  it("keeps the puzzle number when midnight passes and offers a reload", () => {
+    vi.useFakeTimers({
+      toFake: ["setTimeout", "clearTimeout", "setInterval", "clearInterval", "Date"],
+    });
+    try {
+      // 23:59:00 local time; the next puzzle unlocks a minute later.
+      const now = new Date();
+      now.setHours(23, 59, 0, 0);
+      vi.setSystemTime(now);
+      function PuzzleProbe() {
+        const { puzzle } = useGame();
+        return <p>puzzle number {puzzle}</p>;
+      }
+      render(
+        <GameShell game={PLACEHOLDER_GAME} mode="daily" howTo={howTo}>
+          <PuzzleProbe />
+        </GameShell>,
+      );
+      const before = screen.getByText(/puzzle number/).textContent;
+      expect(screen.queryByText("A new puzzle is out.")).toBeNull();
+      act(() => void vi.advanceTimersByTime(2 * 60_000));
+      expect(screen.getByText(/puzzle number/).textContent).toBe(before);
+      expect(screen.getByRole("status", { name: "" })).toHaveTextContent("A new puzzle is out.");
+      expect(screen.getByRole("button", { name: "Reload to play it" })).toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("refuses useGame outside a shell", () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
     expect(() => render(<Probe />)).toThrow(/GameShell/);
@@ -145,6 +174,36 @@ describe("RevealCard", () => {
   });
 });
 
+describe("RevealCard with several sources", () => {
+  it("lists every source with its date", () => {
+    render(
+      <ToastProvider>
+        <RevealCard
+          game="placeholder"
+          itemId="item-2"
+          statement="the fake gadget costs more."
+          source={[
+            {
+              sourceTitle: "Fake Source One",
+              sourceUrl: "https://example.test/one",
+              checkedOn: "2026-01-15",
+            },
+            {
+              sourceTitle: "Fake Source Two",
+              sourceUrl: "https://example.test/two",
+              checkedOn: "2026-02-20",
+            },
+          ]}
+        />
+      </ToastProvider>,
+    );
+    expect(screen.getByText(/^Sources/)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Fake Source One" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Fake Source Two" })).toBeInTheDocument();
+    expect(document.querySelectorAll("time")).toHaveLength(2);
+  });
+});
+
 describe("Mascot", () => {
   it("falls back to the neutral placeholder", () => {
     render(<Mascot pose="celebrate" label="Mascot" />);
@@ -177,6 +236,39 @@ describe("ResultsScreen", () => {
     expect(screen.getByText("4/5")).toBeInTheDocument();
     expect(screen.queryByText("More from Plimp")).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Share/ })).toBeInTheDocument();
+  });
+});
+
+describe("ResultsScreen with a game-styled summary", () => {
+  it("leaves the stats to the summary and shows extras and the mode label", () => {
+    render(
+      <ToastProvider>
+        <ResultsScreen
+          game="placeholder"
+          score="7/10"
+          streak={3}
+          summaryShowsStats
+          summary={<p>Fake receipt</p>}
+          unlimitedHref="/"
+          unlimitedLabel="Endless"
+          extras={<p>Fake poll</p>}
+          getShare={() => ({
+            gameName: "Placeholder Game",
+            slug: "placeholder",
+            puzzle: 1,
+            score: { value: 7, max: 10 },
+            grid: "🟩",
+            teaser: "Fake teaser?",
+          })}
+        />
+      </ToastProvider>,
+    );
+    expect(screen.queryByText("7/10")).not.toBeInTheDocument();
+    expect(screen.queryByRole("timer")).not.toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Your result" })).toBeInTheDocument();
+    expect(screen.getByText("Fake receipt")).toBeInTheDocument();
+    expect(screen.getByText("Fake poll")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Play Endless" })).toBeInTheDocument();
   });
 });
 
