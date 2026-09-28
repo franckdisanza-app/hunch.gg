@@ -82,10 +82,8 @@ export default async function OpengraphImage() {
           </div>
           <div style={{ ...line, fontWeight: 700 }}>{strings.receipt.og}</div>
         </div>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={zigzag(receiptWidth, paper)} width={receiptWidth} height={14} alt="" />
       </div>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={`data:image/svg+xml;base64,${mascot.toString("base64")}`}
         width={340}

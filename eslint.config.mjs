@@ -72,6 +72,12 @@ export default defineConfig([
       ],
     },
   },
+  {
+    // Metadata images render through next/og, where <img> is the only option. Next's own
+    // exemption matches "/opengraph-image" with a forward slash, so it misses on Windows.
+    files: ["src/app/**/{opengraph-image,twitter-image,icon}.tsx"],
+    rules: { "@next/next/no-img-element": "off" },
+  },
   globalIgnores([
     ".next/**",
     "out/**",
