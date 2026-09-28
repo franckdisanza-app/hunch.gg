@@ -48,7 +48,7 @@ not use) into the Vercel project. Then run step A.2 against that project to push
 
 ## 2. Vercel: create the project from GitHub
 
-1. Vercel dashboard → **Add New → Project** → import `franckdisanza-app/hunch.gg` (allow the
+1. Vercel dashboard → **Add New → Project** → import `franckdisanza-app/plimp` (allow the
    Vercel GitHub app to access the repository if asked).
 2. Vercel detects Next.js and pnpm (from `pnpm-lock.yaml`). Keep the defaults: the build command
    runs `pnpm build`, which validates content first. Node.js 24 comes from `engines` in
