@@ -9,7 +9,7 @@ export const games: readonly GameDefinition[] = [
   {
     slug: "sticker-shock",
     name: "Sticker Shock",
-    tagline: "Which costs more: item A in one country or item B in another?",
+    tagline: "Which costs more? Every price is real, with receipts.",
     status: "hidden",
     modes: ["daily", "unlimited"],
     engine: "choice",
