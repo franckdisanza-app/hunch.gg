@@ -7,7 +7,8 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { gzipSync } from "node:zlib";
 
-const BUDGET_KB = 150;
+// Agreed budget: the framework alone (Next 16.3 + React 19.3) ships ~136 KB, see docs/ARCHITECTURE.md.
+const BUDGET_KB = 185;
 const ROUTES = [
   { route: "/", html: "index.html" },
   { route: "/dev/game-shell", html: "dev/game-shell.html" },
