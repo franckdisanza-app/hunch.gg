@@ -131,7 +131,12 @@ describe("RevealCard", () => {
     );
     expect(screen.getByText(/2026/)).toHaveAttribute("datetime", "2026-01-15");
     await user.click(screen.getByRole("button", { name: /Report a mistake/ }));
-    const dialog = screen.getByRole("dialog", { name: "Report a mistake" });
+    // The report dialog is lazy-loaded (src/frame/lazy.ts), so it appears asynchronously.
+    const dialog = await screen.findByRole(
+      "dialog",
+      { name: "Report a mistake" },
+      { timeout: 5000 },
+    );
     await user.type(within(dialog).getByLabelText("Your message"), "The date looks off.");
     vi.mocked(fetch).mockResolvedValueOnce(new Response(null, { status: 204 }));
     await user.click(within(dialog).getByRole("button", { name: "Send report" }));
