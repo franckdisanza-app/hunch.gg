@@ -49,7 +49,7 @@ try {
           join(values.out ?? join(contentDir, "daily"), puzzleFileName(n)),
           file,
         ])
-      : [[values.out ?? join(contentDir, "items.json"), objects]];
+      : [[values.out ?? join(contentDir, mapping.file ?? "items.json"), objects]];
 
   for (const [file, data] of writes) {
     if (values["dry-run"]) {

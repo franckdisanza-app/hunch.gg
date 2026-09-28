@@ -20,6 +20,8 @@
     "content:validate": "tsx scripts/validate-content.ts",
     "new-game": "tsx scripts/new-game.ts",
     "csv-to-json": "tsx scripts/csv-to-json.ts",
+    "sticker-shock:build": "tsx scripts/sticker-shock/build.ts",
+    "sticker-shock:sample": "tsx scripts/sticker-shock/make-sample.ts",
     "size": "tsx scripts/check-bundle-size.ts",
     "db:start": "supabase start",
     "db:reset": "supabase db reset",

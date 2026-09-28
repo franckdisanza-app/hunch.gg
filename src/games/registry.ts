@@ -11,6 +11,8 @@ export const games: readonly GameDefinition[] = [
     name: "Sticker Shock",
     tagline: "Which costs more? Every price is real, with receipts.",
     status: "hidden",
+    // PLACEHOLDER: confirm the real launch date (the date of puzzle #1) before going to production.
+    launchDate: "2026-09-28",
     modes: ["daily", "unlimited"],
     engine: "choice",
     usesCrowdApi: ["polls"],

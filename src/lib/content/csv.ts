@@ -68,6 +68,8 @@ export const csvMappingSchema = z.strictObject({
    * "list": write all rows as one JSON array.
    */
   output: z.enum(["daily", "list"]),
+  /** "list" output: file name in content/<game>/ (default items.json). */
+  file: z.optional(z.string().check(z.regex(/^[a-z0-9][a-z0-9-]*\.json$/))),
   groupBy: z.optional(z.string()),
   itemsKey: z._default(z.string(), "items"),
 });
