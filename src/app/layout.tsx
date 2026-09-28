@@ -1,0 +1,54 @@
+import type { Metadata, Viewport } from "next";
+import { Inter } from "next/font/google";
+import { AnalyticsScript } from "@/frame/AnalyticsScript";
+import { FrameProviders } from "@/frame/FrameProviders";
+import { strings } from "@/frame/strings";
+import { THEME_BOOTSTRAP_SCRIPT } from "@/frame/theme-bootstrap";
+import { resolveAnalyticsConfig } from "@/lib/analytics/config";
+import { siteUrl } from "@/lib/site";
+import "./globals.css";
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
+
+// Resolved at build time. Analytics only loads in production and only when configured.
+const analytics = resolveAnalyticsConfig(process.env);
+if (analytics.warning) console.warn(`[analytics] ${analytics.warning}`);
+
+export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl()),
+  title: { default: strings.site.name, template: `%s · ${strings.site.name}` },
+  description: strings.site.description,
+  applicationName: strings.site.name,
+  openGraph: {
+    type: "website",
+    siteName: strings.site.name,
+    title: strings.site.name,
+    description: strings.site.description,
+  },
+  twitter: { card: "summary_large_image" },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  colorScheme: "light dark",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#FFFFFF" },
+    { media: "(prefers-color-scheme: dark)", color: "#0E0E10" },
+  ],
+};
+
+export default function RootLayout({ children }: LayoutProps<"/">) {
+  return (
+    // data-theme is set by the bootstrap script before hydration, hence suppressHydrationWarning.
+    <html lang="en" className={inter.variable} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP_SCRIPT }} />
+      </head>
+      <body className="antialiased">
+        <FrameProviders analyticsProvider={analytics.provider}>{children}</FrameProviders>
+        {analytics.script && <AnalyticsScript script={analytics.script} />}
+      </body>
+    </html>
+  );
+}

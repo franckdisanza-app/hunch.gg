@@ -1,0 +1,66 @@
+/* Native <dialog> in the top layer. Sheets rise from the bottom on phones and sit centred on wider
+   screens; dialogs are always centred. Motion uses the frame tokens, which drop to 0 ms under
+   prefers-reduced-motion. */
+
+.dialog {
+  color: var(--frame-ink);
+  background: var(--frame-bg);
+  border: 1px solid var(--frame-line);
+  border-radius: var(--frame-radius-sheet);
+  padding: 0;
+  width: min(100vw - 32px, 28rem);
+  max-height: min(100dvh - 32px, 44rem);
+  margin: auto;
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity var(--frame-motion-base) var(--frame-ease-out),
+    transform var(--frame-motion-base) var(--frame-ease-out),
+    overlay var(--frame-motion-base) allow-discrete,
+    display var(--frame-motion-base) allow-discrete;
+}
+
+.dialog:not([open]) {
+  opacity: 0;
+  transform: scale(0.97);
+}
+
+@starting-style {
+  .dialog[open] {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}
+
+.dialog::backdrop {
+  background: rgb(0 0 0 / 0.45);
+  transition: background-color var(--frame-motion-base) var(--frame-ease-out);
+}
+
+@media (max-width: 639px) {
+  .sheet {
+    width: 100vw;
+    max-width: 100vw;
+    max-height: 90dvh;
+    margin: auto 0 0;
+    border-width: 1px 0 0;
+    border-radius: var(--frame-radius-sheet) var(--frame-radius-sheet) 0 0;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .sheet:not([open]) {
+    transform: translateY(100%);
+  }
+
+  @starting-style {
+    .sheet[open] {
+      transform: translateY(100%);
+    }
+  }
+}
+
+.body {
+  overflow-y: auto;
+  max-height: inherit;
+  padding: var(--space-5);
+}
