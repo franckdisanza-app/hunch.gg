@@ -1,0 +1,71 @@
+{
+  "output": "list",
+  "file": "prices.json",
+  "columns": {
+    "id": {
+      "path": "id"
+    },
+    "itemId": {
+      "path": "itemId"
+    },
+    "country": {
+      "path": "country"
+    },
+    "currency": {
+      "path": "currency"
+    },
+    "priceLocal": {
+      "path": "priceLocal",
+      "type": "number"
+    },
+    "packQuantity": {
+      "path": "packQuantity",
+      "type": "number"
+    },
+    "packUnit": {
+      "path": "packUnit"
+    },
+    "fxToUsd": {
+      "path": "fxToUsd",
+      "type": "number",
+      "optional": true
+    },
+    "fxDate": {
+      "path": "fxDate",
+      "type": "date"
+    },
+    "store": {
+      "path": "store"
+    },
+    "sourceUrl": {
+      "path": "sourceUrl"
+    },
+    "proofImage": {
+      "path": "proofImage"
+    },
+    "capturedOn": {
+      "path": "capturedOn",
+      "type": "date"
+    },
+    "licence": {
+      "path": "licence"
+    },
+    "regular": {
+      "path": "regular",
+      "type": "boolean"
+    },
+    "taxIncluded": {
+      "path": "taxIncluded",
+      "type": "boolean"
+    },
+    "notes": {
+      "path": "notes",
+      "optional": true
+    },
+    "sample": {
+      "path": "sample",
+      "type": "boolean",
+      "optional": true
+    }
+  }
+}

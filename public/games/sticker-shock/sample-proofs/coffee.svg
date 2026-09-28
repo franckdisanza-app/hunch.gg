@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="480" viewBox="0 0 640 480" role="img" aria-label="Sample placeholder proof, not a real shelf">
+<rect width="640" height="480" fill="#EDEAE3"/>
+<rect x="40" y="60" width="560" height="360" fill="#FAF7F0" stroke="#1B1B1B" stroke-width="4"/>
+<rect x="40" y="60" width="560" height="44" fill="#E4002B"/>
+<text x="60" y="90" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#FFFFFF">SAMPLE MART (FAKE STORE)</text>
+<text x="60" y="170" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#1B1B1B">250 G GROUND COFFEE</text>
+<text x="60" y="220" font-family="Arial, sans-serif" font-size="22" fill="#1B1B1B">Placeholder image for development.</text>
+<text x="60" y="254" font-family="Arial, sans-serif" font-size="22" fill="#1B1B1B">Not a real price, not a real shelf.</text>
+<g transform="translate(320 300) rotate(-18)">
+<text text-anchor="middle" font-family="Arial, sans-serif" font-size="120" font-weight="900" fill="#E4002B" fill-opacity="0.35" stroke="#1B1B1B" stroke-opacity="0.35" stroke-width="2">SAMPLE</text>
+</g>
+</svg>

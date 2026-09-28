@@ -1,0 +1,198 @@
+[
+  {
+    "id": "check-price",
+    "question": "Do you check the price before it goes in the basket?",
+    "options": [
+      {
+        "id": "always",
+        "label": "Always"
+      },
+      {
+        "id": "rarely",
+        "label": "Rarely"
+      }
+    ]
+  },
+  {
+    "id": "cross-town",
+    "question": "Would you cross town to save 10% on a big shop?",
+    "options": [
+      {
+        "id": "yes",
+        "label": "Yes"
+      },
+      {
+        "id": "no",
+        "label": "No"
+      }
+    ]
+  },
+  {
+    "id": "own-brand",
+    "question": "Supermarket own brand or the name brand?",
+    "options": [
+      {
+        "id": "own",
+        "label": "Own brand"
+      },
+      {
+        "id": "name",
+        "label": "Name brand"
+      }
+    ]
+  },
+  {
+    "id": "shopping-list",
+    "question": "Do you shop with a list?",
+    "options": [
+      {
+        "id": "yes",
+        "label": "Yes"
+      },
+      {
+        "id": "no",
+        "label": "No"
+      }
+    ]
+  },
+  {
+    "id": "shop-online",
+    "question": "Where do you buy groceries more often?",
+    "options": [
+      {
+        "id": "shop",
+        "label": "In a shop"
+      },
+      {
+        "id": "online",
+        "label": "Online"
+      }
+    ]
+  },
+  {
+    "id": "local-food",
+    "question": "Would you pay more for food grown in your own country?",
+    "options": [
+      {
+        "id": "yes",
+        "label": "Yes"
+      },
+      {
+        "id": "no",
+        "label": "No"
+      }
+    ]
+  },
+  {
+    "id": "abroad",
+    "question": "On holiday, do you visit supermarkets?",
+    "options": [
+      {
+        "id": "love-it",
+        "label": "Love it"
+      },
+      {
+        "id": "skip-it",
+        "label": "Skip it"
+      }
+    ]
+  },
+  {
+    "id": "loose-fruit",
+    "question": "Loose fruit or pre-packed?",
+    "options": [
+      {
+        "id": "loose",
+        "label": "Loose"
+      },
+      {
+        "id": "packed",
+        "label": "Pre-packed"
+      }
+    ]
+  },
+  {
+    "id": "per-kilo",
+    "question": "Do you compare the price per kilo?",
+    "options": [
+      {
+        "id": "yes",
+        "label": "Yes"
+      },
+      {
+        "id": "no",
+        "label": "No"
+      }
+    ]
+  },
+  {
+    "id": "weekly-shop",
+    "question": "One big weekly shop or a little every day?",
+    "options": [
+      {
+        "id": "weekly",
+        "label": "Weekly"
+      },
+      {
+        "id": "daily",
+        "label": "Every day"
+      }
+    ]
+  },
+  {
+    "id": "organic-eggs",
+    "question": "Would you pay more for organic eggs?",
+    "options": [
+      {
+        "id": "yes",
+        "label": "Yes"
+      },
+      {
+        "id": "no",
+        "label": "No"
+      }
+    ]
+  },
+  {
+    "id": "on-offer",
+    "question": "Do you buy things because they are on offer?",
+    "options": [
+      {
+        "id": "often",
+        "label": "Often"
+      },
+      {
+        "id": "rarely",
+        "label": "Rarely"
+      }
+    ]
+  },
+  {
+    "id": "receipt",
+    "question": "Do you check your receipt?",
+    "options": [
+      {
+        "id": "yes",
+        "label": "Yes"
+      },
+      {
+        "id": "no",
+        "label": "No"
+      }
+    ]
+  },
+  {
+    "id": "self-checkout",
+    "question": "Self-checkout or a cashier?",
+    "options": [
+      {
+        "id": "self",
+        "label": "Self-checkout"
+      },
+      {
+        "id": "cashier",
+        "label": "Cashier"
+      }
+    ]
+  }
+]
