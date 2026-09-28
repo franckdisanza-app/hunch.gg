@@ -1,0 +1,545 @@
+/*
+ * Sticker Shock's world: a supermarket flyer come to life. Flat colour, no gradients (the masks
+ * below only cut paper edges). Fonts come from next/font variables set on the game route:
+ * --game-font-display (Anton), --ss-font-marker (Permanent Marker), --ss-font-mono (Plex Mono).
+ * Paper objects keep paper colours at night. All motion stops under prefers-reduced-motion.
+ */
+
+.world {
+  --ss-paper: var(--game-paper, #faf7f0);
+  --ss-paper-ink: var(--game-paper-ink, #1b1b1b);
+  --ss-red: var(--game-accent-1);
+  --ss-yellow: var(--game-accent-2);
+  --ss-orange: var(--game-accent-3);
+  --ss-shadow: 4px 4px 0 var(--game-shadow, #1b1b1b);
+  --ss-texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .1 0 0 0 0 .1 0 0 0 0 .1 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.display {
+  font-family: var(--game-font-display), Impact, "Arial Narrow", sans-serif;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  line-height: 1;
+}
+
+.marker {
+  font-family: var(--ss-font-marker), "Comic Sans MS", cursive;
+}
+
+.mono {
+  font-family: var(--ss-font-mono), ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+
+/* ------------------------------------------------------------------------------------------- */
+/* The hand-lettered sign */
+
+.sign {
+  position: relative;
+  display: inline-block;
+  padding: 10px 22px 12px;
+  background: var(--ss-yellow);
+  color: var(--ss-paper-ink);
+  border: 3px solid var(--ss-paper-ink);
+  border-radius: 4px 10px 6px 12px / 10px 4px 12px 6px;
+  box-shadow: var(--ss-shadow);
+  transform: rotate(-2deg);
+}
+
+/* Two strips of tape. */
+.sign::before,
+.sign::after {
+  content: "";
+  position: absolute;
+  top: -10px;
+  width: 44px;
+  height: 18px;
+  background: var(--ss-paper);
+  opacity: 0.85;
+  border: 1px solid color-mix(in srgb, var(--ss-paper-ink) 25%, transparent);
+}
+
+.sign::before {
+  left: 8px;
+  transform: rotate(-8deg);
+}
+
+.sign::after {
+  right: 8px;
+  transform: rotate(7deg);
+}
+
+/* ------------------------------------------------------------------------------------------- */
+/* Shelf-edge label cards */
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 44px;
+  overflow: visible;
+  text-align: left;
+  background: var(--ss-paper);
+  color: var(--ss-paper-ink);
+  border: 3px solid var(--ss-paper-ink);
+  border-radius: 6px;
+  box-shadow: var(--ss-shadow);
+  cursor: pointer;
+  transition:
+    transform var(--frame-motion-fast) var(--frame-ease-out),
+    box-shadow var(--frame-motion-fast) var(--frame-ease-out);
+}
+
+.card:not(:disabled):hover {
+  transform: translate(-1px, -2px) rotate(-0.4deg);
+  box-shadow: 6px 7px 0 var(--game-shadow, #1b1b1b);
+}
+
+.card:not(:disabled):active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--game-shadow, #1b1b1b);
+}
+
+.card:disabled {
+  cursor: default;
+}
+
+.card:focus-visible {
+  outline: 4px solid var(--focus);
+  outline-offset: 4px;
+}
+
+.card[data-status="pending"] {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--game-shadow, #1b1b1b);
+}
+
+.card[data-status="other"],
+.card[data-status="wrong"] {
+  /* The answer stays readable; the loser just steps back a little. */
+  box-shadow: 2px 2px 0 var(--game-shadow, #1b1b1b);
+}
+
+.strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 4px 10px;
+  background: var(--ss-red);
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 0.8125rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: 3px 3px 0 0;
+}
+
+.keyHint {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 4px;
+  border: 2px solid #ffffff;
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
+
+/* Key hints are for keyboards: hide them on touch-only devices. */
+@media (hover: none) {
+  .keyHint {
+    display: none;
+  }
+}
+
+.cardBody {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 10px 10px 12px;
+}
+
+.cardTitle {
+  font-size: clamp(1.5rem, 6.4vw, 2rem);
+  overflow-wrap: anywhere;
+}
+
+/* Side by side, a card is narrow: icon and sticker on top, the title across the bottom. */
+@media (min-width: 640px) {
+  .cardBody {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "icon burst"
+      "title title";
+    flex: 1;
+    align-content: start;
+  }
+
+  .cardBody > svg {
+    grid-area: icon;
+  }
+
+  .cardTitle {
+    grid-area: title;
+    font-size: 1.75rem;
+  }
+
+  .burst {
+    grid-area: burst;
+  }
+}
+
+/* The price sticker: "?" on the front, the price on the back. */
+.burst {
+  position: relative;
+  width: 92px;
+  height: 92px;
+  perspective: 400px;
+}
+
+.burstInner {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transition: transform 450ms cubic-bezier(0.3, 1.4, 0.5, 1);
+}
+
+.flipped .burstInner {
+  transform: rotateY(180deg);
+}
+
+.face {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  backface-visibility: hidden;
+}
+
+.face > svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.back {
+  transform: rotateY(180deg);
+}
+
+.faceText {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+  color: var(--ss-paper-ink);
+}
+
+/* Right or wrong: a rubber stamp with a symbol and a word, never colour alone. */
+.stamp {
+  position: absolute;
+  bottom: -16px;
+  left: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 10px;
+  border: 3px solid var(--ss-paper-ink);
+  border-radius: 6px;
+  font-size: 1.25rem;
+  transform: rotate(-6deg);
+  animation: stamp 260ms cubic-bezier(0.2, 1.6, 0.4, 1);
+  pointer-events: none;
+}
+
+.stampRight {
+  background: var(--ss-yellow);
+  color: var(--ss-paper-ink);
+}
+
+.stampWrong {
+  background: var(--ss-red);
+  color: #ffffff;
+}
+
+.pricier {
+  position: absolute;
+  right: -6px;
+  bottom: -12px;
+  padding: 1px 8px;
+  background: var(--ss-paper-ink);
+  color: var(--ss-paper);
+  font-weight: 800;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: 4px;
+  transform: rotate(3deg);
+}
+
+@keyframes stamp {
+  from {
+    opacity: 0;
+    transform: rotate(-14deg) scale(1.8);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(-6deg) scale(1);
+  }
+}
+
+/* "or", on a dashed cut-here line. */
+.cutLine {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--game-ink);
+}
+
+.cutLine::before,
+.cutLine::after {
+  content: "";
+  flex: 1;
+  border-top: 2px dashed currentColor;
+}
+
+/* Side by side: a vertical cut line. */
+@media (min-width: 640px) {
+  .cutLine {
+    flex-direction: column;
+  }
+
+  .cutLine::before,
+  .cutLine::after {
+    border-top: 0;
+    border-left: 2px dashed currentColor;
+    min-height: 24px;
+  }
+
+  .cutLine > svg {
+    display: none;
+  }
+}
+
+.or {
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--game-ink);
+  color: var(--game-bg);
+  font-size: 1.125rem;
+}
+
+/* The reveal: a coupon with a dashed cut-out border. */
+.coupon {
+  border: 3px dashed var(--game-ink);
+  border-radius: 10px;
+  background: var(--game-bg);
+  color: var(--game-ink);
+}
+
+/* ------------------------------------------------------------------------------------------- */
+/* Buttons */
+
+.bigButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 0 22px;
+  background: var(--ss-red);
+  color: #ffffff;
+  border: 3px solid var(--ss-paper-ink);
+  border-radius: 8px;
+  box-shadow: var(--ss-shadow);
+  font-size: 1.375rem;
+  transition: transform var(--frame-motion-fast) var(--frame-ease-out);
+}
+
+.bigButton:hover {
+  transform: translate(-1px, -1px);
+}
+
+.bigButton:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--game-shadow, #1b1b1b);
+}
+
+.bigButton:focus-visible {
+  outline: 4px solid var(--focus);
+  outline-offset: 3px;
+}
+
+/* ------------------------------------------------------------------------------------------- */
+/* Thermal receipt paper with torn zigzag edges */
+
+.receipt {
+  --tooth: 12px;
+  --tooth-depth: 6px;
+  position: relative;
+  background-color: var(--ss-paper);
+  background-image: var(--ss-texture);
+  color: var(--ss-paper-ink);
+  padding: calc(var(--tooth-depth) + 14px) 16px calc(var(--tooth-depth) + 14px);
+  filter: drop-shadow(0 2px 0 color-mix(in srgb, var(--ss-paper-ink) 35%, transparent));
+}
+
+.receiptPaper {
+  background-color: var(--ss-paper);
+  background-image: var(--ss-texture);
+  mask:
+    conic-gradient(from 135deg at top, #0000, #000 1deg 89deg, #0000 90deg) top / var(--tooth)
+      var(--tooth-depth) repeat-x,
+    conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / var(--tooth)
+      var(--tooth-depth) repeat-x,
+    linear-gradient(#000 0 0) center / 100% calc(100% - 2 * var(--tooth-depth) + 1px) no-repeat;
+}
+
+.receiptLines {
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+.receiptLine {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: start;
+  padding: 2px 0;
+}
+
+.receiptMark {
+  font-weight: 700;
+}
+
+.dashedRule {
+  border: 0;
+  border-top: 2px dashed currentColor;
+  margin: 10px 0;
+}
+
+/* The printer: a slot that feeds paper. */
+.printer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.slot {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 22px;
+  background: var(--game-ink);
+  border-radius: 8px;
+  box-shadow: inset 0 -6px 0 color-mix(in srgb, var(--game-bg) 20%, transparent);
+}
+
+.slot::after {
+  content: "";
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  top: 9px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--game-bg);
+}
+
+.feed {
+  width: 88%;
+  margin-top: -6px;
+}
+
+.newLine {
+  animation: feed 260ms ease-out;
+}
+
+@keyframes feed {
+  from {
+    clip-path: inset(0 0 100% 0);
+    transform: translateY(-12px);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+    transform: translateY(0);
+  }
+}
+
+/* The full receipt slides up as the results screen. */
+.slideUp {
+  animation: slide-up 650ms cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(40vh);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Endless: the first miss tears the receipt off. */
+.torn {
+  animation: tear 700ms cubic-bezier(0.3, 1.2, 0.5, 1);
+  transform-origin: 90% 0;
+}
+
+@keyframes tear {
+  0% {
+    transform: translateY(0) rotate(0);
+  }
+  30% {
+    transform: translateY(6px) rotate(3deg);
+  }
+  100% {
+    transform: translateY(0) rotate(-1.5deg);
+  }
+}
+
+/* ------------------------------------------------------------------------------------------- */
+/* Sample data banner: caution tape */
+
+.sampleBanner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 6px 12px;
+  background: var(--ss-yellow);
+  color: var(--ss-paper-ink);
+  border: 3px solid var(--ss-paper-ink);
+  font-weight: 800;
+  font-size: 0.875rem;
+  text-align: center;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  outline: 4px dashed var(--ss-paper-ink);
+  outline-offset: -9px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .burstInner,
+  .stamp,
+  .newLine,
+  .slideUp,
+  .torn,
+  .bigButton {
+    animation: none !important;
+    transition: none !important;
+  }
+}

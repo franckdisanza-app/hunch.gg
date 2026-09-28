@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { Fragment, type ReactNode } from "react";
 import { cx } from "@/frame/ui/cx";
 import { OPTION_KEYS } from "./keyboard";
 import type { ChoiceAnswer, ChoiceRound, ChoiceState } from "./state";
@@ -47,6 +47,8 @@ export interface ChoiceBoardProps<R extends ChoiceRound> {
   announce: (ctx: ChoiceRevealContext<R>) => string;
   /** Above the options (a question, a sign…). */
   header?: ReactNode;
+  /** Between two options, e.g. "or". */
+  separator?: ReactNode;
   className?: string;
 }
 
@@ -75,6 +77,7 @@ export function ChoiceBoard<R extends ChoiceRound>({
   nextClassName,
   announce,
   header,
+  separator,
   className,
 }: ChoiceBoardProps<R>) {
   const { state, pending, next, getOptionProps, setNextButton, setRoundElement } = game;
@@ -104,14 +107,16 @@ export function ChoiceBoard<R extends ChoiceRound>({
               keyHint: OPTION_KEYS[index]?.hint ?? "",
             };
             return (
-              <button
-                key={`${round.id}-${index}`}
-                {...getOptionProps(index)}
-                data-status={ctx.status}
-                className={optionClassName?.(ctx)}
-              >
-                {renderOption(ctx)}
-              </button>
+              <Fragment key={`${round.id}-${index}`}>
+                {index > 0 && separator}
+                <button
+                  {...getOptionProps(index)}
+                  data-status={ctx.status}
+                  className={optionClassName?.(ctx)}
+                >
+                  {renderOption(ctx)}
+                </button>
+              </Fragment>
             );
           })}
         </div>

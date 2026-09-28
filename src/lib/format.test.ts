@@ -1,6 +1,7 @@
 import {
   formatCountdown,
   formatCurrency,
+  formatCurrencyParts,
   formatIsoDate,
   formatNumber,
   formatPercent,
@@ -14,6 +15,15 @@ describe("format", () => {
     expect(formatPercent(0.537, "en-US")).toBe("54%");
     // Intl separates the currency code with a non-breaking space.
     expect(formatCurrency(12.5, "CHF", "de-CH")).toBe("CHF 12.50");
+  });
+
+  it("splits a currency amount into sign and number", () => {
+    expect(formatCurrencyParts(4.1, "CHF", "en-GB")).toEqual({ currency: "CHF", amount: "4.10" });
+    expect(formatCurrencyParts(1234.5, "GBP", "en-GB")).toEqual({
+      currency: "£",
+      amount: "1,234.50",
+    });
+    expect(formatCurrencyParts(420, "JPY", "en-GB")).toEqual({ currency: "JP¥", amount: "420" });
   });
 
   it("formats ISO dates without a time-zone shift", () => {
