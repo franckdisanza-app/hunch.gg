@@ -31,9 +31,13 @@ export default function AboutPage() {
               {game.credits?.map((credit) => (
                 <li key={`${credit.what}-${credit.work}`}>
                   {credit.what}:{" "}
-                  <a href={credit.url} className="underline underline-offset-2">
-                    {credit.work}
-                  </a>
+                  {credit.url ? (
+                    <a href={credit.url} className="underline underline-offset-2">
+                      {credit.work}
+                    </a>
+                  ) : (
+                    credit.work
+                  )}
                   , {credit.licence}
                 </li>
               ))}

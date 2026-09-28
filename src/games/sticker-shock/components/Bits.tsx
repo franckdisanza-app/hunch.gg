@@ -7,9 +7,7 @@ import styles from "./world.module.css";
 export function Sign({ className }: { className?: string }) {
   return (
     <p className={cx("flex justify-center", className)}>
-      <span className={cx(styles.sign, styles.marker, "text-2xl uppercase sm:text-3xl")}>
-        {strings.sign}
-      </span>
+      <span className={cx(styles.sign, styles.marker)}>{strings.sign}</span>
     </p>
   );
 }

@@ -27,7 +27,7 @@ import { SampleBanner, Sign } from "./Bits";
 import { Board, roundLabels } from "./Board";
 import { Header } from "./Header";
 import { Receipt, ReceiptPrinter, type ReceiptLineData } from "./Receipt";
-import { EndlessLink, StateScreen } from "./States";
+import { EndlessLink, LoadingShelf, StateScreen } from "./States";
 import styles from "./world.module.css";
 
 const SLUG = "sticker-shock";
@@ -69,7 +69,7 @@ export function DailyGame() {
   const [justFinished, setJustFinished] = useState(false);
 
   if (puzzle === null) {
-    return <StateScreen pose="idle" title={strings.loading} busy />;
+    return <LoadingShelf title={strings.name} total={10} />;
   }
   if (puzzle < 1) {
     return (
@@ -79,7 +79,7 @@ export function DailyGame() {
     );
   }
   if (shelf.status === "loading") {
-    return <StateScreen pose="thinking" title={strings.loading} busy />;
+    return <LoadingShelf title={strings.heading(puzzle)} total={10} />;
   }
   if (shelf.status === "missing") {
     return (
@@ -233,6 +233,7 @@ function DailyResults({
       summaryShowsStats
       summary={
         <div className="flex flex-col items-center gap-4">
+          <h1 className="sr-only">{strings.heading(day.puzzle)}</h1>
           <Tag pose={pose} size={112} />
           <h2 className={cx(styles.display, "text-3xl")}>{strings.receipt.title}</h2>
           <Receipt

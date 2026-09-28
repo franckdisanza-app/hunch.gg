@@ -27,7 +27,7 @@ import { SampleBanner, Sign } from "./Bits";
 import { Board, roundLabels } from "./Board";
 import { Header } from "./Header";
 import { Receipt, ReceiptPrinter, type ReceiptLineData } from "./Receipt";
-import { StateScreen } from "./States";
+import { LoadingShelf, StateScreen } from "./States";
 import styles from "./world.module.css";
 
 const POOL_URL = "/api/games/sticker-shock/pool";
@@ -46,8 +46,7 @@ export function EndlessGame() {
   // Each run gets a fresh random seed; "Play again" starts a new run.
   const [run, setRun] = useState(() => ({ n: 0, seed: randomSeed() }));
 
-  if (pool.status === "loading")
-    return <StateScreen pose="thinking" title={strings.loading} busy />;
+  if (pool.status === "loading") return <LoadingShelf title={strings.endlessHeading} />;
   if (pool.status !== "ready") {
     return (
       <StateScreen
@@ -134,6 +133,7 @@ function EndlessRun({ pool, seed, onAgain }: { pool: Pool; seed: string; onAgain
     const streak = summarize(over.answers).score;
     return (
       <section className="flex flex-col items-center gap-5">
+        <h1 className="sr-only">{strings.endlessHeading}</h1>
         <Tag pose="wrong" size={112} />
         <h2 className={cx(styles.display, "text-3xl")}>{strings.receipt.title}</h2>
         <Receipt

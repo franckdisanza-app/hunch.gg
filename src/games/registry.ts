@@ -1,8 +1,10 @@
 import { devRoutesEnabled } from "@/lib/dev-routes";
+import { mascot as stickerShockMascot } from "./sticker-shock/mascot";
+import { theme as stickerShockTheme } from "./sticker-shock/theme";
 import type { GameDefinition, LiveGameDefinition } from "./types";
 
 // Every game's metadata, in shelf order. Metadata only: never import game components here, so the
-// registry stays tiny wherever it is used. `pnpm new-game` inserts new entries above the marker.
+// registry stays tiny wherever it is used (a live game's theme and mascot are plain data). `pnpm new-game` inserts new entries above the marker.
 // Planned games are hidden and have no launch date yet.
 
 export const games: readonly GameDefinition[] = [
@@ -10,13 +12,47 @@ export const games: readonly GameDefinition[] = [
     slug: "sticker-shock",
     name: "Sticker Shock",
     tagline: "Which costs more? Every price is real, with receipts.",
-    status: "hidden",
+    status: "live",
     // PLACEHOLDER: confirm the real launch date (the date of puzzle #1) before going to production.
+    // Changing it renumbers the puzzles: run `pnpm sticker-shock:build --reset` before launch.
     launchDate: "2026-09-28",
     modes: ["daily", "unlimited"],
     engine: "choice",
     // Polls after the daily; guesses record 1 or 0 per pair (right or not) for pair_accuracy.
     usesCrowdApi: ["polls", "guesses"],
+    theme: stickerShockTheme,
+    mascot: stickerShockMascot,
+    credits: [
+      {
+        what: "Flags",
+        work: "flag-icons by Panayiotis Lipiridis",
+        licence: "MIT License",
+        url: "https://github.com/lipis/flag-icons",
+      },
+      {
+        what: "Prices and big numbers",
+        work: "Anton by Vernon Adams",
+        licence: "SIL Open Font License 1.1",
+        url: "https://fonts.google.com/specimen/Anton",
+      },
+      {
+        what: "Hand-lettered signs",
+        work: "Permanent Marker by Font Diner",
+        licence: "Apache License 2.0",
+        url: "https://fonts.google.com/specimen/Permanent+Marker",
+      },
+      {
+        what: "Receipts",
+        work: "IBM Plex Mono by IBM",
+        licence: "SIL Open Font License 1.1",
+        url: "https://fonts.google.com/specimen/IBM+Plex+Mono",
+      },
+      {
+        what: "Item icons and Tag, the mascot",
+        work: "drawn for Plimp",
+        licence: "all rights reserved",
+      },
+    ],
   },
   {
     slug: "handshoe",

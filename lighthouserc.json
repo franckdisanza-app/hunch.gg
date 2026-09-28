@@ -3,15 +3,24 @@
     "collect": {
       "startServerCommand": "pnpm start --port 3200",
       "startServerReadyPattern": "Ready",
-      "url": ["http://localhost:3200/"],
+      "url": ["http://localhost:3200/", "http://localhost:3200/sticker-shock"],
       "numberOfRuns": 3
     },
     "assert": {
       "assertions": {
-        "categories:performance": ["error", { "minScore": 0.9, "aggregationMethod": "median-run" }],
+        "categories:performance": [
+          "error",
+          {
+            "minScore": 0.9,
+            "aggregationMethod": "median-run"
+          }
+        ],
         "categories:accessibility": [
           "error",
-          { "minScore": 0.9, "aggregationMethod": "median-run" }
+          {
+            "minScore": 0.9,
+            "aggregationMethod": "median-run"
+          }
         ]
       }
     },

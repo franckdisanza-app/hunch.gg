@@ -80,10 +80,7 @@ export default async function OpengraphImage() {
             <span>{strings.sign.toUpperCase()}</span>
             <span>A / B</span>
           </div>
-          <div style={line}>
-            <span>{strings.receipt.og}</span>
-            <span style={{ fontWeight: 700 }}>✓</span>
-          </div>
+          <div style={{ ...line, fontWeight: 700 }}>{strings.receipt.og}</div>
         </div>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={zigzag(receiptWidth, paper)} width={receiptWidth} height={14} alt="" />

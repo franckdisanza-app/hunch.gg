@@ -14,7 +14,6 @@ export function Flag({ code, className }: { code: string; className?: string }) 
       width={24}
       height={18}
       decoding="async"
-      loading="lazy"
       draggable={false}
       className={cx("h-[18px] w-6 shrink-0 object-cover ring-1 ring-white", className)}
     />

@@ -53,7 +53,8 @@ export interface GameCredit {
   work: string;
   /** e.g. "MIT", "SIL Open Font License 1.1", "ODbL 1.0". */
   licence: string;
-  url: string;
+  /** Where the work lives; leave out for work made for Plimp. */
+  url?: string;
 }
 
 interface GameBase {

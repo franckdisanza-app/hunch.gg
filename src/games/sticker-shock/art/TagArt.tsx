@@ -132,7 +132,7 @@ export function TagArt({
         />
       )}
       <g transform={backdrop ? "translate(17 17) scale(0.72)" : undefined}>
-        <g className={classes.swing}>
+        <g className={classes.swing} data-part="swing">
           {/* String, with a paper edge so it shows on dark backgrounds. */}
           <path d={string} fill="none" stroke={paper} strokeWidth={halo} strokeLinecap="round" />
           <path

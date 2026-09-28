@@ -53,7 +53,7 @@ const creditSchema = z.strictObject({
   what: z.string().check(z.minLength(1), z.maxLength(80)),
   work: z.string().check(z.minLength(1), z.maxLength(160)),
   licence: z.string().check(z.minLength(1), z.maxLength(80)),
-  url: z.url({ protocol: /^https$/ }),
+  url: z.optional(z.url({ protocol: /^https$/ })),
 });
 
 const base = {

@@ -216,10 +216,11 @@ describe("Mascot", () => {
 
 describe("ResultsScreen", () => {
   it("hides More from Plimp when no other game is live", () => {
+    // Sticker Shock is the only live game: its own results have nothing else to offer.
     render(
       <ToastProvider>
         <ResultsScreen
-          game="placeholder"
+          game="sticker-shock"
           score="4/5"
           streak={2}
           getShare={() => ({
@@ -236,6 +237,33 @@ describe("ResultsScreen", () => {
     expect(screen.getByText("4/5")).toBeInTheDocument();
     expect(screen.queryByText("More from Plimp")).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Share/ })).toBeInTheDocument();
+  });
+});
+
+describe("ResultsScreen with other live games", () => {
+  it("offers the other live games", () => {
+    render(
+      <ToastProvider>
+        <ResultsScreen
+          game="placeholder"
+          score="4/5"
+          streak={1}
+          getShare={() => ({
+            gameName: "Placeholder Game",
+            slug: "placeholder",
+            puzzle: 1,
+            score: { value: 4, max: 5 },
+            grid: "🟩",
+            teaser: "Fake teaser?",
+          })}
+        />
+      </ToastProvider>,
+    );
+    expect(screen.getByRole("navigation", { name: "More from Plimp" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Sticker Shock/ })).toHaveAttribute(
+      "href",
+      "/sticker-shock",
+    );
   });
 });
 

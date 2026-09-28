@@ -34,10 +34,16 @@
 /* ------------------------------------------------------------------------------------------- */
 /* The hand-lettered sign */
 
+/* A big placard: two lines on phones, one on wide screens. */
 .sign {
   position: relative;
   display: inline-block;
+  max-width: 100%;
   padding: 10px 22px 12px;
+  font-size: clamp(1.75rem, 9vw, 2.5rem);
+  line-height: 1.05;
+  text-align: center;
+  text-transform: uppercase;
   background: var(--ss-yellow);
   color: var(--ss-paper-ink);
   border: 3px solid var(--ss-paper-ink);
@@ -344,6 +350,24 @@
   border-radius: 10px;
   background: var(--game-bg);
   color: var(--game-ink);
+}
+
+/* Blank shelf labels while the shelf loads: same size as real ones, so nothing jumps. */
+.blankCard {
+  display: flex;
+  flex-direction: column;
+  min-height: 146px;
+  background: var(--ss-paper);
+  border: 3px solid var(--ss-paper-ink);
+  border-radius: 6px;
+  box-shadow: var(--ss-shadow);
+}
+
+.blankCard::before {
+  content: "";
+  display: block;
+  height: 34px;
+  background: var(--ss-red);
 }
 
 /* ------------------------------------------------------------------------------------------- */
