@@ -46,11 +46,15 @@ flowchart LR
   (`game-theme.ts`: light, dark, and forced scopes, pure CSS), renders the TopBar and the
   help/stats/settings sheets, opens how-to on the first visit, and provides `useGame()`: puzzle
   number, mode, player state (`start`, `saveProgress`, `complete`), `playSound`, `track`,
-  `openSheet`.
+  `openSheet`. The puzzle number is fixed for the life of the page: a round that runs past
+  midnight is recorded as the puzzle it started as, and a notice offers a reload for the new one.
 - **Primitives** (`ui/`): Button, Dialog/Sheet on the native `<dialog>` (Esc, inert background,
   Tab trap, focus return), Toast (live region), SegmentedControl (native radios).
 - **Building blocks:** ResultsScreen, RevealCard (+ ReportDialog), OneTapPoll, ShareButton,
   Countdown, SoundToggle, ThemeSwitch, Mascot (placeholder when art is missing), ShelfTile.
+  RevealCard takes one source or several (a reveal that compares facts). ResultsScreen has an
+  `extras` slot (e.g. the poll), a label for the unlimited mode, and `summaryShowsStats` for a
+  game-styled summary (a receipt) that shows the score, streak and countdown itself.
 - **Lazy loading** (`lazy.ts`): sheets and the report dialog load on first open and are
   prefetched when idle; the boot work (`boot.ts`: meta, theme/sound sync, analytics provider,
   share arrival, return days) loads right after hydration.
@@ -66,7 +70,13 @@ flowchart LR
 - A game's route (`src/app/(games)/<slug>/page.tsx`) renders `GameShell` around the game's
   component. Unreleased games build as 404 in production.
 - Engines (`src/engines/`) are shared mechanics (`choice`, `estimate`, `clue`, `map`), each added
-  with the first game that needs it.
+  with the first game that needs it. `choice` exists (Sticker Shock): pure rules for rounds of 2–3
+  options, daily lists and unlimited generators, a React hook for keys, focus, live announcements
+  and animation hooks, and `ChoiceBoard` with render slots. See `src/engines/README.md`.
+- `credits` in a registry entry (fonts, art, data) are listed on the About page once it is live.
+- Game-specific APIs live under `src/app/api/games/<slug>/`, e.g. Sticker Shock's Endless pool
+  (`/api/games/sticker-shock/pool`), which ships its content files through
+  `outputFileTracingIncludes` like the puzzle API.
 - ESLint (`eslint.config.mjs`) enforces the plugin boundaries.
 
 ## Daily rotation (`src/lib/daily.ts`)
@@ -118,7 +128,8 @@ is never imported into `src/` (lint), so future answers never reach client JavaS
 ## Content pipeline
 
 Each game exports `contentSpec` from `src/games/<slug>/content.schema.ts`: a Zod schema per file
-plus a `facts()` accessor. `pnpm content:validate` (`src/lib/content/validate.ts`) checks the
+plus a `facts()` accessor (left out for files without facts, such as poll questions), and
+optionally `check()` for rules across files (references, assets, what production allows). `pnpm content:validate` (`src/lib/content/validate.ts`) checks the
 registry, every file against its schema, every fact's source fields (even if a schema forgets
 them), that `checkedOn` is not in the future, 14 days of daily files ahead for live games (error)
 and 30 (warning), and no `sample: true` when `CONTENT_MODE=production`. It runs in CI and before
@@ -127,7 +138,8 @@ every build. `pnpm csv-to-json` converts spreadsheet exports with a per-game map
 ## Share and analytics
 
 `buildShareText` (`src/lib/share.ts`): `<Game> #<n> · <score>`, an emoji grid, one teaser, and a
-`?ref=share` link from `NEXT_PUBLIC_SITE_URL`. A line containing a day's answer throws in
+`?ref=share` link from `NEXT_PUBLIC_SITE_URL`. An unlimited run shares one line instead
+(`<Game> <mode> · <result>`) and the link. A line containing a day's answer throws in
 development and is dropped in production. Sharing uses the Web Share API, else the clipboard.
 
 `track()` sends typed events to the provider chosen at build time (`none`, `plausible`, `umami`,
@@ -150,8 +162,8 @@ Plimp renders no user-supplied HTML.
 | First-load JS (gzipped, `pnpm size`)      | Measured |
 | ----------------------------------------- | -------- |
 | Bare Next 16.3 + React 19.3 "hello world" | 136 KB   |
-| Shelf `/`                                 | 179 KB   |
-| Empty GameShell (`/dev/game-shell`)       | 180 KB   |
+| Shelf `/`                                 | 182 KB   |
+| Empty GameShell (`/dev/game-shell`)       | 183 KB   |
 | Budget (CI)                               | 185 KB   |
 
 Plimp's own share is about 43 KB, half of it Zod (mini) plus storage validation. Keep new frame

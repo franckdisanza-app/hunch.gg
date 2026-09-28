@@ -36,7 +36,8 @@ Pick one of the two ways.
 3. Dashboard → **Settings → API Keys**: create a **secret key** (`sb_secret_…`) and copy it, and
    copy the project URL. These become `SUPABASE_SECRET_KEY` and `SUPABASE_URL`.
 4. Check: Dashboard → **Table Editor** shows `votes`, `guesses`, `reports`, `poll_snapshots` and
-   `rate_limits`, each with RLS enabled and no policies. That is intended: only the server, with
+   `rate_limits`, each with RLS enabled and no policies; **Storage** shows the public `proofs`
+   bucket (Sticker Shock's proof images). That is intended: only the server, with
    the secret key, can read or write.
 
 ### B. Through the Vercel Marketplace
@@ -113,6 +114,15 @@ production deployments.
 | `vercel`                         | Enable **Analytics** in the Vercel project                                                      | Hobby plan: page views only, no custom events. Pro: custom events with 2 properties each (Plimp's `game_complete` sends 4); Web Analytics Plus allows 8. |
 
 Check each service's current pricing before choosing; adding a paid service is your call.
+
+## Sticker Shock and production
+
+Sticker Shock is live in the registry but still serves the fake sample set, so a Production build
+(`CONTENT_MODE=production`) **fails on purpose** until real prices replace it. Keep deploying
+Previews; follow `docs/games/sticker-shock/data-guide.md`, confirm the launch date, run
+`pnpm sticker-shock:build --reset`, and check `CONTENT_MODE=production pnpm content:validate`
+before the first Production deploy. Proof images are served from the Supabase `proofs` bucket:
+`SUPABASE_URL` must be set at build time so the Content-Security-Policy allows them.
 
 ## 6. Recommended GitHub settings
 

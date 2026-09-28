@@ -12,19 +12,20 @@ Keep this file short and current. Details live in `docs/`.
 
 ## Commands
 
-| Command                                                                       | What it does                                                                                     |
-| ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| `pnpm dev`                                                                    | Dev server. Hidden games and `/dev` (component gallery) work here.                               |
-| `pnpm build`                                                                  | `content:validate`, then `next build`. A validation error stops the build.                       |
-| `pnpm lint` / `pnpm format`                                                   | ESLint (zero warnings) and Prettier check / write.                                               |
-| `pnpm typecheck`                                                              | `next typegen` + `tsc`. If it trips on a deleted route in `.next/dev/types`, delete `.next/dev`. |
-| `pnpm test`                                                                   | Vitest: unit, component, API route and SQL (migrations run in PGlite) tests.                     |
-| `pnpm test:e2e`                                                               | Playwright + axe against a production build (builds first; `E2E_SKIP_BUILD=1` reuses one).       |
-| `pnpm size`                                                                   | First-load JS budget, after a build with `ENABLE_DEV_ROUTES=1`.                                  |
-| `pnpm content:validate`                                                       | Schemas, sources, 14/30-day lookahead, no `sample: true` in production.                          |
-| `pnpm new-game <slug> --name "<Name>" --engine <choice\|estimate\|clue\|map>` | Scaffold a hidden game.                                                                          |
-| `pnpm csv-to-json <game> <file.csv>`                                          | Spreadsheet export → content, via `content/<game>/csv-mapping.json`.                             |
-| `pnpm db:start` / `db:reset` / `db:types`                                     | Local Supabase (needs Docker), reset with seed, regenerate types.                                |
+| Command                                                                         | What it does                                                                                     |
+| ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `pnpm dev`                                                                      | Dev server. Hidden games and `/dev` (component gallery) work here.                               |
+| `pnpm build`                                                                    | `content:validate`, then `next build`. A validation error stops the build.                       |
+| `pnpm lint` / `pnpm format`                                                     | ESLint (zero warnings) and Prettier check / write.                                               |
+| `pnpm typecheck`                                                                | `next typegen` + `tsc`. If it trips on a deleted route in `.next/dev/types`, delete `.next/dev`. |
+| `pnpm test`                                                                     | Vitest: unit, component, API route and SQL (migrations run in PGlite) tests.                     |
+| `pnpm test:e2e`                                                                 | Playwright + axe against a production build (builds first; `E2E_SKIP_BUILD=1` reuses one).       |
+| `pnpm size`                                                                     | First-load JS budget, after a build with `ENABLE_DEV_ROUTES=1`.                                  |
+| `pnpm content:validate`                                                         | Schemas, sources, 14/30-day lookahead, no `sample: true` in production.                          |
+| `pnpm new-game <slug> --name "<Name>" --engine <choice\|estimate\|clue\|map>`   | Scaffold a hidden game.                                                                          |
+| `pnpm csv-to-json <game> <file.csv>`                                            | Spreadsheet export → content, via `content/<game>/csv-mapping.json`.                             |
+| `pnpm db:start` / `db:reset` / `db:types`                                       | Local Supabase (needs Docker), reset with seed, regenerate types.                                |
+| `pnpm sticker-shock:build` (and `:proofs`, `:open-prices`, `:accuracy`, `:art`) | Sticker Shock's data pipeline: `docs/games/sticker-shock/`.                                      |
 
 Local crowd API without Docker: `CROWD_STORE=memory` in `.env.local`.
 
@@ -34,7 +35,7 @@ Local crowd API without Docker: `CROWD_STORE=memory` in `.env.local`.
 src/app/            routes: shelf, about, privacy, dev/, (games)/<slug>/, api/
 src/frame/          the shared chrome: GameShell, TopBar, sheets, ResultsScreen, RevealCard, ui/
 src/games/          types.ts (GameDefinition), registry.ts, content.ts, <slug>/ per game
-src/engines/        shared game mechanics, added with the first game that needs one
+src/engines/        shared game mechanics: choice/ (Sticker Shock; next Tiptoe, Coined, Chimp)
 src/lib/            daily, storage, share, sound, format, analytics/, crowd/, content/, supabase/
 src/styles/         tokens.css (frame tokens, light/dark)
 content/<slug>/     daily/0001.json … (read at request time, never imported)
@@ -66,7 +67,13 @@ docs/               ARCHITECTURE, ADDING_A_GAME, DEPLOY, games/<slug>.md
     another game, `src/frame` imports no game code, nothing in `src/` imports `content/`.
     Game-specific endpoints live under `src/app/api/games/<slug>/`. See `docs/ADDING_A_GAME.md`.
 - **Engines** own rules and state (rounds, answers, scoring); games own content, art, strings,
-  sounds and the reveal. Engines never import from a game.
+  sounds and the reveal. Engines never import from a game. The **choice engine**
+  (`src/engines/choice/`): rounds of 2–3 options and a game-supplied `correctIndex`; `startChoice`
+  / `pickOption` / `nextRound` are pure (daily `list` or unlimited `generator` with
+  `endOnMiss`, resumable answers); `useChoiceGame` adds keys (A/←, B/→, C, Enter), focus (Next
+  after a reveal), `revealDelayMs` (0 under reduced motion) and `onPick`/`onReveal`/`onFinish`;
+  `ChoiceBoard` renders real buttons through `renderOption`/`renderReveal` slots plus a live
+  region; `summarize` gives score, streak and the emoji grid. No strings in the engine.
 - **Schemas:** Zod everywhere (content, API payloads, stored state), always `zod/mini`
   (`import * as z from "zod/mini"`). Classic `zod` is banned by lint: it adds ~90 KB gzipped to any
   browser bundle it touches.
@@ -102,13 +109,14 @@ docs/               ARCHITECTURE, ADDING_A_GAME, DEPLOY, games/<slug>.md
   middleware, route params are Promises, `typedRoutes` is on, Turbopack builds.
 - Ask before adding a paid service, anything that sets cookies, or a heavy dependency.
 
-## Planned games
+## Games
 
-All `hidden` in the registry; no code or content yet. Sticker Shock is next.
+Sticker Shock is `live` on sample data with a placeholder `launchDate` (real prices and date to
+come: `docs/games/sticker-shock/data-guide.md`). The others are `hidden`, with no code or content.
 
 | slug          | Name          | Engine   | Crowd                        | Tagline                                                        |
 | ------------- | ------------- | -------- | ---------------------------- | -------------------------------------------------------------- |
-| sticker-shock | Sticker Shock | choice   | polls                        | Which costs more: item A in one country or item B in another?  |
+| sticker-shock | Sticker Shock | choice   | polls, guesses (right/wrong) | Which costs more? Every price is real, with receipts.          |
 | handshoe      | Handshoe      | clue     | –                            | Guess the thing from its literal name in another language.     |
 | souvenir      | Souvenir      | map      | –                            | Where does this English word come from? Drop a pin.            |
 | ja-nein       | Ja/Nein       | estimate | polls, guesses               | Vote on a real Swiss referendum, then guess the yes-share.     |

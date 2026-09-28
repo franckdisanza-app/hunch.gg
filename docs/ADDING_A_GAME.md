@@ -56,7 +56,9 @@ pnpm new-game sticker-shock --name "Sticker Shock" --engine choice
 ## 4. Content
 
 - [ ] Define the real schema in `content.schema.ts` with `factSchema` (`zod/mini`). Every fact
-      needs `sourceTitle`, `sourceUrl`, `checkedOn`, `licence`.
+      needs `sourceTitle`, `sourceUrl`, `checkedOn`, `licence` (a `facts()` accessor can map
+      other field names, as Sticker Shock does for prices). Files without facts leave `facts`
+      out; rules across files go in `contentSpec.check`.
 - [ ] Write content in `content/<slug>/daily/0001.json`, … or import a spreadsheet:
       `content/<slug>/csv-mapping.json` + `pnpm csv-to-json <slug> <file.csv>`.
 - [ ] Nothing invented. Placeholder content is marked `"sample": true` and never ships.
@@ -70,7 +72,7 @@ pnpm new-game sticker-shock --name "Sticker Shock" --engine choice
       the name or tagline.
 - [ ] At least 14 days of daily content from launch (30 to avoid warnings) and
       `CONTENT_MODE=production pnpm content:validate` passes.
-- [ ] About page: add the game's data sources and licences.
+- [ ] About page: list the game's fonts, art and data sources in the registry entry's `credits`.
 - [ ] Sitemap, shelf tile and "More from Plimp" pick the game up from the registry.
 - [ ] PR, green CI, check the Vercel preview on a phone, merge.
 
