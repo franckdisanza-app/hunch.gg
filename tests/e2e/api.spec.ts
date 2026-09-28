@@ -90,7 +90,7 @@ test("the cron route rejects requests without the secret", async ({ request }) =
 test("the puzzle API 404s unknown games and unreleased puzzles without caching", async ({
   request,
 }) => {
-  for (const path of ["/api/puzzle/nope/1", "/api/puzzle/sticker-shock/1"]) {
+  for (const path of ["/api/puzzle/nope/1", "/api/puzzle/sticker-shock/9999"]) {
     const response = await request.get(path);
     expect(response.status()).toBe(404);
     expect(response.headers()["cache-control"]).toBe("no-store");

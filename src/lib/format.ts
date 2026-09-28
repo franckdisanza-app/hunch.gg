@@ -60,3 +60,25 @@ export function formatCountdown(ms: number): string {
   const s = total % 60;
   return [h, m, s].map((n) => String(n).padStart(2, "0")).join(":");
 }
+
+/**
+ * A currency amount split into its currency sign and number, e.g. { currency: "CHF", amount:
+ * "4.10" } or { currency: "£", amount: "3.20" }, for layouts that set them apart.
+ */
+export function formatCurrencyParts(
+  amount: number,
+  currency: string,
+  locale: string = UI_LOCALE,
+): { currency: string; amount: string } {
+  const parts = numberFormat(locale, { style: "currency", currency }).formatToParts(amount);
+  return {
+    currency: parts
+      .filter((p) => p.type === "currency")
+      .map((p) => p.value)
+      .join(""),
+    amount: parts
+      .filter((p) => p.type !== "currency" && p.type !== "literal")
+      .map((p) => p.value)
+      .join(""),
+  };
+}

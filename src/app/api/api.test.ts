@@ -117,7 +117,7 @@ describe("POST /api/guess", () => {
   });
 
   it("rejects games without guesses and non-finite values", async () => {
-    expect((await guess(post("/api/guess", { ...body, game: "sticker-shock" }))).status).toBe(404);
+    expect((await guess(post("/api/guess", { ...body, game: "handshoe" }))).status).toBe(404);
     // JSON has no Infinity, but 1e400 parses to it.
     const infinite = JSON.stringify({ ...body, value: 0 }).replace('"value":0', '"value":1e400');
     expect((await guess(post("/api/guess", infinite))).status).toBe(400);
@@ -231,9 +231,7 @@ describe("GET /api/crowd", () => {
 
   it("validates the query", async () => {
     expect((await crowd(get("/api/crowd?game=fair-guess&puzzle=x&item=item-1"))).status).toBe(400);
-    expect((await crowd(get("/api/crowd?game=sticker-shock&puzzle=1&item=item-1"))).status).toBe(
-      404,
-    );
+    expect((await crowd(get("/api/crowd?game=handshoe&puzzle=1&item=item-1"))).status).toBe(404);
   });
 });
 

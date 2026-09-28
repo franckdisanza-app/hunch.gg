@@ -1,0 +1,227 @@
+[
+  {
+    "id": "bananas",
+    "label": "bananas",
+    "quantity": 1,
+    "unit": "kg",
+    "receipt": "BANANAS",
+    "icon": "bananas",
+    "category": "fruit"
+  },
+  {
+    "id": "apples",
+    "label": "apples",
+    "quantity": 1,
+    "unit": "kg",
+    "receipt": "APPLES",
+    "icon": "apples",
+    "category": "fruit"
+  },
+  {
+    "id": "oranges",
+    "label": "oranges",
+    "quantity": 1,
+    "unit": "kg",
+    "receipt": "ORANGES",
+    "icon": "oranges",
+    "category": "fruit"
+  },
+  {
+    "id": "tomatoes",
+    "label": "tomatoes",
+    "quantity": 1,
+    "unit": "kg",
+    "receipt": "TOMATOES",
+    "icon": "tomatoes",
+    "category": "vegetables"
+  },
+  {
+    "id": "potatoes",
+    "label": "potatoes",
+    "quantity": 1,
+    "unit": "kg",
+    "receipt": "POTATOES",
+    "icon": "potatoes",
+    "category": "vegetables"
+  },
+  {
+    "id": "onions",
+    "label": "onions",
+    "quantity": 1,
+    "unit": "kg",
+    "receipt": "ONIONS",
+    "icon": "onions",
+    "category": "vegetables"
+  },
+  {
+    "id": "carrots",
+    "label": "carrots",
+    "quantity": 1,
+    "unit": "kg",
+    "receipt": "CARROTS",
+    "icon": "carrots",
+    "category": "vegetables"
+  },
+  {
+    "id": "eggs",
+    "label": "eggs",
+    "quantity": 12,
+    "unit": "pcs",
+    "receipt": "EGGS",
+    "icon": "eggs",
+    "category": "dairy"
+  },
+  {
+    "id": "milk",
+    "label": "whole milk",
+    "quantity": 1,
+    "unit": "l",
+    "receipt": "MILK",
+    "icon": "milk",
+    "category": "dairy"
+  },
+  {
+    "id": "butter",
+    "label": "butter",
+    "quantity": 250,
+    "unit": "g",
+    "receipt": "BUTTER",
+    "icon": "butter",
+    "category": "dairy"
+  },
+  {
+    "id": "yogurt",
+    "label": "plain yogurt",
+    "quantity": 500,
+    "unit": "g",
+    "receipt": "YOGURT",
+    "icon": "yogurt",
+    "category": "dairy"
+  },
+  {
+    "id": "mozzarella",
+    "label": "mozzarella",
+    "quantity": 125,
+    "unit": "g",
+    "receipt": "MOZZARELLA",
+    "icon": "mozzarella",
+    "category": "dairy"
+  },
+  {
+    "id": "bread",
+    "label": "white sliced bread",
+    "quantity": 500,
+    "unit": "g",
+    "receipt": "BREAD",
+    "icon": "bread",
+    "category": "bakery"
+  },
+  {
+    "id": "rice",
+    "label": "white rice",
+    "quantity": 1,
+    "unit": "kg",
+    "receipt": "RICE",
+    "icon": "rice",
+    "category": "pantry"
+  },
+  {
+    "id": "spaghetti",
+    "label": "spaghetti",
+    "quantity": 500,
+    "unit": "g",
+    "receipt": "SPAGHETTI",
+    "icon": "spaghetti",
+    "category": "pantry"
+  },
+  {
+    "id": "flour",
+    "label": "wheat flour",
+    "quantity": 1,
+    "unit": "kg",
+    "receipt": "FLOUR",
+    "icon": "flour",
+    "category": "pantry"
+  },
+  {
+    "id": "sugar",
+    "label": "white sugar",
+    "quantity": 1,
+    "unit": "kg",
+    "receipt": "SUGAR",
+    "icon": "sugar",
+    "category": "pantry"
+  },
+  {
+    "id": "olive-oil",
+    "label": "extra virgin olive oil",
+    "quantity": 1,
+    "unit": "l",
+    "receipt": "OLIVE OIL",
+    "icon": "olive-oil",
+    "category": "pantry"
+  },
+  {
+    "id": "coffee",
+    "label": "ground coffee",
+    "quantity": 250,
+    "unit": "g",
+    "receipt": "COFFEE",
+    "icon": "coffee",
+    "category": "drinks"
+  },
+  {
+    "id": "chicken",
+    "label": "chicken breast",
+    "quantity": 1,
+    "unit": "kg",
+    "receipt": "CHICKEN",
+    "icon": "chicken",
+    "category": "meat"
+  },
+  {
+    "id": "chocolate",
+    "label": "milk chocolate",
+    "quantity": 100,
+    "unit": "g",
+    "receipt": "CHOCOLATE",
+    "icon": "chocolate",
+    "category": "snacks"
+  },
+  {
+    "id": "water",
+    "label": "still mineral water",
+    "quantity": 1.5,
+    "unit": "l",
+    "receipt": "WATER",
+    "icon": "water",
+    "category": "drinks"
+  },
+  {
+    "id": "cola",
+    "label": "cola",
+    "quantity": 1.5,
+    "unit": "l",
+    "receipt": "COLA",
+    "icon": "cola",
+    "category": "drinks"
+  },
+  {
+    "id": "orange-juice",
+    "label": "orange juice",
+    "quantity": 1,
+    "unit": "l",
+    "receipt": "OJ",
+    "icon": "orange-juice",
+    "category": "drinks"
+  },
+  {
+    "id": "beer",
+    "label": "lager beer",
+    "quantity": 500,
+    "unit": "ml",
+    "receipt": "BEER",
+    "icon": "beer",
+    "category": "drinks"
+  }
+]

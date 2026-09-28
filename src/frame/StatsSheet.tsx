@@ -22,6 +22,8 @@ export interface StatsSheetProps {
   unlimited?: Unlimited | undefined;
   /** Today's puzzle number, to tell whether the streak is still alive. */
   todayPuzzle: number | null;
+  /** The game's name for its unlimited mode, e.g. "Endless". */
+  unlimitedLabel?: string | undefined;
   /** Label a score for the distribution chart, e.g. (s) => `${s}/5`. */
   formatScore?: (score: number) => string;
 }
@@ -32,6 +34,7 @@ export function StatsSheet({
   stats,
   unlimited,
   todayPuzzle,
+  unlimitedLabel = strings.stats.unlimited,
   formatScore = (s) => formatNumber(s),
 }: StatsSheetProps) {
   const completion = stats.played === 0 ? 0 : stats.completed / stats.played;
@@ -77,7 +80,7 @@ export function StatsSheet({
 
       {unlimited && (
         <>
-          <h3 className="mt-6 mb-2 text-sm font-semibold">{strings.stats.unlimited}</h3>
+          <h3 className="mt-6 mb-2 text-sm font-semibold">{unlimitedLabel}</h3>
           <dl className="grid grid-cols-2 gap-2">
             <Stat label={strings.stats.bestRun} value={formatNumber(unlimited.bestRun)} />
             <Stat label={strings.stats.runsPlayed} value={formatNumber(unlimited.runsPlayed)} />

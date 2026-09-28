@@ -27,9 +27,12 @@ for (const scheme of ["light", "dark"] as const) {
   });
 }
 
-test("the shelf shows the first-game-coming-soon state while no game is live", async ({ page }) => {
+test("the shelf shows the live games", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "The first game is coming soon" })).toBeVisible();
+  const tile = page.getByRole("link", { name: /Sticker Shock/ });
+  await expect(tile).toBeVisible();
+  await expect(tile).toHaveAttribute("href", "/sticker-shock");
+  await expect(page.getByRole("heading", { name: "The first game is coming soon" })).toHaveCount(0);
 });
 
 test("the theme choice is saved and applied before the page paints", async ({ page }) => {

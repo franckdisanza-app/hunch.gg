@@ -170,6 +170,60 @@ describe("validateContent", () => {
   });
 });
 
+describe("files without facts and cross-file checks", () => {
+  const listSpec: ContentSpec = defineContentSpec({
+    daily: strictSpec.daily as ContentSpec["daily"],
+    files: {
+      "names.json": { schema: z.array(z.string()) },
+    },
+    check: ({ files, daily, mode, fileExists }) => {
+      const names = (files["names.json"] as string[] | undefined) ?? [];
+      return {
+        errors: [
+          ...(names.includes("forbidden") ? ["names.json lists a forbidden name"] : []),
+          ...(mode === "production" && !fileExists("public/fake-asset.svg")
+            ? ["public/fake-asset.svg is missing"]
+            : []),
+        ],
+        warnings: daily.size < 20 ? [`only ${daily.size} daily files parsed`] : [],
+      };
+    },
+  });
+
+  function writeNames(names: string[]) {
+    mkdirSync(join(root, "content", "fixture-game"), { recursive: true });
+    writeFileSync(join(root, "content", "fixture-game", "names.json"), JSON.stringify(names));
+  }
+
+  it("accepts a file that declares no facts", async () => {
+    writeRange(1, 40);
+    writeNames(["fake one", "fake two"]);
+    const report = await run([LIVE], listSpec, "sample");
+    expect(report.errors).toEqual([]);
+    expect(report.files).toContain("content/fixture-game/names.json");
+  });
+
+  it("runs the game's check with parsed files, daily puzzles, mode and a file probe", async () => {
+    writeRange(1, 10);
+    writeRange(11, 12);
+    writeNames(["forbidden"]);
+    const report = await run([LIVE], listSpec, "production");
+    expect(report.errors).toEqual(
+      expect.arrayContaining([
+        "fixture-game: names.json lists a forbidden name",
+        "fixture-game: public/fake-asset.svg is missing",
+      ]),
+    );
+    expect(report.warnings).toContain("fixture-game: only 12 daily files parsed");
+
+    mkdirSync(join(root, "public"), { recursive: true });
+    writeFileSync(join(root, "public", "fake-asset.svg"), "<svg/>");
+    writeNames([]);
+    const fixed = await run([LIVE], listSpec, "production");
+    expect(fixed.errors.filter((e) => !e.includes("missing daily files"))).toEqual([]);
+  });
+});
+
 describe("findSamples", () => {
   it("finds sample flags anywhere", () => {
     expect(findSamples({ a: [{ sample: true }, { sample: false }], sample: true })).toEqual([

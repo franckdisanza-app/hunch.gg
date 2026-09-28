@@ -11,6 +11,7 @@ import { useHistory, useMeta, usePuzzleNumber, useStats, useUnlimited } from "./
 import type { HowToPlayContent } from "./HowToPlaySheet";
 import { LazyHowToPlaySheet, LazySettingsSheet, LazyStatsSheet, prefetchWhenIdle } from "./lazy";
 import { SkipLink } from "./SkipLink";
+import { strings } from "./strings";
 import { TopBar } from "./TopBar";
 import { cx } from "./ui/cx";
 
@@ -22,6 +23,8 @@ export interface GameShellProps {
   gameSettings?: ReactNode;
   /** Labels scores in the stats chart. */
   formatScore?: (score: number) => string;
+  /** The game's name for its unlimited mode (e.g. "Endless"), in the stats sheet. */
+  unlimitedLabel?: string;
   /** Extra classes for the game world, e.g. the display font's next/font variable. */
   className?: string;
   children: ReactNode;
@@ -37,11 +40,18 @@ export function GameShell({
   howTo,
   gameSettings,
   formatScore,
+  unlimitedLabel,
   className,
   children,
 }: GameShellProps) {
   const slug = game.slug;
-  const puzzle = usePuzzleNumber(mode === "daily" ? game.launchDate : undefined);
+  const livePuzzle = usePuzzleNumber(mode === "daily" ? game.launchDate : undefined);
+  // The puzzle number is fixed for the life of the page: a round that runs past midnight is
+  // finished and recorded as the puzzle it started as. The next one opens after a reload.
+  const [pinnedPuzzle, setPinnedPuzzle] = useState<number | null>(null);
+  if (pinnedPuzzle === null && livePuzzle !== null) setPinnedPuzzle(livePuzzle);
+  const puzzle = pinnedPuzzle ?? livePuzzle;
+  const newPuzzleOut = puzzle !== null && livePuzzle !== null && livePuzzle > puzzle;
   const meta = useMeta();
   const stats = useStats(slug);
   const history = useHistory(slug);
@@ -114,6 +124,21 @@ export function GameShell({
           onStats={() => setSheet("stats")}
           onSettings={() => setSheet("settings")}
         />
+        {newPuzzleOut && (
+          <p
+            role="status"
+            className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 border-b border-frame-line bg-frame-bg px-4 py-2 text-center text-sm text-frame-ink"
+          >
+            {strings.game.newPuzzle}
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className="inline-flex min-h-11 items-center font-semibold underline underline-offset-2"
+            >
+              {strings.game.reload}
+            </button>
+          </p>
+        )}
         <main id="main" className="mx-auto w-full max-w-3xl flex-1 px-4 py-6">
           {children}
         </main>
@@ -125,6 +150,7 @@ export function GameShell({
           onClose={() => setSheet(null)}
           stats={stats}
           unlimited={game.modes.includes("unlimited") ? unlimited : undefined}
+          unlimitedLabel={unlimitedLabel}
           todayPuzzle={puzzle}
           formatScore={formatScore}
         />

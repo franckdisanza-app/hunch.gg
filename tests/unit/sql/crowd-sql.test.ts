@@ -92,6 +92,25 @@ describe("tables", () => {
   });
 });
 
+describe("pair_accuracy (Sticker Shock)", () => {
+  it("gives the share of right answers and the count per pair", async () => {
+    const insert =
+      "insert into public.guesses (game, puzzle, item_id, value, device_id) values ($1, $2, $3, $4, $5)";
+    await db.query(insert, ["sticker-shock", 3, "p0003-01", 1, DEVICE[0]]);
+    await db.query(insert, ["sticker-shock", 3, "p0003-01", 0, DEVICE[1]]);
+    await db.query(insert, ["sticker-shock", 3, "p0003-01", 1, DEVICE[2]]);
+    await db.query(insert, ["sticker-shock", 3, "p0003-02", 0, DEVICE[0]]);
+    await db.query(insert, ["fair-guess", 3, "p0003-01", 42, DEVICE[0]]);
+    const result = await rows<{ pair_id: string; n: number; share_correct: number }>(
+      "select pair_id, n, share_correct from public.pair_accuracy order by pair_id",
+    );
+    expect(result).toEqual([
+      { pair_id: "p0003-01", n: 3, share_correct: 2 / 3 },
+      { pair_id: "p0003-02", n: 1, share_correct: 0 },
+    ]);
+  });
+});
+
 describe("access", () => {
   it("turns on row-level security for every table", async () => {
     const tables = await rows<{ relname: string; relrowsecurity: boolean }>(
@@ -121,6 +140,9 @@ describe("access", () => {
         /permission denied/,
       );
       await expect(db.query("select public.freeze_polls()")).rejects.toThrow(/permission denied/);
+      await expect(db.query("select * from public.pair_accuracy")).rejects.toThrow(
+        /permission denied/,
+      );
     } finally {
       await db.exec("reset role");
     }
@@ -135,6 +157,7 @@ describe("access", () => {
       );
       expect(await rows("select * from public.votes")).toHaveLength(1);
       await db.query("select public.freeze_polls()");
+      expect(await rows("select * from public.pair_accuracy")).toEqual([]);
     } finally {
       await db.exec("reset role");
     }

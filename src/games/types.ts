@@ -45,6 +45,18 @@ export interface MascotDefinition {
   poses: Record<MascotPose, string>;
 }
 
+/** Third-party work a game uses (fonts, icons, data), credited on the About page. */
+export interface GameCredit {
+  /** What it is used for, e.g. "Flags". */
+  what: string;
+  /** Name of the work and its author, e.g. "flag-icons by Panayiotis Lipiridis". */
+  work: string;
+  /** e.g. "MIT", "SIL Open Font License 1.1", "ODbL 1.0". */
+  licence: string;
+  /** Where the work lives; leave out for work made for Plimp. */
+  url?: string;
+}
+
 interface GameBase {
   /** URL segment and storage namespace: lowercase letters, digits and dashes. */
   slug: string;
@@ -55,6 +67,8 @@ interface GameBase {
   engine: GameEngine;
   /** Empty when the game does not use the crowd API. */
   usesCrowdApi: readonly CrowdFeature[];
+  /** Fonts, art and data sources to credit on the About page once the game is live. */
+  credits?: readonly GameCredit[];
 }
 
 export interface LiveGameDefinition extends GameBase {

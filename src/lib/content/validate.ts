@@ -12,6 +12,7 @@ import { dayIndex, latestPuzzleNumber, localIsoDate, parseIsoDate, puzzleFileNam
 //   - every fact has sourceUrl, checkedOn (not in the future) and licence
 //   - live games have daily files for the next 14 days (error) and 30 days (warning)
 //   - nothing is flagged `sample: true` when CONTENT_MODE=production
+//   - each game's own cross-file check (contentSpec.check) passes
 
 export const DAYS_REQUIRED = 14;
 export const DAYS_WARNED = 30;
@@ -82,18 +83,29 @@ export async function validateContent(options: ValidateOptions): Promise<Validat
       continue;
     }
 
-    const checkFile = (file: string, contentFile: ContentFile<unknown>, expectPuzzle?: number) => {
+    /** Returns the parsed data when the file passed its schema. */
+    const checkFile = (
+      file: string,
+      contentFile: ContentFile<unknown>,
+      expectPuzzle?: number,
+    ): { data: unknown } | undefined => {
       const rel = relative(root, file).replaceAll("\\", "/");
       report.files.push(rel);
       const parsed = readJson(file);
-      if (!parsed.ok) return error(`${rel}: invalid JSON (${parsed.error})`);
+      if (!parsed.ok) {
+        error(`${rel}: invalid JSON (${parsed.error})`);
+        return undefined;
+      }
 
       for (const path of findSamples(parsed.data)) {
         if (mode === "production") error(`${rel}: ${path} is flagged sample: true`);
       }
 
       const result = z.safeParse(contentFile.schema, parsed.data);
-      if (!result.success) return error(`${rel}: ${z.prettifyError(result.error)}`);
+      if (!result.success) {
+        error(`${rel}: ${z.prettifyError(result.error)}`);
+        return undefined;
+      }
 
       const data = result.data as { puzzle?: unknown };
       if (
@@ -104,6 +116,7 @@ export async function validateContent(options: ValidateOptions): Promise<Validat
         error(`${rel}: "puzzle" is ${data.puzzle}, but the file name says ${expectPuzzle}`);
       }
 
+      if (!contentFile.facts) return { data: result.data };
       const facts = contentFile.facts(result.data);
       if (facts.length === 0) error(`${rel}: contains no sourced facts`);
       facts.forEach((fact, i) => {
@@ -124,6 +137,7 @@ export async function validateContent(options: ValidateOptions): Promise<Validat
         }
         if (source.data.sourceUrl.startsWith("http:")) warn(`${label}: source is not https`);
       });
+      return { data: result.data };
     };
 
     // Daily files.
@@ -132,6 +146,8 @@ export async function validateContent(options: ValidateOptions): Promise<Validat
       ? readdirSync(dailyDir).filter((f) => f.endsWith(".json"))
       : [];
     const numbers = new Set<number>();
+    const parsedDaily = new Map<number, unknown>();
+    const parsedFiles: Record<string, unknown> = {};
     for (const name of dailyFiles) {
       if (!/^\d{4}\.json$/.test(name)) {
         error(`content/${game.slug}/daily/${name}: name must be four digits, e.g. 0001.json`);
@@ -140,14 +156,29 @@ export async function validateContent(options: ValidateOptions): Promise<Validat
       const n = Number(name.slice(0, 4));
       if (n < 1) error(`content/${game.slug}/daily/${name}: puzzles start at 0001`);
       numbers.add(n);
-      checkFile(join(dailyDir, name), spec.daily, n);
+      const checked = checkFile(join(dailyDir, name), spec.daily, n);
+      if (checked) parsedDaily.set(n, checked.data);
     }
 
     // Other declared files.
     for (const [path, contentFile] of Object.entries(spec.files ?? {})) {
       const file = join(dir, path);
-      if (existsSync(file)) checkFile(file, contentFile);
-      else if (live) error(`content/${game.slug}/${path}: missing`);
+      if (existsSync(file)) {
+        const checked = checkFile(file, contentFile);
+        if (checked) parsedFiles[path] = checked.data;
+      } else if (live) error(`content/${game.slug}/${path}: missing`);
+    }
+
+    // The game's own rules across files.
+    if (spec.check) {
+      const result = spec.check({
+        mode,
+        files: parsedFiles,
+        daily: parsedDaily,
+        fileExists: (path) => existsSync(join(root, path)),
+      });
+      for (const msg of result.errors) error(`${game.slug}: ${msg}`);
+      for (const msg of result.warnings) warn(`${game.slug}: ${msg}`);
     }
 
     // Lookahead for live games: today's puzzle (in UTC+14) and the days after it.

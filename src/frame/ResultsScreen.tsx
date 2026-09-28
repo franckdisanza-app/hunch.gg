@@ -10,6 +10,7 @@ import { ShelfTile } from "./ShelfTile";
 import { ShareButton } from "./ShareButton";
 import { strings } from "./strings";
 import { ButtonLink } from "./ui/Button";
+import { cx } from "./ui/cx";
 
 export interface ResultsScreenProps {
   game: string;
@@ -21,6 +22,15 @@ export interface ResultsScreenProps {
   getShare: () => ShareInput;
   /** Link to the unlimited mode; omit to hide the button. */
   unlimitedHref?: Route;
+  /** The game's name for its unlimited mode, e.g. "Endless". */
+  unlimitedLabel?: string;
+  /**
+   * The summary already shows the score, the streak and the countdown in the game's style (a
+   * receipt, a scorecard): the frame then leaves out its own score line and streak box.
+   */
+  summaryShowsStats?: boolean;
+  /** After the share and unlimited buttons, e.g. the one-tap poll. */
+  extras?: ReactNode;
 }
 
 /** The end of a daily round. Structure is shared; games fill the summary slot. */
@@ -31,6 +41,9 @@ export function ResultsScreen({
   streak,
   getShare,
   unlimitedHref,
+  unlimitedLabel,
+  summaryShowsStats = false,
+  extras,
 }: ResultsScreenProps) {
   const others = liveGames().filter((g) => g.slug !== game);
   const titleId = useId();
@@ -38,30 +51,39 @@ export function ResultsScreen({
   return (
     <section aria-labelledby={titleId} className="flex flex-col gap-6">
       <header className="flex flex-col items-center gap-1 text-center">
-        <h2 id={titleId} className="text-sm font-semibold text-frame-muted">
+        <h2
+          id={titleId}
+          className={cx("text-sm font-semibold text-frame-muted", summaryShowsStats && "sr-only")}
+        >
           {strings.results.title}
         </h2>
-        <p className="text-5xl font-black tabular">{score}</p>
+        {!summaryShowsStats && <p className="text-5xl font-black tabular">{score}</p>}
       </header>
 
       {summary && <div>{summary}</div>}
 
-      <div className="grid grid-cols-2 items-center gap-4 rounded-sheet border border-frame-line p-4">
-        <p className="flex flex-col items-center gap-1">
-          <span className="text-sm text-frame-muted">{strings.results.streak}</span>
-          <span className="text-2xl font-bold tabular">{formatNumber(streak)}</span>
-        </p>
-        <Countdown />
-      </div>
+      {!summaryShowsStats && (
+        <div className="grid grid-cols-2 items-center gap-4 rounded-sheet border border-frame-line p-4">
+          <p className="flex flex-col items-center gap-1">
+            <span className="text-sm text-frame-muted">{strings.results.streak}</span>
+            <span className="text-2xl font-bold tabular">{formatNumber(streak)}</span>
+          </p>
+          <Countdown />
+        </div>
+      )}
 
       <div className="flex flex-col gap-3">
         <ShareButton getShare={getShare} className="w-full" />
         {unlimitedHref && (
           <ButtonLink href={unlimitedHref} size="lg" className="w-full">
-            {strings.results.playUnlimited}
+            {unlimitedLabel
+              ? strings.results.playMode(unlimitedLabel)
+              : strings.results.playUnlimited}
           </ButtonLink>
         )}
       </div>
+
+      {extras}
 
       {others.length > 0 && (
         <nav aria-labelledby={moreId} className="flex flex-col gap-3">

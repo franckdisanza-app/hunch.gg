@@ -1,0 +1,34 @@
+{
+  "bananas": {
+    "category_tag": "en:bananas",
+    "price_per": "KILOGRAM"
+  },
+  "apples": {
+    "category_tag": "en:apples",
+    "price_per": "KILOGRAM"
+  },
+  "oranges": {
+    "category_tag": "en:oranges",
+    "price_per": "KILOGRAM"
+  },
+  "tomatoes": {
+    "category_tag": "en:tomatoes",
+    "price_per": "KILOGRAM"
+  },
+  "potatoes": {
+    "category_tag": "en:potatoes",
+    "price_per": "KILOGRAM"
+  },
+  "onions": {
+    "category_tag": "en:onions",
+    "price_per": "KILOGRAM"
+  },
+  "carrots": {
+    "category_tag": "en:carrots",
+    "price_per": "KILOGRAM"
+  },
+  "eggs": {
+    "category_tag": "en:eggs",
+    "price_per": "UNIT"
+  }
+}

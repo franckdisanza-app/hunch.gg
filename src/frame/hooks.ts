@@ -31,6 +31,26 @@ export const useUnlimited = (game: string) =>
 export const usePollVotes = (game: string) =>
   useStore((s) => s.getPollVotes(game), EMPTY_POLL_VOTES);
 
+const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
+
+function subscribeToReducedMotion(onChange: () => void) {
+  const query = window.matchMedia?.(REDUCED_MOTION);
+  query?.addEventListener("change", onChange);
+  return () => query?.removeEventListener("change", onChange);
+}
+
+/**
+ * Whether the player asked for reduced motion. Server renders and the first client render assume
+ * yes, so nothing animates before we know.
+ */
+export function usePrefersReducedMotion(): boolean {
+  return useSyncExternalStore(
+    subscribeToReducedMotion,
+    () => window.matchMedia?.(REDUCED_MOTION).matches ?? false,
+    () => true,
+  );
+}
+
 /** True once the component is running in the browser (false on the server and during hydration). */
 export function useIsClient(): boolean {
   return useSyncExternalStore(

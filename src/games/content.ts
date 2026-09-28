@@ -39,8 +39,28 @@ export type Sourced = Partial<Source> & { id?: string };
 
 export interface ContentFile<T> {
   schema: z.core.$ZodType<T>;
-  /** Every sourced fact in the file, so the validator can check sources, dates and licences. */
-  facts(data: T): readonly Sourced[];
+  /**
+   * Every sourced fact in the file, so the validator can check sources, dates and licences. Leave
+   * it out for files that hold no facts (lists of item names, poll questions).
+   */
+  facts?(data: T): readonly Sourced[];
+}
+
+/** What a game's cross-file check sees. Pure data plus a file probe, so it runs anywhere. */
+export interface ContentCheckContext {
+  /** "production" rejects sample content; "sample" allows it while a game is being built. */
+  mode: "production" | "sample";
+  /** Parsed files from `files` that passed their schema, keyed by path. */
+  files: Readonly<Record<string, unknown>>;
+  /** Parsed daily files that passed their schema, keyed by puzzle number. */
+  daily: ReadonlyMap<number, unknown>;
+  /** Whether a file exists, by path relative to the repository root (e.g. "public/…"). */
+  fileExists(path: string): boolean;
+}
+
+export interface ContentCheckResult {
+  errors: string[];
+  warnings: string[];
 }
 
 /**
@@ -51,6 +71,8 @@ export interface ContentFile<T> {
 export interface ContentSpec<Daily = unknown> {
   daily: ContentFile<Daily>;
   files?: Record<string, ContentFile<unknown>>;
+  /** Rules across files (references, assets, what production allows). */
+  check?(context: ContentCheckContext): ContentCheckResult;
 }
 
 export function defineContentSpec<Daily>(spec: ContentSpec<Daily>): ContentSpec<Daily> {

@@ -52,7 +52,7 @@ export const siteStrings = {
     crowdIntro: "Some games compare your answer with other players. For that, our server stores:",
     crowdItems: [
       "Poll votes: the game, the poll, the option you picked, your random device ID and the time.",
-      "Guesses: the game, the puzzle number, the item, the number you guessed, your random device ID and the time.",
+      "Guesses: the game, the puzzle number, the item, the number you guessed (in games where you pick an answer, 1 if your pick was right and 0 if not), your random device ID and the time.",
       "Mistake reports: the game, the item and the message you wrote, with the time. Please do not include personal details in a report.",
     ],
     deviceId:

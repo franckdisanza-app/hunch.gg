@@ -8,6 +8,11 @@ const nextConfig: NextConfig = {
   // The puzzle API reads daily content from disk at request time; ship those files with it.
   outputFileTracingIncludes: {
     "/api/puzzle/\\[game\\]/\\[n\\]": ["./content/*/daily/*.json"],
+    // Sticker Shock's Endless pool reads the price list and the upcoming dailies.
+    "/api/games/sticker-shock/pool": [
+      "./content/sticker-shock/*.json",
+      "./content/sticker-shock/daily/*.json",
+    ],
   },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders(process.env) }];
