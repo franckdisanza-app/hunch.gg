@@ -40,3 +40,7 @@ npm-debug.log*
 next-env.d.ts
 /lhci-report/
 /.lighthouseci/
+
+# Sticker Shock: proof images waiting for upload, and Open Prices review files
+/content/sticker-shock/proofs-inbox/
+/content/sticker-shock/review/

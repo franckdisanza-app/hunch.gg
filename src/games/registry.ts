@@ -15,7 +15,8 @@ export const games: readonly GameDefinition[] = [
     launchDate: "2026-09-28",
     modes: ["daily", "unlimited"],
     engine: "choice",
-    usesCrowdApi: ["polls"],
+    // Polls after the daily; guesses record 1 or 0 per pair (right or not) for pair_accuracy.
+    usesCrowdApi: ["polls", "guesses"],
   },
   {
     slug: "handshoe",

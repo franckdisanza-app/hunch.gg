@@ -135,7 +135,16 @@ export type Database = {
       };
     };
     Views: {
-      [_ in never]: never;
+      pair_accuracy: {
+        Row: {
+          game: string | null;
+          n: number | null;
+          pair_id: string | null;
+          puzzle: number | null;
+          share_correct: number | null;
+        };
+        Relationships: [];
+      };
     };
     Functions: {
       crowd_histogram: {
