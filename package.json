@@ -26,6 +26,8 @@
     "sticker-shock:proofs": "tsx scripts/sticker-shock/proofs.ts",
     "sticker-shock:open-prices": "tsx scripts/sticker-shock/open-prices.ts",
     "sticker-shock:accuracy": "tsx scripts/sticker-shock/accuracy.ts",
+    "ping:build": "tsx scripts/ping/build.ts",
+    "ping:sample": "tsx scripts/ping/make-sample.ts",
     "size": "tsx scripts/check-bundle-size.ts",
     "db:start": "supabase start",
     "db:reset": "supabase db reset",
