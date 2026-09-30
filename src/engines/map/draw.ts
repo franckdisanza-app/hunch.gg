@@ -1,7 +1,8 @@
-import { geoGraticule10, geoInterpolate, geoPath, type GeoProjection } from "d3-geo";
+import { geoDistance, geoGraticule10, geoInterpolate, geoPath, type GeoProjection } from "d3-geo";
 import type { LineString } from "geojson";
 import type { Atlas } from "./atlas";
-import { easeOut, isVisible, type Camera } from "./camera";
+import { easeOut, globeRadius, isVisible, type Camera } from "./camera";
+import { capBox, clipPolygon } from "./clip";
 import { circleIntersections, geodesicCircle, kmToDegrees, toLonLat, type GeoPoint } from "./geo";
 
 // Draws the globe and everything on it onto a canvas. Plain functions: the Globe component owns
@@ -236,8 +237,26 @@ export function drawFrame(input: FrameInput): boolean {
   ctx.stroke();
 
   if (atlas) {
+    // Only what can show: in front of the horizon and, zoomed in, inside the view. Zoomed in,
+    // big polygons (continents) are first cut to the box around the view, so d3 projects only
+    // their visible stretch.
+    const { width: w, height: h, camera } = input;
+    const reach = Math.hypot(w, h) / 2 / globeRadius(w, h, camera.zoom);
+    const visible = (reach >= 1 ? Math.PI / 2 : Math.asin(reach)) + 0.02;
+    const center = toLonLat(camera.center);
+    const box = visible < 0.5 ? capBox(center, visible) : null;
+    const inView = (part: { center: [number, number]; radius: number }) =>
+      geoDistance(part.center, center) - part.radius < visible;
     ctx.beginPath();
-    path(atlas.land);
+    for (const part of atlas.parts) {
+      if (!inView(part)) continue;
+      if (box && part.points > 300) {
+        const clipped = clipPolygon(part.geometry, box);
+        if (clipped) path(clipped);
+      } else {
+        path(part.geometry);
+      }
+    }
     ctx.fillStyle = colors.land;
     ctx.fill();
     ctx.lineWidth = 0.8;
@@ -245,7 +264,7 @@ export function drawFrame(input: FrameInput): boolean {
     ctx.stroke();
 
     ctx.beginPath();
-    path(atlas.borders);
+    for (const part of atlas.borderParts) if (inView(part)) path(part.geometry);
     ctx.lineWidth = 0.5;
     ctx.strokeStyle = colors.border;
     ctx.stroke();

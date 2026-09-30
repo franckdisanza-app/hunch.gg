@@ -7,9 +7,9 @@ import {
   frameFor,
   isVisible,
   nudge,
-  projectionFor,
   zoomBy,
 } from "./camera";
+import { projectionFor } from "./projection";
 import { circleIntersections, distanceKm } from "./geo";
 
 const W = 360;

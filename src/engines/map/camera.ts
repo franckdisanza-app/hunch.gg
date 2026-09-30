@@ -1,14 +1,9 @@
-import {
-  geoCentroid,
-  geoDistance,
-  geoInterpolate,
-  geoOrthographic,
-  type GeoProjection,
-} from "d3-geo";
+import { geoCentroid, geoDistance, geoInterpolate } from "d3-geo";
 import { clampLat, fromLonLat, normalizeLon, toLonLat, type GeoPoint } from "./geo";
 
 // The globe's camera, as pure functions: where the crosshair points (the centre of the view) and
-// how far in the view is zoomed. North always stays up, so players keep their bearings.
+// how far in the view is zoomed. North always stays up, so players keep their bearings. The
+// projection itself lives in projection.ts, which only the (lazy-loaded) Globe needs.
 
 export interface Camera {
   /** The point under the crosshair. */
@@ -37,19 +32,6 @@ export function clampCamera(camera: Camera, limits: CameraLimits = DEFAULT_LIMIT
 /** The globe's radius in CSS pixels. */
 export function globeRadius(width: number, height: number, zoom: number): number {
   return (Math.min(width, height) / 2) * FIT * zoom;
-}
-
-/** An orthographic projection for the camera, clipped to the view. */
-export function projectionFor(camera: Camera, width: number, height: number): GeoProjection {
-  const { lat, lon } = camera.center;
-  return geoOrthographic()
-    .translate([width / 2, height / 2])
-    .scale(globeRadius(width, height, camera.zoom))
-    .rotate([-lon, -lat])
-    .clipExtent([
-      [-2, -2],
-      [width + 2, height + 2],
-    ]);
 }
 
 /** Degrees of arc per CSS pixel at the centre of the view. */

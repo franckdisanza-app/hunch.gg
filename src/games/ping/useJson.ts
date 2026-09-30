@@ -11,10 +11,33 @@ export type Loaded<T> =
   /** Network or server trouble, or a file that fails its schema. */
   | { status: "error" };
 
-/** Fetches and validates a JSON document once per URL (null: wait). */
+interface Fetched {
+  status: number;
+  body: unknown;
+}
+
+/** A request started early (before React hydrates), for useJson to pick up. */
+export interface Prefetched {
+  url: string;
+  result: Promise<Fetched>;
+}
+
+/** Fetches a JSON document; the body is read at once, so the result can be shared. */
+export function requestJson(url: string): Promise<Fetched> {
+  return fetch(url).then(async (res) => ({
+    status: res.status,
+    body: res.ok ? ((await res.json()) as unknown) : null,
+  }));
+}
+
+/**
+ * Fetches and validates a JSON document once per URL (null: wait). `prefetched` is used instead
+ * of a new request when it is for the same URL (the first time only; a retry fetches again).
+ */
 export function useJson<T>(
   url: string | null,
   schema: z.ZodMiniType<T>,
+  prefetched?: Prefetched | null,
 ): Loaded<T> & { retry(): void } {
   const [state, setState] = useState<{ url: string | null; loaded: Loaded<T> }>({
     url,
@@ -31,18 +54,19 @@ export function useJson<T>(
     const done = (loaded: Loaded<T>) => {
       if (!cancelled) setState({ url, loaded });
     };
-    fetch(url)
-      .then(async (res) => {
-        if (res.status === 404) return done({ status: "missing" });
-        if (!res.ok) return done({ status: "error" });
-        const parsed = z.safeParse(schema, await res.json());
+    const request = attempt === 0 && prefetched?.url === url ? prefetched.result : requestJson(url);
+    request
+      .then(({ status, body }) => {
+        if (status === 404) return done({ status: "missing" });
+        if (status < 200 || status >= 300) return done({ status: "error" });
+        const parsed = z.safeParse(schema, body);
         done(parsed.success ? { status: "ready", data: parsed.data } : { status: "error" });
       })
       .catch(() => done({ status: "error" }));
     return () => {
       cancelled = true;
     };
-  }, [url, schema, attempt]);
+  }, [url, schema, attempt, prefetched]);
 
   const retry = useCallback(() => {
     setState((s) => ({ ...s, loaded: { status: "loading" } }));

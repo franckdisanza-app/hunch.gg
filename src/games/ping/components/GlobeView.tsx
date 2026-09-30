@@ -9,6 +9,7 @@ import type { GlobeHandle } from "@/engines/map/Globe";
 import { cx } from "@/frame/ui/cx";
 import { HEAT } from "../palette";
 import { strings } from "../strings";
+import { GlobePicture } from "./GlobePicture";
 import { Isobars } from "./Isobars";
 import styles from "./world.module.css";
 
@@ -16,13 +17,11 @@ import styles from "./world.module.css";
 // weigh on the first paint (and the shelf never loads any of it).
 const Globe = dynamic(() => import("@/engines/map/Globe").then((m) => m.Globe), {
   ssr: false,
+  // The globe picture underneath stands in until then.
   loading: () => (
-    <div className={styles.globe}>
-      <div className={styles.globePlaceholder} />
-      <p className="sr-only" role="status">
-        {strings.globe.loading}
-      </p>
-    </div>
+    <p className="sr-only" role="status">
+      {strings.globe.loading}
+    </p>
   ),
 });
 
@@ -70,6 +69,7 @@ export function GlobeView({ globeRef, ...props }: GlobeViewProps) {
   return (
     <div className={styles.globeWrap}>
       <Isobars className={styles.isobars} />
+      <GlobePicture />
       <Globe
         ref={globeRef}
         {...props}

@@ -21,13 +21,13 @@ import {
   dragBy,
   flightPath,
   nudge,
-  projectionFor,
   zoomBy,
   type Camera,
   type CameraLimits,
 } from "./camera";
 import { drawFrame, sweepAngle, type GlobeColors, type GlobeScene, type SweepState } from "./draw";
 import { normalizeLon, type GeoPoint } from "./geo";
+import { projectionFor } from "./projection";
 
 // The globe: an orthographic d3-geo globe on a canvas at the device pixel ratio, turned by
 // dragging (with inertia), zoomed by pinching, the wheel or +/−, and aimed with a fixed crosshair
@@ -89,7 +89,7 @@ export interface GlobeProps {
 }
 
 /** Zoom above which the 1:50m shapes are used (loaded the first time it is reached). */
-const DETAIL_ZOOM = 2.5;
+const DETAIL_ZOOM = 4;
 /** Inertia: the glide slows with this time constant (ms), and stops below this speed (deg/ms). */
 const INERTIA_TAU_MS = 325;
 const INERTIA_STOP = 0.0008;
@@ -223,6 +223,8 @@ export function Globe({
       const ctx = canvas?.getContext("2d");
       const { width, height, dpr } = size.current;
       if (!canvas || !ctx || width === 0 || height === 0) return;
+      // Nothing until the land has loaded: a game may show a picture of the globe underneath.
+      if (!atlases.current["110m"]) return;
       if (!resolved.current) resolveStyle();
       const { scene: currentScene, limits: currentLimits } = props.current;
       let moving = false;
@@ -293,7 +295,12 @@ export function Globe({
         dpr,
         projection,
         camera: camera.current,
-        atlas: bestAtlas(),
+        // While the globe moves (dragged, pinched, gliding, flying) the light 1:110m shapes keep
+        // frames fast; the detail comes back the frame it stops.
+        atlas:
+          moving || pointers.current.size > 0
+            ? (atlases.current["110m"] ?? bestAtlas())
+            : bestAtlas(),
         scene: currentScene,
         colors: resolved.current!.colors,
         font: resolved.current!.font,
@@ -545,6 +552,8 @@ export function Globe({
 
   function onPointerUp(event: PointerEvent<HTMLDivElement>) {
     if (!pointers.current.delete(event.pointerId)) return;
+    // Redraw at full detail once the fingers are off.
+    requestFrame();
     if (pointers.current.size < 2) pinch.current = null;
     if (pointers.current.size > 0 || reducedMotion) return;
     // Glide on with the speed of the last ~100 ms of dragging.

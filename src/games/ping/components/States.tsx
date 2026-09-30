@@ -5,6 +5,7 @@ import { cx } from "@/frame/ui/cx";
 import type { MascotPose } from "@/games/types";
 import { Sonde } from "../art/Sonde";
 import { strings } from "../strings";
+import { GlobePicture } from "./GlobePicture";
 import { Isobars } from "./Isobars";
 import styles from "./world.module.css";
 
@@ -28,7 +29,7 @@ export function LoadingRadar({ title }: { title: string }) {
       <div aria-hidden="true" className={cx(styles.panel, "h-24")} />
       <div aria-hidden="true" className={styles.globeWrap}>
         <Isobars className={styles.isobars} />
-        <div className={styles.globePlaceholder} />
+        <GlobePicture />
       </div>
     </div>
   );

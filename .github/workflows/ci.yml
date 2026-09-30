@@ -86,8 +86,11 @@ jobs:
           path: playwright-report/
           retention-days: 7
 
-      - name: Lighthouse (mobile) on the shelf
+      - name: Lighthouse (mobile) on the shelf and the games
         run: npx --yes @lhci/cli@0.15.1 autorun
+        env:
+          # Hidden games (Ping) serve their puzzles only with dev routes on, read at request time.
+          ENABLE_DEV_ROUTES: "1"
       - uses: actions/upload-artifact@v7
         if: always()
         with:

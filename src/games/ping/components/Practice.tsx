@@ -17,7 +17,7 @@ import {
 import { practiceShare } from "../share";
 import { strings } from "../strings";
 import { useDistanceUnit } from "../useDistanceUnit";
-import { useJson } from "../useJson";
+import { requestJson, useJson, type Prefetched } from "../useJson";
 import { DraftBanner } from "./Bits";
 import { Board } from "./Board";
 import { BigLink, DAILY_HREF, LoadingRadar, StateScreen } from "./States";
@@ -25,6 +25,10 @@ import { Summary } from "./Summary";
 import styles from "./world.module.css";
 
 const POOL_URL = `/api/games/${GAME_SLUG}/practice`;
+
+/** The pool, requested as soon as this module runs in the browser (before React hydrates). */
+const early: Prefetched | null =
+  typeof window === "undefined" ? null : { url: POOL_URL, result: requestJson(POOL_URL) };
 
 /** Three random past questions, each of a different category when the pool allows. */
 export function pickRound(pool: readonly DailyQuestion[], random = Math.random): DailyQuestion[] {
@@ -49,7 +53,7 @@ export function pickRound(pool: readonly DailyQuestion[], random = Math.random):
 
 /** Practice: random past questions (never today's or later). Never touches daily stats. */
 export function PracticeGame() {
-  const pool = useJson(POOL_URL, practicePoolSchema);
+  const pool = useJson(POOL_URL, practicePoolSchema, early);
   const [round, setRound] = useState(0);
 
   if (pool.status === "loading") return <LoadingRadar title={strings.practiceHeading} />;

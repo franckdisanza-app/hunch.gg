@@ -101,16 +101,7 @@ export function Board({
       const key = `${round.id}-${pin.attempt}`;
       if (!game.reducedMotion) setGrownAt((g) => ({ ...g, [key]: performance.now() }));
       playSound(pin.perfect ? SOUNDS.squeak : SOUNDS.ping(pin.band));
-      setAnnouncement(
-        pin.perfect
-          ? strings.announce.bullseye(pin.attempt + 1)
-          : strings.announce.miss(
-              pin.attempt + 1,
-              formatDistance(pin.km, unit),
-              strings.heat[pin.band],
-              strings.pins.left(state.pinsLeft),
-            ),
-      );
+      setAnnouncement(pinAnnouncement(pin, state.pinsLeft));
       callbacks.current.onProgress?.(game.saved());
     },
     onReveal(round, answer, state) {
@@ -147,8 +138,21 @@ export function Board({
   const revealTimer = useRef<number | undefined>(undefined);
   useEffect(() => () => window.clearTimeout(revealTimer.current), []);
 
-  function showCard(answer: MapAnswer<Band>, place: string) {
-    setAnnouncement(strings.announce.reveal(place, formatNumber(answer.score)));
+  function pinAnnouncement(pin: MapPin<Band>, pinsLeft: number): string {
+    return pin.perfect
+      ? strings.announce.bullseye(pin.attempt + 1)
+      : strings.announce.miss(
+          pin.attempt + 1,
+          formatDistance(pin.km, unit),
+          strings.heat[pin.band],
+          strings.pins.left(pinsLeft),
+        );
+  }
+
+  /** Shows the card; `before` is read out first (the last pin, when the reveal is instant). */
+  function showCard(answer: MapAnswer<Band>, place: string, before?: string) {
+    const reveal = strings.announce.reveal(place, formatNumber(answer.score));
+    setAnnouncement(before ? `${before} ${reveal}` : reveal);
     setStep("card");
   }
 
@@ -160,8 +164,9 @@ export function Board({
       ...pins.map((p) => p.point),
     ];
     if (game.reducedMotion) {
+      // No flight or sweep: the pin and the answer are read out together.
       globe.current?.setView(frameFor(points));
-      showCard(answer, target.label);
+      showCard(answer, target.label, pinAnnouncement(pins.at(-1)!, 0));
       return;
     }
     setStep("flying");
@@ -290,7 +295,10 @@ export function Board({
         interactive={aiming}
         reducedMotion={reducedMotion}
         onDrop={drop}
-        onSweepEnd={() => state.answer && showCard(state.answer, official.label)}
+        onSweepEnd={() => {
+          // Only the sweep this board is waiting for (an instant reveal has shown the card already).
+          if (step === "sweep" && state.answer) showCard(state.answer, official.label);
+        }}
       />
 
       {state.pins.length > 0 && step !== "card" && (
