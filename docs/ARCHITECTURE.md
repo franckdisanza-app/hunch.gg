@@ -72,7 +72,11 @@ flowchart LR
 - Engines (`src/engines/`) are shared mechanics (`choice`, `estimate`, `clue`, `map`), each added
   with the first game that needs it. `choice` exists (Sticker Shock): pure rules for rounds of 2–3
   options, daily lists and unlimited generators, a React hook for keys, focus, live announcements
-  and animation hooks, and `ChoiceBoard` with render slots. See `src/engines/README.md`.
+  and animation hooks, and `ChoiceBoard` with render slots. `map` exists (Ping): pure rules for
+  pin rounds scored relative to each round's scope, spherical helpers on d3-geo, and a lazy-loaded
+  canvas `Globe` with lazy world-atlas shapes. See `src/engines/README.md`.
+- Games whose scores run into the thousands pass `scoreBucket` (and `formatScore`) to
+  `GameShell`: the stats chart then groups scores, while history keeps them exact.
 - `credits` in a registry entry (fonts, art, data) are listed on the About page once it is live.
 - Game-specific APIs live under `src/app/api/games/<slug>/`, e.g. Sticker Shock's Endless pool
   (`/api/games/sticker-shock/pool`), which ships its content files through

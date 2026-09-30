@@ -76,6 +76,37 @@ export const games: readonly GameDefinition[] = [
     engine: "map",
     // Guesses record each question's first-pin distance in km, for difficulty tuning.
     usesCrowdApi: ["guesses"],
+    credits: [
+      {
+        what: "Headings and big numbers",
+        work: "Unbounded by The Unbounded Project Authors",
+        licence: "SIL Open Font License 1.1",
+        url: "https://github.com/googlefonts/unbounded",
+      },
+      {
+        what: "Radar readouts",
+        work: "JetBrains Mono by The JetBrains Mono Project Authors",
+        licence: "SIL Open Font License 1.1",
+        url: "https://github.com/JetBrains/JetBrainsMono",
+      },
+      {
+        what: "Land and country shapes",
+        work: "Natural Earth, via world-atlas by Mike Bostock",
+        licence: "Public domain (Natural Earth), ISC License (world-atlas)",
+        url: "https://github.com/topojson/world-atlas",
+      },
+      {
+        what: "Computed questions",
+        work: "OpenStreetMap contributors",
+        licence: "Open Database License (ODbL) 1.0",
+        url: "https://www.openstreetmap.org/copyright",
+      },
+      {
+        what: "Sonde, the icons and the weather-chart art",
+        work: "drawn for Plimp",
+        licence: "all rights reserved",
+      },
+    ],
   },
   {
     slug: "souvenir",
