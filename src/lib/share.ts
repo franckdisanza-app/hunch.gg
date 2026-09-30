@@ -1,5 +1,6 @@
 import type { ShareMethod } from "./analytics/events";
 import { SHARE_REF } from "./analytics/share-arrival";
+import { formatNumber } from "./format";
 import { siteUrl } from "./site";
 
 // The share text format is shared by every game (the share image is each game's own):
@@ -49,8 +50,10 @@ export type ShareInput = DailyShareInput | RunShareInput;
 
 export class SpoilerError extends Error {}
 
+/** "8/10", "812", "2,140/3,000": numbers in the UI locale, never words. */
 export function formatShareScore(score: ShareScore): string {
-  return score.max === undefined ? `${score.value}` : `${score.value}/${score.max}`;
+  const value = formatNumber(score.value);
+  return score.max === undefined ? value : `${value}/${formatNumber(score.max)}`;
 }
 
 export function shareUrl(slug: string, baseUrl = siteUrl()): string {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { useNow } from "@/frame/hooks";
 import { cx } from "@/frame/ui/cx";
 import { deviceTimeZone, msUntilNextPuzzle } from "@/lib/daily";
@@ -15,24 +15,6 @@ export interface ReceiptLineData {
   correct: boolean;
 }
 
-const TYPE_MS = 16;
-
-/** Types `text` out one character at a time; all at once when motion is reduced. */
-function useTypewriter(text: string, animate: boolean): string {
-  const [shown, setShown] = useState(animate ? 0 : text.length);
-  useEffect(() => {
-    if (!animate) return;
-    let n = 0;
-    const id = window.setInterval(() => {
-      n += 1;
-      setShown(n);
-      if (n >= text.length) window.clearInterval(id);
-    }, TYPE_MS);
-    return () => window.clearInterval(id);
-  }, [text, animate]);
-  return animate ? text.slice(0, shown) : text;
-}
-
 function Mark({ correct }: { correct: boolean }) {
   return (
     <span className={styles.receiptMark}>
@@ -42,47 +24,12 @@ function Mark({ correct }: { correct: boolean }) {
   );
 }
 
-function Line({ line, typing }: { line: ReceiptLineData; typing: boolean }) {
-  const typed = useTypewriter(line.text, typing);
-  const done = typed.length === line.text.length;
+function Line({ line }: { line: ReceiptLineData }) {
   return (
-    <li className={cx(styles.receiptLine, typing && styles.newLine)}>
-      <span>
-        <span aria-hidden="true">{typed}</span>
-        <span className="sr-only">{line.text}</span>
-      </span>
-      {done ? <Mark correct={line.correct} /> : <span aria-hidden="true"> </span>}
+    <li className={styles.receiptLine}>
+      <span>{line.text}</span>
+      <Mark correct={line.correct} />
     </li>
-  );
-}
-
-/**
- * The receipt printer under the cards: each reveal feeds a line out of the slot and types it.
- * Hidden from the live region: the reveal is announced on its own.
- */
-export function ReceiptPrinter({
-  lines,
-  animate,
-  className,
-}: {
-  lines: readonly ReceiptLineData[];
-  /** Type the newest line (false under reduced motion and when restoring a saved game). */
-  animate: boolean;
-  className?: string;
-}) {
-  return (
-    <section aria-label={strings.receipt.printer} className={cx(styles.printer, className)}>
-      <div className={styles.slot} aria-hidden="true" />
-      {lines.length > 0 && (
-        <div className={cx(styles.feed, styles.receipt, styles.receiptPaper, styles.mono)}>
-          <ol className={styles.receiptLines}>
-            {lines.map((line, i) => (
-              <Line key={line.key} line={line} typing={animate && i === lines.length - 1} />
-            ))}
-          </ol>
-        </div>
-      )}
-    </section>
   );
 }
 
@@ -141,7 +88,7 @@ export function Receipt({
       <hr className={styles.dashedRule} />
       <ol className={styles.receiptLines}>
         {lines.map((line) => (
-          <Line key={line.key} line={line} typing={false} />
+          <Line key={line.key} line={line} />
         ))}
       </ol>
       <hr className={styles.dashedRule} />

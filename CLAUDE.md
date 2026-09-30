@@ -26,6 +26,7 @@ Keep this file short and current. Details live in `docs/`.
 | `pnpm csv-to-json <game> <file.csv>`                                            | Spreadsheet export → content, via `content/<game>/csv-mapping.json`.                             |
 | `pnpm db:start` / `db:reset` / `db:types`                                       | Local Supabase (needs Docker), reset with seed, regenerate types.                                |
 | `pnpm sticker-shock:build` (and `:proofs`, `:open-prices`, `:accuracy`, `:art`) | Sticker Shock's data pipeline: `docs/games/sticker-shock/`.                                      |
+| `pnpm ping:build` (and `:sample`, `:art`, `:furthest`, `:difficulty`)           | Ping's dailies and tools: `docs/games/ping/` (content guide included).                           |
 
 Local crowd API without Docker: `CROWD_STORE=memory` in `.env.local`.
 
@@ -35,7 +36,8 @@ Local crowd API without Docker: `CROWD_STORE=memory` in `.env.local`.
 src/app/            routes: shelf, about, privacy, dev/, (games)/<slug>/, api/
 src/frame/          the shared chrome: GameShell, TopBar, sheets, ResultsScreen, RevealCard, ui/
 src/games/          types.ts (GameDefinition), registry.ts, content.ts, <slug>/ per game
-src/engines/        shared game mechanics: choice/ (Sticker Shock; next Tiptoe, Coined, Chimp)
+src/engines/        shared game mechanics: choice/ (Sticker Shock; next Tiptoe, Coined, Chimp),
+                    map/ (Ping; next Souvenir)
 src/lib/            daily, storage, share, sound, format, analytics/, crowd/, content/, supabase/
 src/styles/         tokens.css (frame tokens, light/dark)
 content/<slug>/     daily/0001.json … (read at request time, never imported)
@@ -72,8 +74,20 @@ docs/               ARCHITECTURE, ADDING_A_GAME, DEPLOY, games/<slug>.md
   / `pickOption` / `nextRound` are pure (daily `list` or unlimited `generator` with
   `endOnMiss`, resumable answers); `useChoiceGame` adds keys (A/←, B/→, C, Enter), focus (Next
   after a reveal), `revealDelayMs` (0 under reduced motion) and `onPick`/`onReveal`/`onFinish`;
-  `ChoiceBoard` renders real buttons through `renderOption`/`renderReveal` slots plus a live
-  region; `summarize` gives score, streak and the emoji grid. No strings in the engine.
+  `ChoiceBoard` renders real buttons through `renderOption`/`renderReveal` slots, an optional
+  pinned `actionBar` for Next, and a live region; `summarize` gives score, streak and the emoji grid. No strings in the engine.
+  The **map engine** (`src/engines/map/`): rounds of up to `weights.length` pins against one or
+  more targets (a pin scores against the nearest); scoring relative to the round's scope size
+  (`scopeSizeKm`): a pin inside the perfect radius scores `maxPoints` on any attempt, a miss
+  `maxPoints · e^(−d / (decay × scope))` × its attempt weight, bands by fraction of the scope;
+  `startMap` / `dropPin` / `nextRound` are pure and resumable (`saveMap`); `useMapGame` adds
+  callbacks and focus. `Globe` (lazy-load it: d3-geo + world-atlas never reach the shelf) is an
+  orthographic canvas globe with a fixed crosshair, drag with inertia, pinch, wheel, arrows,
+  +/− and Enter, rings, pins, target blips, arcs, a radar sweep and `flyTo`; colours may be
+  `var(--game-…)`; screen readers hear the coordinates and country under the crosshair; jump
+  cuts under reduced motion; a `backdrop` picture of the opening view spares the first draw, and
+  the 1:50m shapes wait for the player's first move. `geo.ts`: great-circle distance, geodesic circles, circle
+  crossings, antimeridian-safe boxes, km/mi. `/dev/globe` shows it with a fake target.
 - **Schemas:** Zod everywhere (content, API payloads, stored state), always `zod/mini`
   (`import * as z from "zod/mini"`). Classic `zod` is banned by lint: it adds ~90 KB gzipped to any
   browser bundle it touches.
@@ -112,12 +126,15 @@ docs/               ARCHITECTURE, ADDING_A_GAME, DEPLOY, games/<slug>.md
 ## Games
 
 Sticker Shock is `live` on sample data with a placeholder `launchDate` (real prices and date to
-come: `docs/games/sticker-shock/data-guide.md`). The others are `hidden`, with no code or content.
+come: `docs/games/sticker-shock/data-guide.md`). Ping is `hidden`, fully built on 20 fake sample
+questions with a placeholder `launchDate` (real questions to come:
+`docs/games/ping/content-guide.md`). The others are `hidden`, with no code or content.
 
 | slug          | Name          | Engine   | Crowd                        | Tagline                                                        |
 | ------------- | ------------- | -------- | ---------------------------- | -------------------------------------------------------------- |
 | sticker-shock | Sticker Shock | choice   | polls, guesses (right/wrong) | Which costs more? Every price is real, with receipts.          |
 | handshoe      | Handshoe      | clue     | –                            | Guess the thing from its literal name in another language.     |
+| ping          | Ping          | map      | guesses (first-pin km)       | Pin the world's extremes: hottest, wettest, farthest.          |
 | souvenir      | Souvenir      | map      | –                            | Where does this English word come from? Drop a pin.            |
 | ja-nein       | Ja/Nein       | estimate | polls, guesses               | Vote on a real Swiss referendum, then guess the yes-share.     |
 | same-boat     | Same Boat     | estimate | polls, guesses               | Pick a side, then guess how many players agree with you.       |

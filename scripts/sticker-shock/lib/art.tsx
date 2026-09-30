@@ -4,7 +4,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { TagArt } from "@/games/sticker-shock/art/TagArt";
 import { PALETTE } from "@/games/sticker-shock/palette";
 import { MASCOT_POSES } from "@/games/types";
-import { readWoff, textPath } from "./font-paths";
+import { readWoff, textPath } from "../../lib/font-paths";
 
 /** The static art files, by path under public/games/sticker-shock/. */
 export function artFiles(root: string): Record<string, string> {

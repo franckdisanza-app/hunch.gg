@@ -1,0 +1,95 @@
+{
+  "puzzle": 177,
+  "questions": [
+    {
+      "id": "sample-19",
+      "category": "geography",
+      "prompt": "Sample 19 (fake data): where is the made-up landmark? A random spot, placed to test Ping.",
+      "teaser": "Where is the made-up landmark of sample 19?",
+      "scope": { "level": "world", "name": "the world" },
+      "targets": [
+        {
+          "lat": -26.6535,
+          "lon": -49.0181,
+          "label": "Fake place 19",
+          "official": true,
+          "value": 43.3,
+          "unit": "fake units",
+          "date": "2026-09"
+        }
+      ],
+      "authority": "Fake Weather Office (sample)",
+      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
+      "sourceTitle": "Sample Source (fake)",
+      "sourceUrl": "https://example.test/ping/sample-19",
+      "checkedOn": "2026-09-30",
+      "licence": "Sample data, not a real fact",
+      "sample": true,
+      "surface": "land"
+    },
+    {
+      "id": "sample-13",
+      "category": "furthest-from",
+      "prompt": "Sample 13 (fake data): where in Fake Region 13 is the made-up most remote spot, as of September 2026? A random spot, placed to test Ping.",
+      "teaser": "Where is the made-up most remote spot of sample 13?",
+      "scope": {
+        "level": "region",
+        "name": "Fake Region 13",
+        "bbox": [-147.9476, 49.256, -127.9476, 65.256]
+      },
+      "targets": [
+        {
+          "lat": 61.9746,
+          "lon": -133.5228,
+          "label": "Fake place 13",
+          "official": true,
+          "value": 60.7,
+          "unit": "fake units",
+          "date": "2026-09"
+        }
+      ],
+      "authority": "Fake computation (sample)",
+      "turnsOut": "this sample was not computed from anything: the place and its nearest features are made up.",
+      "computedOn": "2026-09-30",
+      "dataAsOf": "2026-09-30",
+      "nearest": [
+        { "name": "Fake feature 13-1", "town": "Fake Town", "lat": 61.6344, "lon": -132.8818 },
+        { "name": "Fake feature 13-2", "town": "Fake Town", "lat": 62.4127, "lon": -133.1599 },
+        { "name": "Fake feature 13-3", "town": "Fake Town", "lat": 62.2395, "lon": -133.2596 }
+      ],
+      "sourceTitle": "Sample Source (fake)",
+      "sourceUrl": "https://example.test/ping/sample-13",
+      "checkedOn": "2026-09-30",
+      "licence": "Sample data, not a real fact",
+      "sample": true,
+      "surface": "land"
+    },
+    {
+      "id": "sample-15",
+      "category": "heat",
+      "prompt": "Sample 15 (fake data): where is the made-up hottest spot? A random spot, placed by a script to test how Ping lays out a long question on a small phone screen without scrolling.",
+      "teaser": "Where is the made-up hottest spot of sample 15?",
+      "scope": { "level": "world", "name": "the world" },
+      "targets": [
+        {
+          "lat": -3.5524,
+          "lon": 35.6397,
+          "label": "Fake place 15",
+          "official": true,
+          "value": 94.5,
+          "unit": "fake units",
+          "date": "2026-09"
+        }
+      ],
+      "authority": "Fake Weather Office (sample)",
+      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
+      "sourceTitle": "Sample Source (fake)",
+      "sourceUrl": "https://example.test/ping/sample-15",
+      "checkedOn": "2026-09-30",
+      "licence": "Sample data, not a real fact",
+      "sample": true,
+      "surface": "land"
+    }
+  ],
+  "sample": true
+}

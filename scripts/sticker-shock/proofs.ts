@@ -10,7 +10,7 @@ import { join } from "node:path";
 import { parseArgs } from "node:util";
 import { parseCsv } from "@/lib/content/csv";
 import { BUCKET, prepareProof, priceIdOf, withProofUrls, type PreparedProof } from "./lib/proofs";
-import { scriptSupabase } from "./lib/supabase";
+import { scriptSupabase } from "../lib/supabase";
 
 const root = process.cwd();
 const { values } = parseArgs({

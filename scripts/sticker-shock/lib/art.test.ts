@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { artFiles } from "./art";
-import { readWoff, textPath } from "./font-paths";
+import { readWoff, textPath } from "../../lib/font-paths";
 
 const root = process.cwd();
 const out = join(root, "public", "games", "sticker-shock");

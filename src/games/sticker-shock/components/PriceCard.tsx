@@ -29,6 +29,8 @@ export function PriceCard({ price, status, revealed, keyHint, display, tilt }: P
   const title = itemTitle(price.item);
   const parts = display ? formatCurrencyParts(display.amount, display.currency) : null;
   const pricier = revealed && (status === "right" || status === "answer");
+  // A right pick already says it costs more (its stamp); the badge only marks a missed answer.
+  const pricierBadge = revealed && status === "answer";
   const spoken = [
     `${title}, ${price.countryName}`,
     parts ? `${parts.currency} ${parts.amount}` : "",
@@ -47,7 +49,7 @@ export function PriceCard({ price, status, revealed, keyHint, display, tilt }: P
         {keyHint && <span className={styles.keyHint}>{keyHint}</span>}
       </span>
       <span aria-hidden="true" className={styles.cardBody}>
-        <ItemIcon icon={price.item.icon} size={48} />
+        <ItemIcon icon={price.item.icon} size={40} />
         <span className={cx(styles.display, styles.cardTitle)}>{title}</span>
         <span className={cx(styles.burst, revealed && styles.flipped)}>
           <span className={styles.burstInner}>
@@ -88,7 +90,7 @@ export function PriceCard({ price, status, revealed, keyHint, display, tilt }: P
           {status === "right" ? strings.stamp.right : strings.stamp.wrong}
         </span>
       )}
-      {pricier && (
+      {pricierBadge && (
         <span aria-hidden="true" className={styles.pricier}>
           {strings.pricier}
         </span>

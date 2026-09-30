@@ -12,9 +12,11 @@ Which costs more? Every price is real, with receipts.
 
 Two shelf labels show an item, its quantity and a country ("12 EGGS · Japan", "1 KG BANANAS ·
 Switzerland"). The player taps the one that costs more. The reveal flips both price stickers to
-the display currency, shows both local prices (and the real pack when a price was scaled), the
-store and capture date, "See the shelf" (the proof image with its source and licence) and a
-"Turns out…" sentence. The receipt printer under the cards types one line per pair.
+the display currency, stamps the pick right or wrong, and shows a short "Turns out…" sentence
+with the source line. "Receipts" unfolds the local prices (and the real pack when a price was
+scaled), stores, capture dates and "See the shelf" (the proof image with its source and licence).
+Next sits in a bar pinned to the bottom of the screen: two taps a pair (pick, next), no
+scrolling. The ✓/✗ marks by the title show the day so far.
 
 - **Daily 10**: the same ten pairs for everyone. After pair 10 the whole receipt slides up as the
   results screen (score, streak, best, barcode, countdown), then share and the day's poll.
@@ -99,7 +101,8 @@ game shows "Sample data — not real prices", and `CONTENT_MODE=production` fail
 - **Icons**: 25 flat item icons drawn for Plimp (`art/ItemIcon.tsx`). Flags from flag-icons (MIT).
 - **Sounds** (Web Audio, off by default): scanner beep, cha-ching, low buzz, receipt-printer
   chatter.
-- **Signature moment**: the receipt. A line prints per reveal; the full receipt is the results.
+- **Signature moment**: the receipt, which slides up as the results screen (Endless: torn off at
+  the first miss).
 
 ## Tests
 

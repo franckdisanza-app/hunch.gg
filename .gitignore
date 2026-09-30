@@ -44,3 +44,6 @@ next-env.d.ts
 # Sticker Shock: proof images waiting for upload, and Open Prices review files
 /content/sticker-shock/proofs-inbox/
 /content/sticker-shock/review/
+
+# pnpm ping:furthest caches OpenStreetMap downloads here
+/.cache/

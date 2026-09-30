@@ -1,0 +1,185 @@
+/* The how-to loop: 7 s. Pin 1 drops (0–6%), its ring grows (6–26%) and freezes with a label;
+   pin 2 drops (34–40%), its ring grows (40–54%); everything holds, then fades before the loop. */
+
+.demo {
+  margin: 0;
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.labelText {
+  fill: #eaf2ff;
+  font-family: var(--ping-font-mono), ui-monospace, monospace;
+  font-size: 10.5px;
+  font-weight: 700;
+}
+
+.ring1,
+.ring2 {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.pin1,
+.pin2 {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+
+.pin1 {
+  animation: drop 7s ease-out infinite;
+}
+
+.ring1 {
+  animation: grow1 7s ease-out infinite;
+}
+
+.label1 {
+  animation: show1 7s linear infinite;
+}
+
+.pin2 {
+  animation: drop2 7s ease-out infinite;
+}
+
+.ring2 {
+  animation: grow2 7s ease-out infinite;
+}
+
+.label2 {
+  animation: show2 7s linear infinite;
+}
+
+.target {
+  animation: blip 7s linear infinite;
+}
+
+@keyframes drop {
+  0% {
+    transform: translateY(-30px);
+    opacity: 0;
+  }
+  6%,
+  90% {
+    transform: none;
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes grow1 {
+  0%,
+  6% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  7% {
+    opacity: 1;
+  }
+  26%,
+  90% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes show1 {
+  0%,
+  26% {
+    opacity: 0;
+  }
+  29%,
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes drop2 {
+  0%,
+  34% {
+    transform: translateY(-30px);
+    opacity: 0;
+  }
+  40%,
+  90% {
+    transform: none;
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes grow2 {
+  0%,
+  40% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  41% {
+    opacity: 1;
+  }
+  54%,
+  90% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes show2 {
+  0%,
+  54% {
+    opacity: 0;
+  }
+  57%,
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes blip {
+  0%,
+  60% {
+    opacity: 0;
+  }
+  64%,
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Reduced motion: the final frame, still. */
+@media (prefers-reduced-motion: reduce) {
+  .pin1,
+  .ring1,
+  .label1,
+  .pin2,
+  .ring2,
+  .label2,
+  .target {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+  }
+}

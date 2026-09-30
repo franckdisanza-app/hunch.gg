@@ -34,6 +34,8 @@ async function playDaily(page: Page, options: { keyboard?: boolean; axe?: boolea
     else await region.getByRole("button").first().click();
     const next = page.getByRole("button", { name: n === 10 ? "See the receipt" : "Next pair" });
     await expect(next).toBeFocused();
+    // Next is pinned to the bottom of the screen: never a scroll away.
+    await expect(next).toBeInViewport();
     await expect(page.getByText(/^Turns out/)).toBeVisible();
     if (options.axe && n === 1) await expectNoSeriousAxeViolations(page);
     if (options.keyboard) await page.keyboard.press("Enter");
@@ -79,8 +81,12 @@ test("every reveal shows proof, store, capture date and a source link", async ({
   await closeHowTo(page);
   await pair(page, 1).getByRole("button").first().click();
   const reveal = page.getByRole("article");
-  await expect(reveal.getByText(/Sample Mart, \d/)).toHaveCount(2);
+  // The source line is always there; the rest folds into "Receipts".
   await expect(reveal.getByRole("link", { name: "Sample Mart" })).toHaveCount(2);
+  await expect(reveal.getByText(/Sample Mart, \d/).first()).toBeHidden();
+  await reveal.getByText("Receipts").click();
+  await expect(reveal.getByText(/Sample Mart, \d/)).toHaveCount(2);
+  await expect(reveal.getByText(/on the shelf|scaled to/)).toHaveCount(2);
   await reveal
     .getByRole("button", { name: /^See the shelf/ })
     .first()
@@ -213,7 +219,7 @@ test("a keyboard-only run", async ({ page }) => {
 test.describe("reduced motion", () => {
   test.use({ reducedMotion: "reduce" });
 
-  test("reveals at once, prints without typing and keeps Tag still", async ({ page }) => {
+  test("reveals at once and keeps Tag still", async ({ page }) => {
     await page.goto(DAILY);
     await closeHowTo(page);
     const swing = page.locator("svg[data-pose] [data-part='swing']").first();
@@ -221,9 +227,8 @@ test.describe("reduced motion", () => {
     await pair(page, 1).getByRole("button").first().click();
     // No pick delay: the reveal is there straight away.
     await expect(page.getByRole("button", { name: "Next pair" })).toBeFocused({ timeout: 200 });
-    const printed = page.getByRole("region", { name: "Receipt printer" }).locator("li").first();
-    const full = await printed.locator(".sr-only").first().textContent();
-    await expect(printed.locator("[aria-hidden='true']").first()).toHaveText(full ?? "");
+    await expect(page.getByText(/^Turns out/)).toBeVisible({ timeout: 200 });
+    await expect(swing).toHaveCSS("animation-name", "none");
   });
 });
 

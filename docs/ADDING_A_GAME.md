@@ -48,6 +48,8 @@ pnpm new-game sticker-shock --name "Sticker Shock" --engine choice
       `src/app/api/games/<slug>/`.
 - [ ] Game settings (e.g. display currency) go in `GameShell`'s `gameSettings` slot and are
       saved with `playerStorage().updateMeta({ prefs: … })`.
+- [ ] Scores in the hundreds or thousands: pass `scoreBucket` and `formatScore` to `GameShell`
+      so the stats chart groups them (Ping groups by 500).
 - [ ] Every string in `src/games/<slug>/strings.ts`; format with `src/lib/format.ts`.
 - [ ] Keep first-load JS under budget (`ENABLE_DEV_ROUTES=1 pnpm build && pnpm size` measures
       the empty shell; check the game's own page in the build output too).

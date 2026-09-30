@@ -1,0 +1,101 @@
+{
+  "puzzle": 174,
+  "questions": [
+    {
+      "id": "sample-14",
+      "category": "regional",
+      "prompt": "Sample 14 (fake data): where in Fake Region 14 is the made-up local record? A random spot, placed to test Ping.",
+      "teaser": "Where is the made-up local record of sample 14?",
+      "scope": {
+        "level": "region",
+        "name": "Fake Region 14",
+        "bbox": [67.158, 53.7311, 87.158, 69.7311]
+      },
+      "targets": [
+        {
+          "lat": 63.2404,
+          "lon": 79.4363,
+          "label": "Fake place 14",
+          "official": true,
+          "value": 67.1,
+          "unit": "fake units",
+          "date": "2026-09"
+        }
+      ],
+      "authority": "Fake Weather Office (sample)",
+      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
+      "sourceTitle": "Sample Source (fake)",
+      "sourceUrl": "https://example.test/ping/sample-14",
+      "checkedOn": "2026-09-30",
+      "licence": "Sample data, not a real fact",
+      "sample": true,
+      "surface": "land"
+    },
+    {
+      "id": "sample-11",
+      "category": "wind",
+      "prompt": "Sample 11 (fake data): where is the made-up windiest spot? A random spot, placed to test Ping.",
+      "teaser": "Where is the made-up windiest spot of sample 11?",
+      "scope": { "level": "world", "name": "the world" },
+      "targets": [
+        {
+          "lat": 45.0655,
+          "lon": -91.0714,
+          "label": "Fake place 11",
+          "official": true,
+          "value": 57.9,
+          "unit": "fake units",
+          "date": "2026-09"
+        },
+        {
+          "lat": 55.891,
+          "lon": -98.791,
+          "label": "Fake contender 11b",
+          "official": false,
+          "value": 44.9,
+          "unit": "fake units",
+          "date": "2026-09"
+        }
+      ],
+      "authority": "Fake Weather Office (sample)",
+      "turnsOut": "this fake record has fake contenders too. The reveal shows every one, with the official one marked.",
+      "sourceTitle": "Sample Source (fake)",
+      "sourceUrl": "https://example.test/ping/sample-11",
+      "checkedOn": "2026-09-30",
+      "licence": "Sample data, not a real fact",
+      "sample": true,
+      "surface": "land"
+    },
+    {
+      "id": "sample-05",
+      "category": "geography",
+      "prompt": "Sample 05 (fake data): where in Fake Continent 05 is the made-up landmark? A random spot, placed to test Ping.",
+      "teaser": "Where is the made-up landmark of sample 05?",
+      "scope": {
+        "level": "continent",
+        "name": "Fake Continent 05",
+        "bbox": [19.8368, 21.7565, 69.8368, 57.7565]
+      },
+      "targets": [
+        {
+          "lat": 34.6926,
+          "lon": 48.4029,
+          "label": "Fake place 05",
+          "official": true,
+          "value": 91.3,
+          "unit": "fake units",
+          "date": "2026-09"
+        }
+      ],
+      "authority": "Fake Weather Office (sample)",
+      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
+      "sourceTitle": "Sample Source (fake)",
+      "sourceUrl": "https://example.test/ping/sample-05",
+      "checkedOn": "2026-09-30",
+      "licence": "Sample data, not a real fact",
+      "sample": true,
+      "surface": "land"
+    }
+  ],
+  "sample": true
+}

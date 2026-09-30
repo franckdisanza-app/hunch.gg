@@ -38,6 +38,7 @@ export const strings = {
       `${local} for ${pack}, scaled to ${item}`,
     captured: (store: string, date: string) => `${store}, ${date}`,
     seeShelf: "See the shelf",
+    receipts: "Receipts",
     seeShelfOf: (item: string, country: string) => `See the shelf: ${item} in ${country}`,
   },
   turnsOut: {
@@ -91,7 +92,6 @@ export const strings = {
     nextShelf: "NEXT SHELF IN",
     torn: "TORN OFF AT THE FIRST MISS",
     og: "RECEIPTS INCLUDED",
-    printer: "Receipt printer",
     right: "right",
     wrong: "wrong",
   },

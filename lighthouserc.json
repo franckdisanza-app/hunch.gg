@@ -3,7 +3,11 @@
     "collect": {
       "startServerCommand": "pnpm start --port 3200",
       "startServerReadyPattern": "Ready",
-      "url": ["http://localhost:3200/", "http://localhost:3200/sticker-shock"],
+      "url": [
+        "http://localhost:3200/",
+        "http://localhost:3200/sticker-shock",
+        "http://localhost:3200/ping"
+      ],
       "numberOfRuns": 3
     },
     "assert": {

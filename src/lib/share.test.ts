@@ -36,6 +36,8 @@ describe("buildShareText", () => {
   it("always writes the score in numbers", () => {
     const text = buildShareText({ ...input, score: { value: 812 } });
     expect(text.split("\n")[0]).toBe("Demo Game #12 · 812");
+    const big = buildShareText({ ...input, score: { value: 2140, max: 3000 } });
+    expect(big.split("\n")[0]).toBe("Demo Game #12 · 2,140/3,000");
   });
 
   it("builds links from the site URL", () => {
