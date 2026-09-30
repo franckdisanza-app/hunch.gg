@@ -26,7 +26,7 @@ import { useJson } from "../useJson";
 import { SampleBanner, Sign } from "./Bits";
 import { Board, roundLabels } from "./Board";
 import { Header } from "./Header";
-import { Receipt, ReceiptPrinter, type ReceiptLineData } from "./Receipt";
+import { Receipt, type ReceiptLineData } from "./Receipt";
 import { EndlessLink, LoadingShelf, StateScreen } from "./States";
 import styles from "./world.module.css";
 
@@ -138,7 +138,6 @@ function DailyPlay({
   const { player, playSound } = useGame();
   const currency = useDisplayCurrency();
   const config = useMemo(() => configFor(day), [day]);
-  const [printing, setPrinting] = useState(false);
 
   const game = useChoiceGame({
     config,
@@ -151,7 +150,6 @@ function DailyPlay({
     onReveal(round, answer, state) {
       if (state.answers.length === 1 && restore.length === 0) player.start();
       playSound(answer.correct ? SOUNDS.right : SOUNDS.wrong);
-      setPrinting(true);
       // Fire and forget: the crowd API never blocks play.
       sendGuess({
         game: SLUG,
@@ -197,11 +195,6 @@ function DailyPlay({
         roundLabel={roundLabels.daily}
         nextLabel={(s) => (s.isLast ? strings.finish : strings.next)}
         reportId={(round) => round.id}
-      />
-      <ReceiptPrinter
-        lines={linesFor(day, state.answers)}
-        animate={printing && !game.reducedMotion}
-        className="mt-2"
       />
     </div>
   );

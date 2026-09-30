@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { cx } from "@/frame/ui/cx";
 import type { MascotPose } from "@/games/types";
 import { Tag } from "../art/Tag";
@@ -12,12 +13,15 @@ export function Header({
   pose,
   marks,
   total,
+  children,
 }: {
   title: string;
   pose: MascotPose;
   marks: readonly boolean[];
   /** Pairs in the day; unset for Endless. */
   total?: number;
+  /** A line under the title instead of the marks (Endless: the run). */
+  children?: ReactNode;
 }) {
   const slots = total ?? 0;
   return (
@@ -41,6 +45,7 @@ export function Header({
             ))}
           </ol>
         )}
+        {children}
       </div>
     </header>
   );

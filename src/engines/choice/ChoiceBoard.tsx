@@ -49,6 +49,11 @@ export interface ChoiceBoardProps<R extends ChoiceRound> {
   header?: ReactNode;
   /** Between two options, e.g. "or". */
   separator?: ReactNode;
+  /**
+   * An action bar that is always there (e.g. pinned to the bottom of the screen): it holds the
+   * Next button after a reveal and `idle` before one, so Next is always in the same place.
+   */
+  actionBar?: { className?: string; idle?: ReactNode };
   className?: string;
 }
 
@@ -78,6 +83,7 @@ export function ChoiceBoard<R extends ChoiceRound>({
   announce,
   header,
   separator,
+  actionBar,
   className,
 }: ChoiceBoardProps<R>) {
   const { state, pending, next, getOptionProps, setNextButton, setRoundElement } = game;
@@ -122,10 +128,22 @@ export function ChoiceBoard<R extends ChoiceRound>({
         </div>
       )}
       {revealCtx && renderReveal?.(revealCtx)}
-      {state.phase === "revealed" && (
-        <button type="button" ref={setNextButton} onClick={next} className={nextClassName}>
-          {nextLabel(state)}
-        </button>
+      {actionBar ? (
+        <div className={actionBar.className} data-phase={state.phase}>
+          {state.phase === "revealed" ? (
+            <button type="button" ref={setNextButton} onClick={next} className={nextClassName}>
+              {nextLabel(state)}
+            </button>
+          ) : (
+            actionBar.idle
+          )}
+        </div>
+      ) : (
+        state.phase === "revealed" && (
+          <button type="button" ref={setNextButton} onClick={next} className={nextClassName}>
+            {nextLabel(state)}
+          </button>
+        )
       )}
       <p aria-live="polite" className="sr-only">
         {revealCtx ? announce(revealCtx) : ""}

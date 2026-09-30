@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { ChoiceBoard } from "@/engines/choice/ChoiceBoard";
 import type { ChoiceState } from "@/engines/choice/state";
 import type { ChoiceGame } from "@/engines/choice/useChoiceGame";
@@ -25,8 +26,20 @@ export interface BoardProps {
   reportId: (round: PriceRound) => string;
 }
 
-/** One pair: two shelf labels, "or" between them, the reveal and Next. */
+/**
+ * One pair: two shelf labels, "or" between them, a short reveal, and Next in a bar pinned to the
+ * bottom of the screen (two taps a pair, no scrolling).
+ */
 export function Board({ game, currency, rates, roundLabel, nextLabel, reportId }: BoardProps) {
+  // A new pair starts at the top, even if the last reveal scrolled the page.
+  const firstIndex = useRef(game.state.index);
+  const { index } = game.state;
+  const { reducedMotion } = game;
+  useEffect(() => {
+    if (index === firstIndex.current || window.scrollY === 0) return;
+    window.scrollTo({ top: 0, behavior: reducedMotion ? "auto" : "smooth" });
+  }, [index, reducedMotion]);
+
   const price = (round: PriceRound, index: number) => {
     const option = round.options[index as 0 | 1];
     return { price: option, amount: displayAmount(option, currency, rates) };
@@ -36,7 +49,7 @@ export function Board({ game, currency, rates, roundLabel, nextLabel, reportId }
     <ChoiceBoard
       game={game}
       roundLabel={roundLabel}
-      className="flex flex-col gap-6"
+      className={cx("flex flex-col gap-5", styles.withBar)}
       optionsClassName="grid items-stretch gap-3 sm:grid-cols-[1fr_auto_1fr] sm:gap-4"
       separator={<CutLine />}
       optionClassName={() => styles.card!}
@@ -54,14 +67,14 @@ export function Board({ game, currency, rates, roundLabel, nextLabel, reportId }
         );
       }}
       renderReveal={({ round }) => (
-        <PriceReveal round={round} itemId={reportId(round)} currency={currency} rates={rates} />
+        <PriceReveal round={round} itemId={reportId(round)} rates={rates} />
       )}
       nextLabel={nextLabel}
-      nextClassName={cx(
-        styles.bigButton,
-        styles.display,
-        "w-full self-center sm:w-auto sm:min-w-64",
-      )}
+      nextClassName={cx(styles.bigButton, styles.display, "w-full")}
+      actionBar={{
+        className: styles.actionBar,
+        idle: <p className={styles.actionHint}>{strings.pickHint}</p>,
+      }}
       announce={({ round, answer }) =>
         announcement(
           answer.correct,

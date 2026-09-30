@@ -26,7 +26,7 @@ import { useJson } from "../useJson";
 import { SampleBanner, Sign } from "./Bits";
 import { Board, roundLabels } from "./Board";
 import { Header } from "./Header";
-import { Receipt, ReceiptPrinter, type ReceiptLineData } from "./Receipt";
+import { Receipt, type ReceiptLineData } from "./Receipt";
 import { LoadingShelf, StateScreen } from "./States";
 import styles from "./world.module.css";
 
@@ -77,7 +77,6 @@ export function EndlessGame() {
 function EndlessRun({ pool, seed, onAgain }: { pool: Pool; seed: string; onAgain: () => void }) {
   const { player, playSound } = useGame();
   const currency = useDisplayCurrency();
-  const [printing, setPrinting] = useState(false);
   const [over, setOver] = useState<ChoiceState<PriceRound> | null>(null);
   // Played rounds, for the receipt: the engine only keeps the current one.
   const [played, setPlayed] = useState<ReceiptLineData[]>([]);
@@ -111,7 +110,6 @@ function EndlessRun({ pool, seed, onAgain }: { pool: Pool; seed: string; onAgain
     onReveal(round, answer, state) {
       if (state.answers.length === 1) player.start();
       playSound(answer.correct ? SOUNDS.right : SOUNDS.wrong);
-      setPrinting(true);
       // The receipt grows with each right answer; the miss is its last line.
       const [a, b] = round.options;
       setPlayed((lines) => [
@@ -172,13 +170,14 @@ function EndlessRun({ pool, seed, onAgain }: { pool: Pool; seed: string; onAgain
 
   return (
     <div className="flex flex-col gap-5">
-      <Header title={strings.endlessHeading} pose={pose} marks={[]} />
-      <p className={cx(styles.mono, "flex justify-between text-sm font-bold")}>
-        <span>
-          {strings.receipt.run} {formatNumber(streak)}
-        </span>
-        <span>{strings.results.bestRun(formatNumber(player.unlimited.bestRun))}</span>
-      </p>
+      <Header title={strings.endlessHeading} pose={pose} marks={[]}>
+        <p className={cx(styles.mono, "flex gap-4 text-sm font-bold")}>
+          <span>
+            {strings.receipt.run} {formatNumber(streak)}
+          </span>
+          <span>{strings.results.bestRun(formatNumber(player.unlimited.bestRun))}</span>
+        </p>
+      </Header>
       <Sign />
       <Board
         game={game}
@@ -188,7 +187,6 @@ function EndlessRun({ pool, seed, onAgain }: { pool: Pool; seed: string; onAgain
         nextLabel={(s) => (s.isLast ? strings.endlessOver : strings.next)}
         reportId={(round) => round.options[0].id}
       />
-      <ReceiptPrinter lines={played} animate={printing && !game.reducedMotion} className="mt-2" />
     </div>
   );
 }

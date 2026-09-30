@@ -20,7 +20,8 @@ sounds and the reveal. Engines never import from `src/games/<slug>/`.
   `key` to restart.
 - `ChoiceBoard`: the default markup. Options are real buttons with `aria-keyshortcuts`; the game
   draws them through `renderOption` (with a status: idle, pending, right, wrong, answer, other) and
-  the reveal through `renderReveal`; `announce` fills a polite live region.
+  the reveal through `renderReveal`; `announce` fills a polite live region. `actionBar` keeps
+  Next in one place (e.g. pinned to the bottom of the screen), with `idle` content before a pick.
 - `summary.ts`: score, streaks and the emoji grid for stats and the share text.
 
 No strings live in the engine: every label comes from the game.

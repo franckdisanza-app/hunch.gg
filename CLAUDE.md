@@ -72,8 +72,8 @@ docs/               ARCHITECTURE, ADDING_A_GAME, DEPLOY, games/<slug>.md
   / `pickOption` / `nextRound` are pure (daily `list` or unlimited `generator` with
   `endOnMiss`, resumable answers); `useChoiceGame` adds keys (A/←, B/→, C, Enter), focus (Next
   after a reveal), `revealDelayMs` (0 under reduced motion) and `onPick`/`onReveal`/`onFinish`;
-  `ChoiceBoard` renders real buttons through `renderOption`/`renderReveal` slots plus a live
-  region; `summarize` gives score, streak and the emoji grid. No strings in the engine.
+  `ChoiceBoard` renders real buttons through `renderOption`/`renderReveal` slots, an optional
+  pinned `actionBar` for Next, and a live region; `summarize` gives score, streak and the emoji grid. No strings in the engine.
 - **Schemas:** Zod everywhere (content, API payloads, stored state), always `zod/mini`
   (`import * as z from "zod/mini"`). Classic `zod` is banned by lint: it adds ~90 KB gzipped to any
   browser bundle it touches.

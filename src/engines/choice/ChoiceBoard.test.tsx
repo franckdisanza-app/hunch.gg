@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useMemo } from "react";
 import { ChoiceBoard } from "./ChoiceBoard";
@@ -167,6 +167,33 @@ describe("ChoiceBoard", () => {
     render(<FakeGame hooks={{ revealDelayMs: 5000 }} />);
     fireEvent.click(screen.getByRole("button", { name: /Fake A/ }));
     expect(screen.getByText("Fake wrong")).toBeInTheDocument();
+  });
+
+  it("keeps an action bar in place: idle content before a reveal, Next after", async () => {
+    const user = userEvent.setup();
+    function BarGame() {
+      const config = useMemo<ChoiceConfig<FakeRound>>(
+        () => ({ source: { kind: "list", rounds: ROUNDS }, correctIndex }),
+        [],
+      );
+      const game = useChoiceGame({ config });
+      return (
+        <ChoiceBoard
+          game={game}
+          roundLabel={() => "Fake round"}
+          renderOption={({ option }) => option.label}
+          nextLabel={() => "Fake next"}
+          announce={() => "Fake announcement"}
+          actionBar={{ className: "fake-bar", idle: <p>Fake hint</p> }}
+        />
+      );
+    }
+    const { container } = render(<BarGame />);
+    const bar = container.querySelector(".fake-bar")!;
+    expect(bar).toHaveTextContent("Fake hint");
+    await user.click(screen.getByRole("button", { name: "Fake A" }));
+    expect(bar).not.toHaveTextContent("Fake hint");
+    expect(within(bar as HTMLElement).getByRole("button", { name: "Fake next" })).toHaveFocus();
   });
 
   it("resumes saved answers without moving focus", () => {
