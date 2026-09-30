@@ -1,9 +1,11 @@
 import type { MascotDefinition } from "@/games/types";
 
-// TODO: name the mascot and draw all six poses in public/games/ping/mascot/.
-// Until the files exist, <Mascot> shows the neutral placeholder.
+// Sonde: a small white weather balloon with big round eyes and a radiosonde box on its string, an
+// eager explorer that drifts to the edges of the world and reports back. The game draws Sonde
+// inline with motion (art/Sonde.tsx); these static poses, on a dark mini-globe with one heat
+// ring, are for the shelf and anything else outside the game. Regenerate with `pnpm ping:art`.
 export const mascot: MascotDefinition = {
-  name: "TODO",
+  name: "Sonde",
   poses: {
     idle: "/games/ping/mascot/idle.svg",
     thinking: "/games/ping/mascot/thinking.svg",

@@ -28,6 +28,7 @@
     "sticker-shock:accuracy": "tsx scripts/sticker-shock/accuracy.ts",
     "ping:build": "tsx scripts/ping/build.ts",
     "ping:sample": "tsx scripts/ping/make-sample.ts",
+    "ping:art": "tsx scripts/ping/art.tsx",
     "size": "tsx scripts/check-bundle-size.ts",
     "db:start": "supabase start",
     "db:reset": "supabase db reset",

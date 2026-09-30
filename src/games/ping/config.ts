@@ -2,6 +2,9 @@ import { roundGeometry, type MapScoring } from "@/engines/map/scoring";
 import { scopeSizeKm } from "@/engines/map/geo";
 import type { MapRound } from "@/engines/map/state";
 import type { Category, Question } from "./content.schema";
+import { HEAT } from "./palette";
+
+export { HEAT };
 
 // Ping's tuning, in one place: change these after playtesting.
 //
@@ -57,9 +60,6 @@ export const CATEGORY_EMOJI: Record<Category, string> = {
   "furthest-from": "📍",
   regional: "🚩",
 };
-
-/** The heat ramp, the game's colour language: cold → mild → hot. Same in light and dark. */
-export const HEAT = { cold: "#4C8DFF", mild: "#FFD34D", hot: "#FF5A4E" } as const;
 
 function mix(a: string, b: string, t: number): string {
   const channel = (hex: string, i: number) => parseInt(hex.slice(1 + i * 2, 3 + i * 2), 16);

@@ -419,8 +419,12 @@ export function Globe({
     [],
   );
 
+  /** Stops a glide or a flight where it is (a flight's promise resolves). */
   const stopMotion = useCallback(() => {
     inertia.current = null;
+    const trip = flight.current;
+    flight.current = null;
+    trip?.resolve();
   }, []);
 
   const moveTo = useCallback(
@@ -442,15 +446,11 @@ export function Globe({
       view: () => camera.current,
       setView(view) {
         stopMotion();
-        flight.current?.resolve();
-        flight.current = null;
         moveTo(view);
       },
       flyTo(view) {
         stopMotion();
         const target = clampCamera(view, props.current.limits);
-        flight.current?.resolve();
-        flight.current = null;
         if (props.current.reducedMotion) {
           moveTo(target);
           return Promise.resolve();

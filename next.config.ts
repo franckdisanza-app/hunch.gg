@@ -13,6 +13,8 @@ const nextConfig: NextConfig = {
       "./content/sticker-shock/*.json",
       "./content/sticker-shock/daily/*.json",
     ],
+    // Ping's Practice serves the questions of past days.
+    "/api/games/ping/practice": ["./content/ping/daily/*.json"],
   },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders(process.env) }];

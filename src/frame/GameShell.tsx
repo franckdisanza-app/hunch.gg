@@ -23,6 +23,11 @@ export interface GameShellProps {
   gameSettings?: ReactNode;
   /** Labels scores in the stats chart. */
   formatScore?: (score: number) => string;
+  /**
+   * Groups scores for the stats chart, e.g. (s) => Math.floor(s / 500) * 500 for a game scored
+   * in the thousands; formatScore then labels the groups. History keeps exact scores.
+   */
+  scoreBucket?: (score: number) => number;
   /** The game's name for its unlimited mode (e.g. "Endless"), in the stats sheet. */
   unlimitedLabel?: string;
   /** Extra classes for the game world, e.g. the display font's next/font variable. */
@@ -40,6 +45,7 @@ export function GameShell({
   howTo,
   gameSettings,
   formatScore,
+  scoreBucket,
   unlimitedLabel,
   className,
   children,
@@ -96,7 +102,11 @@ export function GameShell({
         complete({ answers, score }) {
           if (mode === "daily") {
             if (puzzle === null) return;
-            store.recordDailyCompletion(slug, puzzle, { answers, score });
+            store.recordDailyCompletion(slug, puzzle, {
+              answers,
+              score,
+              ...(scoreBucket ? { bucket: scoreBucket(score) } : {}),
+            });
           } else {
             store.recordUnlimitedRun(slug, score);
           }
@@ -107,7 +117,7 @@ export function GameShell({
       track,
       openSheet: setSheet,
     };
-  }, [game, mode, puzzle, slug, stats, history, unlimited]);
+  }, [game, mode, puzzle, slug, stats, history, unlimited, scoreBucket]);
 
   return (
     <GameContext.Provider value={context}>

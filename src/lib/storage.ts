@@ -352,12 +352,13 @@ export function createPlayerStorage(options: PlayerStorageOptions) {
 
   /**
    * Records a finished daily puzzle. A streak counts consecutive puzzle numbers completed.
-   * Completing the same puzzle twice changes nothing.
+   * Completing the same puzzle twice changes nothing. `bucket` files the score under a coarser key
+   * in the histogram (games with scores in the thousands); history keeps the exact score.
    */
   function recordDailyCompletion(
     game: string,
     puzzle: number,
-    result: { answers: unknown[]; score: number },
+    result: { answers: unknown[]; score: number; bucket?: number },
   ): Stats {
     const history = getHistory(game);
     const existing = history[String(puzzle)];
@@ -375,7 +376,7 @@ export function createPlayerStorage(options: PlayerStorageOptions) {
     });
 
     const stats = getStats(game);
-    const scoreKey = String(result.score);
+    const scoreKey = String(result.bucket ?? result.score);
     const next: Stats = {
       ...stats,
       played:

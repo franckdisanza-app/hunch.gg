@@ -159,6 +159,18 @@ describe("streaks", () => {
     expect(stats.bestStreak).toBe(3);
   });
 
+  it("files scores under their bucket in the histogram, exact in history", () => {
+    const store = setup();
+    store.recordDailyCompletion("demo", 1, { answers: [], score: 2140, bucket: 2000 });
+    const stats = store.recordDailyCompletion("demo", 2, {
+      answers: [],
+      score: 2480,
+      bucket: 2000,
+    });
+    expect(stats.histogram).toEqual({ "2000": 2 });
+    expect(store.getHistory("demo")["1"]?.score).toBe(2140);
+  });
+
   it("ignores completing the same puzzle twice", () => {
     const store = setup();
     store.recordDailyCompletion("demo", 1, { answers: [], score: 1 });
