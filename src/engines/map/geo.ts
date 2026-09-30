@@ -81,6 +81,53 @@ export function greatCircleArc(a: GeoPoint, b: GeoPoint): LineString {
   return { type: "LineString", coordinates: [toLonLat(a), toLonLat(b)] };
 }
 
+type Vec3 = [number, number, number];
+const RAD = Math.PI / 180;
+
+function toVector(point: GeoPoint): Vec3 {
+  const lat = point.lat * RAD;
+  const lon = point.lon * RAD;
+  return [Math.cos(lat) * Math.cos(lon), Math.cos(lat) * Math.sin(lon), Math.sin(lat)];
+}
+
+function fromVector([x, y, z]: Vec3): GeoPoint {
+  return { lat: Math.asin(Math.max(-1, Math.min(1, z))) / RAD, lon: Math.atan2(y, x) / RAD };
+}
+
+/**
+ * Where two circles on the sphere cross (0, 1 or 2 points): the places `r1Km` from `c1` and `r2Km`
+ * from `c2`. Two exact distances pin an answer down to these points, so games can light them up.
+ */
+export function circleIntersections(
+  c1: GeoPoint,
+  r1Km: number,
+  c2: GeoPoint,
+  r2Km: number,
+): GeoPoint[] {
+  const a1 = toVector(c1);
+  const a2 = toVector(c2);
+  const cosD = a1[0] * a2[0] + a1[1] * a2[1] + a1[2] * a2[2];
+  const sin2D = 1 - cosD * cosD;
+  // The same or opposite centres: the circles coincide or never cross.
+  if (sin2D < 1e-12) return [];
+  const cos1 = Math.cos(r1Km / EARTH_RADIUS_KM);
+  const cos2 = Math.cos(r2Km / EARTH_RADIUS_KM);
+  const a = (cos1 - cos2 * cosD) / sin2D;
+  const b = (cos2 - cos1 * cosD) / sin2D;
+  const t2 = (1 - (a * a + b * b + 2 * a * b * cosD)) / sin2D;
+  if (t2 < -1e-12) return [];
+  const n: Vec3 = [
+    a1[1] * a2[2] - a1[2] * a2[1],
+    a1[2] * a2[0] - a1[0] * a2[2],
+    a1[0] * a2[1] - a1[1] * a2[0],
+  ];
+  const base: Vec3 = [a * a1[0] + b * a2[0], a * a1[1] + b * a2[1], a * a1[2] + b * a2[2]];
+  const t = Math.sqrt(Math.max(0, t2));
+  const point = (sign: number) =>
+    fromVector([base[0] + sign * t * n[0], base[1] + sign * t * n[1], base[2] + sign * t * n[2]]);
+  return t < 1e-9 ? [point(1)] : [point(1), point(-1)];
+}
+
 /** Longitudes a bounding box spans, in degrees (0–360), antimeridian-safe. */
 export function bboxLonSpan([west, , east]: BBox): number {
   const span = (((east - west) % 360) + 360) % 360;
