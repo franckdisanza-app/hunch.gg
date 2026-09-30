@@ -57,6 +57,13 @@ export default defineConfig([
               message: "The frame is shared by every game and must not import game code.",
             },
             {
+              target: "./src/engines",
+              from: "./src/games",
+              except: SHARED_GAME_FILES,
+              message:
+                "Engines are shared mechanics: games theme them, engines never import a game.",
+            },
+            {
               target: "./src",
               from: "./content",
               message:

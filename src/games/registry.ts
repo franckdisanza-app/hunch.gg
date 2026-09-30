@@ -64,6 +64,20 @@ export const games: readonly GameDefinition[] = [
     usesCrowdApi: [],
   },
   {
+    slug: "ping",
+    name: "Ping",
+    tagline: "Pin the world's extremes: hottest, wettest, farthest.",
+    status: "hidden",
+    // PLACEHOLDER: the puzzle API needs a date to serve the sample dailies in development. Pick
+    // the real launch date (the date of puzzle #1) before going live, then run
+    // `pnpm ping:build --reset`: changing it renumbers the puzzles.
+    launchDate: "2026-09-26",
+    modes: ["daily", "unlimited"],
+    engine: "map",
+    // Guesses record each question's first-pin distance in km, for difficulty tuning.
+    usesCrowdApi: ["guesses"],
+  },
+  {
     slug: "souvenir",
     name: "Souvenir",
     tagline: "Where does this English word come from? Drop a pin.",
