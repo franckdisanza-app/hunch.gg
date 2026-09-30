@@ -85,7 +85,8 @@ docs/               ARCHITECTURE, ADDING_A_GAME, DEPLOY, games/<slug>.md
   orthographic canvas globe with a fixed crosshair, drag with inertia, pinch, wheel, arrows,
   +/− and Enter, rings, pins, target blips, arcs, a radar sweep and `flyTo`; colours may be
   `var(--game-…)`; screen readers hear the coordinates and country under the crosshair; jump
-  cuts under reduced motion. `geo.ts`: great-circle distance, geodesic circles, circle
+  cuts under reduced motion; a `backdrop` picture of the opening view spares the first draw, and
+  the 1:50m shapes wait for the player's first move. `geo.ts`: great-circle distance, geodesic circles, circle
   crossings, antimeridian-safe boxes, km/mi. `/dev/globe` shows it with a fake target.
 - **Schemas:** Zod everywhere (content, API payloads, stored state), always `zod/mini`
   (`import * as z from "zod/mini"`). Classic `zod` is banned by lint: it adds ~90 KB gzipped to any

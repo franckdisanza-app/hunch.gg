@@ -1,3 +1,4 @@
+import type { Camera } from "@/engines/map/camera";
 import { roundGeometry, type MapScoring } from "@/engines/map/scoring";
 import { scopeSizeKm } from "@/engines/map/geo";
 import type { MapRound } from "@/engines/map/state";
@@ -12,6 +13,12 @@ export { HEAT };
 // it; the whole world is 20,015 km). On a world question the numbers below mean: a 50 km perfect
 // radius, and a score that falls to 37% at 1,500 km. On a question about a country 400 km across,
 // the same miss ratios apply: a perfect radius of 5 km (the floor) and 37% at 30 km.
+
+/**
+ * How a world question opens: Africa and Europe in the middle. The globe picture under the canvas
+ * (`pnpm ping:art`) shows exactly this view, so the canvas can leave it to the picture.
+ */
+export const WORLD_VIEW: Camera = { center: { lat: 20, lon: 10 }, zoom: 1 };
 
 export const BANDS = ["burning", "hot", "warm", "cold", "freezing"] as const;
 export type Band = (typeof BANDS)[number];

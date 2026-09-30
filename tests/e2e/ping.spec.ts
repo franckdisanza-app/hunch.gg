@@ -361,6 +361,87 @@ test("the shelf ships no globe code; the game loads it on demand", async ({ page
   expect((await loaded()).some(globeCode)).toBe(true);
 });
 
+/** Whether the globe's canvas has anything drawn on it. */
+async function canvasPainted(page: Page): Promise<boolean> {
+  return globe(page)
+    .locator("canvas")
+    .evaluate((canvas: HTMLCanvasElement) => {
+      const { data } = canvas.getContext("2d")!.getImageData(0, 0, canvas.width, canvas.height);
+      for (let i = 3; i < data.length; i += 4) if (data[i] !== 0) return true;
+      return false;
+    });
+}
+
+test("on a world question the canvas leaves the globe picture showing until the globe moves", async ({
+  page,
+}) => {
+  await serveFakeDay(page, [FAR_AWAY, FAR_AWAY, FAR_AWAY]);
+  await page.goto(DAILY);
+  await closeHowTo(page);
+  await expect(globe(page)).toBeVisible();
+  await page.waitForLoadState("networkidle");
+  // The picture underneath already shows this view: nothing is drawn over it yet.
+  await expect(page.locator('img[src="/games/ping/globe-light.svg"]').first()).toBeVisible();
+  expect(await canvasPainted(page)).toBe(false);
+  await globe(page).focus();
+  await page.keyboard.press("ArrowRight");
+  await expect.poll(() => canvasPainted(page)).toBe(true);
+});
+
+test("a theme that differs from the system's hides the picture and draws the globe at once", async ({
+  page,
+}) => {
+  await serveFakeDay(page, [FAR_AWAY, FAR_AWAY, FAR_AWAY]);
+  // The system is light (Playwright's default); pick dark in the settings.
+  await page.goto("/");
+  await page.getByRole("button", { name: "Settings" }).click();
+  await page.getByRole("dialog", { name: "Settings" }).getByText("Dark", { exact: true }).click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+
+  await page.goto(DAILY);
+  await closeHowTo(page);
+  await expect(globe(page)).toBeVisible();
+  await expect(page.locator('img[src="/games/ping/globe-light.svg"]').first()).toBeHidden();
+  await expect.poll(() => canvasPainted(page)).toBe(true);
+});
+
+test("a question that opens zoomed in loads the detailed map only once the player moves", async ({
+  page,
+}) => {
+  const urls = new Set<string>();
+  page.on("request", (request) => {
+    const url = request.url();
+    if (url.includes("/_next/") && url.endsWith(".js")) urls.add(url);
+  });
+  // Andorra is in the 1:50m shapes only.
+  const detailed = async () => {
+    const texts = await Promise.all(
+      [...urls].map(async (url) => (await page.request.get(url)).text()),
+    );
+    return texts.some((text) => text.includes('"name":"Andorra"'));
+  };
+  await page.route("**/api/puzzle/ping/*", (route) => {
+    const n = Number(new URL(route.request().url()).pathname.split("/").pop());
+    const day = fakeDay(n, [{ lat: 46.5, lon: 8 }, FAR_AWAY, FAR_AWAY]);
+    day.questions[0]!.scope = {
+      level: "region",
+      name: "Fake Region",
+      bbox: [5, 44, 12, 49],
+    } as (typeof day.questions)[number]["scope"];
+    return route.fulfill({ json: day });
+  });
+
+  await page.goto(DAILY);
+  await closeHowTo(page);
+  await expect(globe(page)).toBeVisible();
+  await page.waitForLoadState("networkidle");
+  expect(await detailed()).toBe(false);
+
+  await globe(page).focus();
+  await page.keyboard.press("ArrowRight");
+  await expect.poll(detailed, { timeout: 15_000 }).toBe(true);
+});
+
 test("the practice API never serves today's or a future day", async ({ request }) => {
   const res = await request.get("/api/games/ping/practice");
   expect(res.status()).toBe(200);

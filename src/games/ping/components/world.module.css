@@ -211,24 +211,17 @@
   pointer-events: none;
 }
 
-.darkOnly {
-  display: none;
-}
-
+/* The globe picture follows the system's colour scheme (a <picture>): a theme picked in the
+   settings that differs from it hides the picture, and the canvas globe draws at once instead
+   (globePictureVisible). */
 @media (prefers-color-scheme: dark) {
-  :global(:root:not([data-theme="light"])) .darkOnly {
-    display: block;
-  }
-
-  :global(:root:not([data-theme="light"])) .lightOnly {
+  :global(:root[data-theme="light"]) .systemScheme {
     display: none;
   }
 }
 
-:global(:root[data-theme="dark"]) .darkOnly {
-  display: block;
-}
-
-:global(:root[data-theme="dark"]) .lightOnly {
-  display: none;
+@media not (prefers-color-scheme: dark) {
+  :global(:root[data-theme="dark"]) .systemScheme {
+    display: none;
+  }
 }

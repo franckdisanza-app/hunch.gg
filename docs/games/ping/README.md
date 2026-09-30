@@ -90,7 +90,7 @@ fails until real, verified questions replace them.
 | `pnpm ping:build`      | Validates the questions and plans daily files from a fixed seed with the mix rules (never two questions of a category on a day; at most one ocean or Antarctica answer in any 7 days). Released days keep their questions; `--repeat` reuses questions (the sample set), `--reset` replans released days (before launch only). Prints categories per week and the days left. |
 | `pnpm ping:furthest`   | `--region <country or GeoJSON> --what <OSM tag filter>`: the point in the region furthest from any matching OpenStreetMap feature, with the three nearest features.                                                                                                                                                                                                          |
 | `pnpm ping:difficulty` | Median first-pin distance per question, from Supabase.                                                                                                                                                                                                                                                                                                                       |
-| `pnpm ping:art`        | Exports Sonde's static poses, the share-image Sonde and the wordmark to `public/games/ping/`.                                                                                                                                                                                                                                                                                |
+| `pnpm ping:art`        | Exports Sonde's static poses, the share-image Sonde, the wordmark and the globe pictures to `public/games/ping/`.                                                                                                                                                                                                                                                            |
 
 ## World
 
@@ -110,6 +110,12 @@ fails until real, verified questions replace them.
   sweep at the reveal, a balloon squeak on a perfect pin.
 - **Share image:** a dark globe drawn with d3-geo, three heat rings meeting at one spot, Sonde and
   the tagline (`src/app/(games)/ping/opengraph-image.tsx`).
+- **First paint:** the globe picture (`components/GlobePicture.tsx`, `public/games/ping/globe-*.svg`
+  from `pnpm ping:art`) is the page's largest paint: one SVG for the system's colour scheme,
+  preloaded from the head. The canvas globe leaves it showing (the engine's `backdrop`) until the
+  view changes or a pin lands, and a question that opens zoomed in keeps the 1:110m shapes until
+  the player first moves the globe. A theme picked in the settings that differs from the system's
+  hides the picture and the canvas draws at once.
 
 ## Share
 

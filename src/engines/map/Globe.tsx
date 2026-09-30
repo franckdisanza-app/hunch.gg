@@ -25,7 +25,14 @@ import {
   type Camera,
   type CameraLimits,
 } from "./camera";
-import { drawFrame, sweepAngle, type GlobeColors, type GlobeScene, type SweepState } from "./draw";
+import {
+  drawFrame,
+  showsOnlyBackdrop,
+  sweepAngle,
+  type GlobeColors,
+  type GlobeScene,
+  type SweepState,
+} from "./draw";
 import { normalizeLon, type GeoPoint } from "./geo";
 import { projectionFor } from "./projection";
 
@@ -63,6 +70,13 @@ export interface GlobeProps {
   /** Font family list for labels on the canvas, or a var(--name) reference to one. */
   font: string;
   initialView?: Camera;
+  /**
+   * A picture under the canvas that already shows `view`, at the same size and in the same
+   * colours. While the camera is on that view and the scene is empty, the canvas stays clear and
+   * lets the picture show: the page pays for no drawing until the view changes or something
+   * appears. `visible` (read every frame) says whether the picture is showing at all.
+   */
+  backdrop?: { view: Camera; visible?: () => boolean };
   limits?: Partial<CameraLimits>;
   /** False while the game animates the globe itself (e.g. during a reveal). */
   interactive?: boolean;
@@ -88,7 +102,11 @@ export interface GlobeProps {
   ref?: Ref<GlobeHandle>;
 }
 
-/** Zoom above which the 1:50m shapes are used (loaded the first time it is reached). */
+/**
+ * Zoom above which the 1:50m shapes are used. They load the first time it is reached after the
+ * player first turns, zooms or aims the globe (or the game moves it): a view that opens zoomed in
+ * shows the 1:110m shapes until then, so ~750 KB of shapes never compete with the first paint.
+ */
 const DETAIL_ZOOM = 4;
 /** Inertia: the glide slows with this time constant (ms), and stops below this speed (deg/ms). */
 const INERTIA_TAU_MS = 325;
@@ -121,6 +139,7 @@ export function Globe({
   colors,
   font,
   initialView,
+  backdrop,
   limits: limitOverrides,
   interactive = true,
   reducedMotion,
@@ -149,6 +168,8 @@ export function Globe({
   const size = useRef({ width: 0, height: 0, dpr: 1 });
   const atlases = useRef<Partial<Record<Atlas["detail"], Atlas>>>({});
   const detailRequested = useRef(false);
+  // Whether the view has changed since it opened (by the player or the game): see DETAIL_ZOOM.
+  const engaged = useRef(false);
   const resolved = useRef<{ colors: GlobeColors; font: string } | null>(null);
   const sweep = useRef<SweepState | null>(null);
   const sweepKey = useRef<string | undefined>(undefined);
@@ -167,12 +188,32 @@ export function Globe({
   const settleTimer = useRef<number | undefined>(undefined);
   // The camera of the last frame drawn: any change since (drag, keys, wheel, flights) settles.
   const drawnCamera = useRef<Camera | null>(null);
+  // Whether the canvas has drawn anything yet (see `backdrop`).
+  const painted = useRef(false);
 
   // Latest props for the frame loop and event handlers.
-  const props = useRef({ scene, colors, font, interactive, reducedMotion, limits, describeAim });
+  const props = useRef({
+    scene,
+    colors,
+    font,
+    backdrop,
+    interactive,
+    reducedMotion,
+    limits,
+    describeAim,
+  });
   const callbacks = useRef({ readout, onDrop, onSweepEnd });
   useLayoutEffect(() => {
-    props.current = { scene, colors, font, interactive, reducedMotion, limits, describeAim };
+    props.current = {
+      scene,
+      colors,
+      font,
+      backdrop,
+      interactive,
+      reducedMotion,
+      limits,
+      describeAim,
+    };
     callbacks.current = { readout, onDrop, onSweepEnd };
   });
 
@@ -288,26 +329,37 @@ export function Globe({
         }
       }
 
-      const animating = drawFrame({
-        ctx,
-        width,
-        height,
-        dpr,
-        projection,
-        camera: camera.current,
-        // While the globe moves (dragged, pinched, gliding, flying) the light 1:110m shapes keep
-        // frames fast; the detail comes back the frame it stops.
-        atlas:
-          moving || pointers.current.size > 0
-            ? (atlases.current["110m"] ?? bestAtlas())
-            : bestAtlas(),
-        scene: currentScene,
-        colors: resolved.current!.colors,
-        font: resolved.current!.font,
-        now,
-        sweep: sweep.current,
-        lit: lit.current,
-      });
+      // Still on the picture underneath, with nothing on it: leave the canvas clear.
+      const picture = props.current.backdrop;
+      const onBackdrop =
+        !painted.current &&
+        !moving &&
+        !!picture &&
+        (picture.visible?.() ?? true) &&
+        showsOnlyBackdrop(camera.current, currentScene, picture.view);
+      if (!onBackdrop) painted.current = true;
+      const animating =
+        !onBackdrop &&
+        drawFrame({
+          ctx,
+          width,
+          height,
+          dpr,
+          projection,
+          camera: camera.current,
+          // While the globe moves (dragged, pinched, gliding, flying) the light 1:110m shapes keep
+          // frames fast; the detail comes back the frame it stops.
+          atlas:
+            moving || pointers.current.size > 0
+              ? (atlases.current["110m"] ?? bestAtlas())
+              : bestAtlas(),
+          scene: currentScene,
+          colors: resolved.current!.colors,
+          font: resolved.current!.font,
+          now,
+          sweep: sweep.current,
+          lit: lit.current,
+        });
 
       if (readoutRef.current && callbacks.current.readout) {
         readoutRef.current.textContent = callbacks.current.readout(
@@ -315,19 +367,17 @@ export function Globe({
           camera.current.zoom,
         );
       }
-      if (moved) {
-        settle();
-        if (camera.current.zoom >= DETAIL_ZOOM && !detailRequested.current) {
-          detailRequested.current = true;
-          loadAtlas("50m")
-            .then((atlas) => {
-              atlases.current["50m"] = atlas;
-              requestFrame();
-            })
-            .catch(() => {
-              detailRequested.current = false;
-            });
-        }
+      if (moved) settle();
+      if (engaged.current && camera.current.zoom >= DETAIL_ZOOM && !detailRequested.current) {
+        detailRequested.current = true;
+        loadAtlas("50m")
+          .then((atlas) => {
+            atlases.current["50m"] = atlas;
+            requestFrame();
+          })
+          .catch(() => {
+            detailRequested.current = false;
+          });
       }
       if (moving || animating || sweep.current) requestFrame();
     },
@@ -436,6 +486,7 @@ export function Globe({
 
   const moveTo = useCallback(
     (next: Camera) => {
+      engaged.current = true;
       camera.current = clampCamera(next, props.current.limits);
       requestFrame();
     },
@@ -463,6 +514,7 @@ export function Globe({
           return Promise.resolve();
         }
         return new Promise<void>((resolve) => {
+          engaged.current = true;
           flight.current = {
             path: flightPath(camera.current, target),
             target,
@@ -498,6 +550,11 @@ export function Globe({
     if (!interactive || (event.pointerType === "mouse" && event.button !== 0)) return;
     event.currentTarget.setPointerCapture(event.pointerId);
     stopMotion();
+    // A touch is enough to start loading the detail for a view that opened zoomed in.
+    if (!engaged.current) {
+      engaged.current = true;
+      requestFrame();
+    }
     pointers.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
     samples.current = [{ t: event.timeStamp, ...camera.current.center }];
     if (pointers.current.size === 2) {

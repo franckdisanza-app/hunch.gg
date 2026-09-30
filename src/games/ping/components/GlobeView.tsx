@@ -7,9 +7,10 @@ import { formatLatLon, type GeoPoint } from "@/engines/map/geo";
 import type { Camera } from "@/engines/map/camera";
 import type { GlobeHandle } from "@/engines/map/Globe";
 import { cx } from "@/frame/ui/cx";
+import { WORLD_VIEW } from "../config";
 import { HEAT } from "../palette";
 import { strings } from "../strings";
-import { GlobePicture } from "./GlobePicture";
+import { GlobePicture, globePictureVisible } from "./GlobePicture";
 import { Isobars } from "./Isobars";
 import styles from "./world.module.css";
 
@@ -24,6 +25,9 @@ const Globe = dynamic(() => import("@/engines/map/Globe").then((m) => m.Globe), 
     </p>
   ),
 });
+
+/** The globe picture underneath shows the world view: the canvas leaves it be until it changes. */
+const BACKDROP = { view: WORLD_VIEW, visible: globePictureVisible };
 
 /** The globe in Ping's colours: var() references follow the light and dark themes. */
 export const GLOBE_COLORS: GlobeColors = {
@@ -73,6 +77,7 @@ export function GlobeView({ globeRef, ...props }: GlobeViewProps) {
       <Globe
         ref={globeRef}
         {...props}
+        backdrop={BACKDROP}
         colors={GLOBE_COLORS}
         font="var(--ping-font-mono)"
         label={strings.globe.label}

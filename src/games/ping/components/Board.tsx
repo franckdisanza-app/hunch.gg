@@ -12,7 +12,15 @@ import { cx } from "@/frame/ui/cx";
 import type { MascotPose } from "@/games/types";
 import { formatNumber } from "@/lib/format";
 import { Sonde } from "../art/Sonde";
-import { PINS_PER_QUESTION, SCORING, TIMING, heatColor, roundFor, type Band } from "../config";
+import {
+  PINS_PER_QUESTION,
+  SCORING,
+  TIMING,
+  WORLD_VIEW,
+  heatColor,
+  roundFor,
+  type Band,
+} from "../config";
 import type { DailyQuestion, Question } from "../content.schema";
 import { HEAT } from "../palette";
 import { SOUNDS, registerSounds } from "../sounds";
@@ -43,7 +51,7 @@ export interface BoardProps {
 /** Where the globe starts for a question: the whole world, or its scope's box. */
 export function startView(question: Pick<Question, "scope">): Camera {
   const { bbox } = question.scope;
-  if (!bbox) return { center: { lat: 20, lon: 10 }, zoom: 1 };
+  if (!bbox) return WORLD_VIEW;
   const [west, south, east, north] = bbox;
   return frameFor([
     bboxCenter(bbox),

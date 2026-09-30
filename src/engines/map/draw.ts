@@ -3,7 +3,14 @@ import type { LineString } from "geojson";
 import type { Atlas } from "./atlas";
 import { easeOut, globeRadius, isVisible, type Camera } from "./camera";
 import { capBox, clipPolygon } from "./clip";
-import { circleIntersections, geodesicCircle, kmToDegrees, toLonLat, type GeoPoint } from "./geo";
+import {
+  circleIntersections,
+  geodesicCircle,
+  kmToDegrees,
+  normalizeLon,
+  toLonLat,
+  type GeoPoint,
+} from "./geo";
 
 // Draws the globe and everything on it onto a canvas. Plain functions: the Globe component owns
 // the canvas, the camera and the frame loop; this file only paints one frame.
@@ -103,6 +110,31 @@ export interface FrameInput {
   sweep: SweepState | null;
   /** Blip id → performance.now() when it lit up. */
   lit: ReadonlyMap<string, number>;
+}
+
+/**
+ * Whether a frame would show only what a backdrop picture of `backdrop` already shows: the same
+ * view, and nothing on the globe (no rings, pins, blips, arcs or sweep).
+ */
+export function showsOnlyBackdrop(
+  view: Camera,
+  scene: GlobeScene,
+  backdrop: Camera | undefined,
+): boolean {
+  if (!backdrop) return false;
+  const empty =
+    scene.rings.length === 0 &&
+    scene.pins.length === 0 &&
+    scene.blips.length === 0 &&
+    !scene.arcs?.length &&
+    !scene.sweep;
+  const near = (a: number, b: number) => Math.abs(a - b) < 1e-6;
+  return (
+    empty &&
+    near(view.zoom, backdrop.zoom) &&
+    near(view.center.lat, backdrop.center.lat) &&
+    near(normalizeLon(view.center.lon - backdrop.center.lon), 0)
+  );
 }
 
 const graticule = geoGraticule10();
