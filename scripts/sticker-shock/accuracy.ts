@@ -9,7 +9,7 @@ import { parseArgs } from "node:util";
 import type { DailyPuzzle } from "@/games/sticker-shock/content.schema";
 import { receiptLine } from "@/games/sticker-shock/text";
 import { DEFAULT_ACCURACY, accuracyReport, type AccuracyRow } from "./lib/accuracy";
-import { scriptSupabase } from "./lib/supabase";
+import { scriptSupabase } from "../lib/supabase";
 
 const { values } = parseArgs({ options: { min: { type: "string", default: "30" } } });
 const minAnswers = Number(values.min);
