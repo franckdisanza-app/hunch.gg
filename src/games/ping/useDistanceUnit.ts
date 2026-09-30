@@ -1,33 +1,20 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
 import { unitForLocale, type DistanceUnit } from "@/engines/map/geo";
-import { useMeta } from "@/frame/hooks";
-import { playerStorage } from "@/lib/storage";
+import { browserLanguages, saveGamePref, useGamePref, type GamePref } from "@/frame/prefs";
 import { UNIT_PREF } from "./config";
-
-const subscribeNever = () => () => {};
-
-function isUnit(value: unknown): value is DistanceUnit {
-  return value === "km" || value === "mi";
-}
 
 /**
  * Kilometres or miles: the player's choice in settings, else what the browser's locale uses
- * (distances only appear after a pin, so reading the locale cannot break hydration).
+ * (distances only appear after a pin, so reading the locale cannot break hydration). Later map
+ * games (Souvenir) share the key.
  */
-export function useDistanceUnit(): DistanceUnit {
-  const meta = useMeta();
-  const fallback = useSyncExternalStore(
-    subscribeNever,
-    () => unitForLocale(navigator.languages?.[0] ?? navigator.language),
-    () => "km" as const,
-  );
-  const saved = meta?.prefs[UNIT_PREF];
-  return isUnit(saved) ? saved : fallback;
-}
+const distanceUnit: GamePref<DistanceUnit> = {
+  key: UNIT_PREF,
+  is: (value): value is DistanceUnit => value === "km" || value === "mi",
+  browserDefault: () => unitForLocale(browserLanguages()[0]),
+  serverDefault: "km",
+};
 
-/** Saved in plimp:v1:meta prefs, so later map games (Souvenir) share it. */
-export function saveDistanceUnit(unit: DistanceUnit) {
-  playerStorage().updateMeta((meta) => ({ prefs: { ...meta.prefs, [UNIT_PREF]: unit } }));
-}
+export const useDistanceUnit = () => useGamePref(distanceUnit);
+export const saveDistanceUnit = (unit: DistanceUnit) => saveGamePref(distanceUnit, unit);

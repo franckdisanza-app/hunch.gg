@@ -5,11 +5,10 @@ import * as z from "zod/mini";
 import { startMap, summarizeMap, type MapAnswer, type SavedMapAnswer } from "@/engines/map/state";
 import { useGame } from "@/frame/GameContext";
 import { ResultsScreen } from "@/frame/ResultsScreen";
+import { prefetchTodaysPuzzle, puzzleUrl, useJson } from "@/frame/useJson";
 import { cx } from "@/frame/ui/cx";
 import type { MascotPose } from "@/games/types";
-import { getGame } from "@/games/registry";
 import { sendGuess } from "@/lib/crowd/client";
-import { deviceTimeZone, puzzleNumber } from "@/lib/daily";
 import { formatNumber } from "@/lib/format";
 import { Sonde } from "../art/Sonde";
 import { DAILY_MAX, SCORING, roundFor, type Band } from "../config";
@@ -17,7 +16,6 @@ import { GAME_SLUG, dailyPuzzleSchema, type DailyPuzzle } from "../content.schem
 import { dailyShare } from "../share";
 import { strings } from "../strings";
 import { useDistanceUnit } from "../useDistanceUnit";
-import { requestJson, useJson, type Prefetched } from "../useJson";
 import { DraftBanner } from "./Bits";
 import { Board } from "./Board";
 import { BigLink, LoadingRadar, PRACTICE_HREF, StateScreen } from "./States";
@@ -37,19 +35,8 @@ function savedPins(value: unknown): SavedMapAnswer[] {
   return parsed.success ? parsed.data : [];
 }
 
-/**
- * Today's questions, requested as soon as this module runs in the browser, before React
- * hydrates: the question is the largest thing on the page, so it should not wait for hydration.
- * Same puzzle number as GameShell's (local date); if they ever differ, useJson fetches anew.
- */
-const early: Prefetched | null = (() => {
-  const launchDate = getGame(GAME_SLUG)?.launchDate;
-  if (typeof window === "undefined" || !launchDate) return null;
-  const n = puzzleNumber(launchDate, Date.now(), deviceTimeZone());
-  if (n < 1) return null;
-  const url = `/api/puzzle/${GAME_SLUG}/${n}`;
-  return { url, result: requestJson(url) };
-})();
+/** Today's questions, requested before React hydrates (see prefetchTodaysPuzzle). */
+const early = prefetchTodaysPuzzle(GAME_SLUG);
 
 function scoreOf(answers: readonly MapAnswer<Band>[]): number {
   return summarizeMap(answers, SCORING).score;
@@ -58,7 +45,7 @@ function scoreOf(answers: readonly MapAnswer<Band>[]): number {
 /** Today's three questions: loads the day, then plays it, resumes it, or shows today's results. */
 export function DailyGame() {
   const { puzzle, player } = useGame();
-  const url = puzzle !== null && puzzle >= 1 ? `/api/puzzle/${GAME_SLUG}/${puzzle}` : null;
+  const url = puzzle !== null && puzzle >= 1 ? puzzleUrl(GAME_SLUG, puzzle) : null;
   const day = useJson(url, dailyPuzzleSchema, early);
   const [justFinished, setJustFinished] = useState(false);
 

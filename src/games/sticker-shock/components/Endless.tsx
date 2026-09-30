@@ -7,6 +7,7 @@ import { summarize } from "@/engines/choice/summary";
 import { useChoiceGame } from "@/engines/choice/useChoiceGame";
 import { useGame } from "@/frame/GameContext";
 import { ShareButton } from "@/frame/ShareButton";
+import { prefetchJson, useJson } from "@/frame/useJson";
 import { Button, ButtonLink } from "@/frame/ui/Button";
 import { cx } from "@/frame/ui/cx";
 import type { MascotPose } from "@/games/types";
@@ -22,7 +23,6 @@ import { SOUNDS, registerSounds } from "../sounds";
 import { strings } from "../strings";
 import { receiptLine } from "../text";
 import { useDisplayCurrency } from "../useDisplayCurrency";
-import { useJson } from "../useJson";
 import { SampleBanner, Sign } from "./Bits";
 import { Board, roundLabels } from "./Board";
 import { Header } from "./Header";
@@ -34,6 +34,9 @@ const POOL_URL = "/api/games/sticker-shock/pool";
 const DAILY_HREF = "/sticker-shock" as Route;
 const REVEAL_DELAY_MS = 450;
 
+/** The pool, requested as soon as this module runs in the browser (before React hydrates). */
+const early = prefetchJson(POOL_URL);
+
 function randomSeed(): string {
   const bytes = new Uint32Array(2);
   globalThis.crypto.getRandomValues(bytes);
@@ -42,7 +45,7 @@ function randomSeed(): string {
 
 /** Endless: random pairs until the first miss. Never touches daily stats or streaks. */
 export function EndlessGame() {
-  const pool = useJson(POOL_URL, poolSchema);
+  const pool = useJson(POOL_URL, poolSchema, early);
   // Each run gets a fresh random seed; "Play again" starts a new run.
   const [run, setRun] = useState(() => ({ n: 0, seed: randomSeed() }));
 

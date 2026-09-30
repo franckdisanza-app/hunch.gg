@@ -34,7 +34,8 @@ Local crowd API without Docker: `CROWD_STORE=memory` in `.env.local`.
 
 ```
 src/app/            routes: shelf, about, privacy, dev/, (games)/<slug>/, api/
-src/frame/          the shared chrome: GameShell, TopBar, sheets, ResultsScreen, RevealCard, ui/
+src/frame/          the shared chrome: GameShell, TopBar, sheets, ResultsScreen, RevealCard, ui/;
+                    game plumbing: useJson (+ early prefetch), prefs, game-route
 src/games/          types.ts (GameDefinition), registry.ts, content.ts, <slug>/ per game
 src/engines/        shared game mechanics: choice/ (Sticker Shock; next Tiptoe, Coined, Chimp),
                     map/ (Ping; next Souvenir)
@@ -66,8 +67,9 @@ docs/               ARCHITECTURE, ADDING_A_GAME, DEPLOY, games/<slug>.md
   `sourceTitle`, `sourceUrl`, `checkedOn` and `licence`; every reveal shows its source line.
 - **Games are plugins.** A game is a registry entry + `src/games/<slug>/` + `src/app/(games)/<slug>/`
   - `content/<slug>/`. Adding a game never touches another game. ESLint enforces: no game imports
-    another game, `src/frame` imports no game code, nothing in `src/` imports `content/`.
-    Game-specific endpoints live under `src/app/api/games/<slug>/`. See `docs/ADDING_A_GAME.md`.
+    another game (code, pages or API routes), `src/frame` imports no game code, nothing in `src/`
+    imports `content/`. Game-specific endpoints live under `src/app/api/games/<slug>/`. See
+    `docs/ADDING_A_GAME.md`.
 - **Engines** own rules and state (rounds, answers, scoring); games own content, art, strings,
   sounds and the reveal. Engines never import from a game. The **choice engine**
   (`src/engines/choice/`): rounds of 2–3 options and a game-supplied `correctIndex`; `startChoice`

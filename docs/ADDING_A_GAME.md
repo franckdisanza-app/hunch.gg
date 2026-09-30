@@ -39,20 +39,25 @@ pnpm new-game sticker-shock --name "Sticker Shock" --engine choice
       themed by the game; they never import from a game.
 - [ ] Replace the placeholder component. Use `useGame()` for the puzzle number, player state
       (`start`, `saveProgress`, `complete`), `playSound` and `track`.
-- [ ] Fetch the day's puzzle from `/api/puzzle/<slug>/<n>` once; never import `content/`.
+- [ ] Fetch the day's puzzle from `/api/puzzle/<slug>/<n>` once with `useJson` (`src/frame/`),
+      passing `prefetchTodaysPuzzle("<slug>")` from module level so the request starts before
+      hydration (`prefetchJson(url)` does the same for an unlimited pool); never import
+      `content/`.
 - [ ] Reveals use `RevealCard` ("Turns out…" + source line + report link); the end uses
       `ResultsScreen` and `buildShareText` (no answers in the share text; pass them as
       `spoilers`).
 - [ ] Crowd features: set `usesCrowdApi` in the registry; poll IDs are `<slug>:<id>`; use
       `OneTapPoll`, `sendGuess` and `fetchCrowdStats`. Game-specific endpoints go under
       `src/app/api/games/<slug>/`.
-- [ ] Game settings (e.g. display currency) go in `GameShell`'s `gameSettings` slot and are
-      saved with `playerStorage().updateMeta({ prefs: … })`.
+- [ ] Game settings (e.g. display currency) go in `GameShell`'s `gameSettings` slot. Describe
+      each as a `GamePref` and read or save it with `useGamePref` / `saveGamePref`
+      (`src/frame/prefs.ts`); reuse an existing key (`currency`, `distanceUnit`) when it means
+      the same thing.
 - [ ] Scores in the hundreds or thousands: pass `scoreBucket` and `formatScore` to `GameShell`
       so the stats chart groups them (Ping groups by 500).
 - [ ] Every string in `src/games/<slug>/strings.ts`; format with `src/lib/format.ts`.
-- [ ] Keep first-load JS under budget (`ENABLE_DEV_ROUTES=1 pnpm build && pnpm size` measures
-      the empty shell; check the game's own page in the build output too).
+- [ ] Keep first-load JS under budget: `ENABLE_DEV_ROUTES=1 pnpm build && pnpm size` measures
+      the shelf, the empty shell and every game route (the game's pages are found on their own).
 - [ ] Unit tests for scoring and content, e2e for a full daily round with axe.
 
 ## 4. Content

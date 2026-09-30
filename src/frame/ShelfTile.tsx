@@ -4,7 +4,7 @@ import type { Route } from "next";
 import Link from "next/link";
 import type { GameDefinition } from "@/games/types";
 import { GameThemeStyle } from "./GameThemeStyle";
-import { useHistory, usePuzzleNumber } from "./hooks";
+import { LazyPlayedTodayBadge } from "./lazy";
 import { Mascot } from "./Mascot";
 import { strings } from "./strings";
 import { cx } from "./ui/cx";
@@ -15,9 +15,6 @@ import { cx } from "./ui/cx";
  */
 export function ShelfTile({ game, compact = false }: { game: GameDefinition; compact?: boolean }) {
   const live = game.status === "live";
-  const puzzle = usePuzzleNumber(live ? game.launchDate : undefined);
-  const history = useHistory(game.slug);
-  const playedToday = puzzle !== null && Boolean(history[String(puzzle)]?.finishedAt);
 
   const body = (
     <>
@@ -39,11 +36,7 @@ export function ShelfTile({ game, compact = false }: { game: GameDefinition; com
         )}
         {!compact && <span className="text-sm opacity-80">{game.tagline}</span>}
       </span>
-      {live && playedToday && (
-        <span className="absolute top-2 right-2 rounded-full bg-game-ink px-2 py-0.5 text-xs font-semibold text-game-bg">
-          {strings.shelf.playedToday}
-        </span>
-      )}
+      {live && <LazyPlayedTodayBadge slug={game.slug} launchDate={game.launchDate} />}
       {!live && (
         <span className="absolute top-2 right-2 rounded-full border border-current px-2 py-0.5 text-xs font-semibold">
           {strings.shelf.comingSoon}

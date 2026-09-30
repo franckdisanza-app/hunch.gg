@@ -51,28 +51,23 @@ function templates(slug: string, name: string, tagline: string, engine: GameEngi
   const pageFor = (mode: "daily" | "unlimited") => {
     const path = mode === "daily" ? `/${slug}` : `/${slug}/unlimited`;
     return `import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { gameMetadata, reachableGame } from "@/frame/game-route";
 import { GameShell } from "@/frame/GameShell";
-import { strings as frameStrings } from "@/frame/strings";
-import { getGame, isGameReachable } from "@/games/registry";
 import { ${Pascal}Game } from "@/games/${slug}/${Pascal}Game";
 import { mascot } from "@/games/${slug}/mascot";
 import { strings } from "@/games/${slug}/strings";
 import { theme } from "@/games/${slug}/theme";
 
-const game = getGame(${q(slug)});
-
 export function generateMetadata(): Metadata {
-  if (!game || !isGameReachable(game)) return { title: frameStrings.notFound.title };
-  return {
+  return gameMetadata(${q(slug)}, {
     title: ${mode === "daily" ? "strings.name" : "`${strings.name}: ${strings.unlimited}`"},
     description: strings.tagline,
-    alternates: { canonical: ${q(path)} },
-  };
+    path: ${q(path)},
+  });
 }
 
 export default function ${Pascal}${mode === "daily" ? "" : "Unlimited"}Page() {
-  if (!game || !isGameReachable(game)) notFound();
+  const game = reachableGame(${q(slug)});
   // Until the game is live, its registry entry has no theme or mascot; use the local stubs.
   const definition = { ...game, theme: game.theme ?? theme, mascot: game.mascot ?? mascot };
   return (

@@ -1,25 +1,20 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-import { strings as frameStrings } from "@/frame/strings";
-import { getGame, isGameReachable } from "@/games/registry";
-import { DailyGame } from "@/games/ping/components/Daily";
+import { gameMetadata, reachableGame } from "@/frame/game-route";
 import { PingShell } from "@/games/ping/PingShell";
+import { DailyGame } from "@/games/ping/components/Daily";
 import { strings } from "@/games/ping/strings";
 import { fontClassName } from "./fonts";
 
-const game = getGame("ping");
-
 export function generateMetadata(): Metadata {
-  if (!game || !isGameReachable(game)) return { title: frameStrings.notFound.title };
-  return {
+  return gameMetadata("ping", {
     title: strings.name,
     description: strings.tagline,
-    alternates: { canonical: "/ping" },
-  };
+    path: "/ping",
+  });
 }
 
 export default function PingPage() {
-  if (!game || !isGameReachable(game)) notFound();
+  reachableGame("ping");
   return (
     <PingShell mode="daily" fontClassName={fontClassName}>
       <DailyGame />
