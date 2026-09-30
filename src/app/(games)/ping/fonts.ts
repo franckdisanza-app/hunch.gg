@@ -10,11 +10,13 @@ const unbounded = Unbounded({
   display: "swap",
 });
 
+// Readouts only appear once the game has loaded: no preload competing with the first paint.
 const mono = JetBrains_Mono({
   weight: ["500", "700"],
   subsets: ["latin"],
   variable: "--ping-font-mono",
   display: "swap",
+  preload: false,
 });
 
 export const fontClassName = [unbounded.variable, mono.variable].join(" ");

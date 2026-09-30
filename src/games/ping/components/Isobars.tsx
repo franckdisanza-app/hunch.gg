@@ -28,11 +28,13 @@ export function Isobars({ className }: { className?: string }) {
         <path d="M0 190c60-24 120 10 190-8s130-70 230-40" />
         <path d="M0 330c80-30 140 6 220-10s120-40 200-20" />
       </g>
+      {/* The display font, which the page's heading loads anyway: the readout font waits for the
+          game, and two letters would otherwise pull it into the first paint. */}
       <g
         fill="currentColor"
-        fontFamily="var(--ping-font-mono), monospace"
+        fontFamily="var(--game-font-display), sans-serif"
         fontSize="14"
-        fontWeight="700"
+        fontWeight="800"
       >
         <text x="150" y="104">
           H
