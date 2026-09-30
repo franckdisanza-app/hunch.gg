@@ -13,6 +13,8 @@ export function artFiles(root: string): Record<string, string> {
     const svg = renderToStaticMarkup(<SondeArt pose={pose} size={120} backdrop />);
     files[`mascot/${pose}.svg`] = `${svg}\n`;
   }
+  // Sonde alone, celebrating, for the share image (next to its own big globe).
+  files["sonde.svg"] = `${renderToStaticMarkup(<SondeArt pose="celebrate" size={220} />)}\n`;
   files["wordmark.svg"] = wordmark(root);
   return files;
 }

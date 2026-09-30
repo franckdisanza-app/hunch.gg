@@ -2,6 +2,7 @@
 //
 // Exports Ping's static art to public/games/ping/:
 //   mascot/<pose>.svg  Sonde on a dark mini-globe with one heat ring, for the shelf and the registry
+//   sonde.svg          Sonde celebrating, without a backdrop, for the share image
 //   wordmark.svg       "PING" in Unbounded as paths (no font download on the shelf)
 // A unit test checks that the committed files match what this script would write.
 import { mkdirSync, writeFileSync } from "node:fs";
