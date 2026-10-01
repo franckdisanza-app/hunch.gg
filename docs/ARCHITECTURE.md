@@ -55,8 +55,15 @@ flowchart LR
   RevealCard takes one source or several (a reveal that compares facts). ResultsScreen has an
   `extras` slot (e.g. the poll), a label for the unlimited mode, and `summaryShowsStats` for a
   game-styled summary (a receipt) that shows the score, streak and countdown itself.
-- **Lazy loading** (`lazy.ts`): sheets and the report dialog load on first open and are
-  prefetched when idle; the boot work (`boot.ts`: meta, theme/sound sync, analytics provider,
+- **Shared game plumbing:** `useJson` loads what a game plays (a day's puzzle, an unlimited
+  pool) once per URL, validated with the game's schema; `prefetchTodaysPuzzle` / `prefetchJson`
+  start that request at module load, before hydration, and a failed early request is retried
+  once. `prefs.ts` reads and saves game preferences (`meta.prefs`: display currency, distance
+  unit) with a hydration-safe browser default. `game-route.ts` gives game route pages their
+  metadata and the 404 for unreleased games.
+- **Lazy loading** (`lazy.ts`): sheets, the report dialog and the shelf's "played today" badge
+  (the only thing on the shelf that reads player storage, so Zod never reaches `/`) load on
+  first use and are prefetched when idle; the boot work (`boot.ts`: meta, theme/sound sync, analytics provider,
   share arrival, return days) loads right after hydration.
 - **Strings:** `strings.ts` (interface), `site-strings.ts` (server-only page copy). Formatting uses
   a fixed `UI_LOCALE` (`src/lib/locale.ts`) so prerendered HTML matches the client.
@@ -163,16 +170,24 @@ Plimp renders no user-supplied HTML.
 
 ## Performance budget
 
-| First-load JS (gzipped, `pnpm size`)      | Measured |
-| ----------------------------------------- | -------- |
-| Bare Next 16.3 + React 19.3 "hello world" | 136 KB   |
-| Shelf `/`                                 | 182 KB   |
-| Empty GameShell (`/dev/game-shell`)       | 183 KB   |
-| Budget (CI)                               | 185 KB   |
+| First-load JS (gzipped, `pnpm size`)      | Measured   | Budget (CI) |
+| ----------------------------------------- | ---------- | ----------- |
+| Bare Next 16.3 + React 19.3 "hello world" | 136 KB     |             |
+| Shelf `/`                                 | 158 KB     | 185 KB      |
+| Empty GameShell (`/dev/game-shell`)       | 183 KB     | 185 KB      |
+| Each game page (found on its own)         | 207–211 KB | 215 KB      |
 
-Plimp's own share is about 43 KB, half of it Zod (mini) plus storage validation. Keep new frame
-code lazy where it is not needed for first paint. Lighthouse mobile on `/`: performance 0.94–0.98,
-accessibility 1.00 (CI asserts ≥ 0.9).
+Plimp's own share is about 43 KB on a game page, half of it Zod (mini) plus storage validation;
+the shelf skips that half by loading its "played today" badge lazily. A game page cannot: every
+game validates its puzzle with Zod anyway. Keep new frame code lazy where it is not needed for
+first paint. Lighthouse mobile on `/`: performance 0.94–0.98, accessibility 1.00 (CI asserts
+≥ 0.9).
+
+Turbopack's tree-shaking of Zod depends on which module reaches `zod/mini` first. Shared frame code
+that validates game data (`useJson`) therefore validates through Standard Schema
+(`schema["~standard"].validate`) with a type-only Zod import: a runtime import there once made
+every game page 1.5 KB heavier. `pnpm size` measures every game route, so a shift like that fails
+CI.
 
 ## Tests
 

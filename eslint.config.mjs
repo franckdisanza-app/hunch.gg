@@ -23,6 +23,11 @@ const gameIsolationZones = gameSlugs.flatMap((slug) => [
     from: "./src/games",
     except: [`./${slug}`, ...SHARED_GAME_FILES],
   },
+  {
+    target: `./src/app/api/games/${slug}`,
+    from: "./src/games",
+    except: [`./${slug}`, ...SHARED_GAME_FILES],
+  },
 ]);
 
 export default defineConfig([

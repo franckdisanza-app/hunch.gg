@@ -9,6 +9,7 @@ import { useChoiceGame } from "@/engines/choice/useChoiceGame";
 import { useGame } from "@/frame/GameContext";
 import { OneTapPoll } from "@/frame/OneTapPoll";
 import { ResultsScreen } from "@/frame/ResultsScreen";
+import { prefetchTodaysPuzzle, puzzleUrl, useJson } from "@/frame/useJson";
 import { Button } from "@/frame/ui/Button";
 import { cx } from "@/frame/ui/cx";
 import type { MascotPose } from "@/games/types";
@@ -22,7 +23,6 @@ import { SOUNDS, registerSounds } from "../sounds";
 import { strings } from "../strings";
 import { receiptLine } from "../text";
 import { useDisplayCurrency } from "../useDisplayCurrency";
-import { useJson } from "../useJson";
 import { SampleBanner, Sign } from "./Bits";
 import { Board, roundLabels } from "./Board";
 import { Header } from "./Header";
@@ -33,6 +33,9 @@ import styles from "./world.module.css";
 const SLUG = "sticker-shock";
 const ENDLESS_HREF = "/sticker-shock/unlimited" as Route;
 const REVEAL_DELAY_MS = 450;
+
+/** Today's shelf, requested before React hydrates (see prefetchTodaysPuzzle). */
+const early = prefetchTodaysPuzzle(SLUG);
 
 const savedAnswersSchema = z.array(
   z.object({ roundId: z.string(), picked: z.int().check(z.nonnegative()) }),
@@ -64,8 +67,8 @@ function puzzleDate(launchDate: string, puzzle: number): string {
 /** Daily 10: loads today's shelf, then plays it, resumes it, or shows today's receipt. */
 export function DailyGame() {
   const { puzzle, player } = useGame();
-  const url = puzzle !== null && puzzle >= 1 ? `/api/puzzle/${SLUG}/${puzzle}` : null;
-  const shelf = useJson(url, dailyPuzzleSchema);
+  const url = puzzle !== null && puzzle >= 1 ? puzzleUrl(SLUG, puzzle) : null;
+  const shelf = useJson(url, dailyPuzzleSchema, early);
   const [justFinished, setJustFinished] = useState(false);
 
   if (puzzle === null) {

@@ -11,6 +11,7 @@ const load = {
   stats: () => import("./StatsSheet"),
   settings: () => import("./SettingsSheet"),
   report: () => import("./ReportDialog"),
+  playedToday: () => import("./PlayedTodayBadge"),
 };
 
 export const LazyHowToPlaySheet = dynamic(() => load.howTo().then((m) => m.HowToPlaySheet), {
@@ -25,6 +26,13 @@ export const LazySettingsSheet = dynamic(() => load.settings().then((m) => m.Set
 export const LazyReportDialog = dynamic(() => load.report().then((m) => m.ReportDialog), {
   ssr: false,
 });
+
+// Not a sheet, but the same idea: the shelf's "played today" badge needs player storage (and Zod),
+// which the shelf itself does not. It can only show after hydration anyway.
+export const LazyPlayedTodayBadge = dynamic(
+  () => load.playedToday().then((m) => m.PlayedTodayBadge),
+  { ssr: false },
+);
 
 /** Fetches the given sheets once the browser is idle, so opening them feels instant. */
 export function prefetchWhenIdle(...names: (keyof typeof load)[]): () => void {

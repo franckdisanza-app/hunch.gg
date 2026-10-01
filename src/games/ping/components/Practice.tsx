@@ -4,6 +4,7 @@ import { useState } from "react";
 import { summarizeMap, type MapAnswer } from "@/engines/map/state";
 import { useGame } from "@/frame/GameContext";
 import { ShareButton } from "@/frame/ShareButton";
+import { prefetchJson, useJson } from "@/frame/useJson";
 import { cx } from "@/frame/ui/cx";
 import { formatNumber } from "@/lib/format";
 import { Sonde } from "../art/Sonde";
@@ -17,7 +18,6 @@ import {
 import { practiceShare } from "../share";
 import { strings } from "../strings";
 import { useDistanceUnit } from "../useDistanceUnit";
-import { requestJson, useJson, type Prefetched } from "../useJson";
 import { DraftBanner } from "./Bits";
 import { Board } from "./Board";
 import { BigLink, DAILY_HREF, LoadingRadar, StateScreen } from "./States";
@@ -27,8 +27,7 @@ import styles from "./world.module.css";
 const POOL_URL = `/api/games/${GAME_SLUG}/practice`;
 
 /** The pool, requested as soon as this module runs in the browser (before React hydrates). */
-const early: Prefetched | null =
-  typeof window === "undefined" ? null : { url: POOL_URL, result: requestJson(POOL_URL) };
+const early = prefetchJson(POOL_URL);
 
 /** Three random past questions, each of a different category when the pool allows. */
 export function pickRound(pool: readonly DailyQuestion[], random = Math.random): DailyQuestion[] {
