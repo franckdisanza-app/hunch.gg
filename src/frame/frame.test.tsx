@@ -215,8 +215,7 @@ describe("Mascot", () => {
 });
 
 describe("ResultsScreen", () => {
-  it("hides More from Plimp when no other game is live", () => {
-    // Sticker Shock is the only live game: its own results have nothing else to offer.
+  it("offers the other live games, never the game itself", () => {
     render(
       <ToastProvider>
         <ResultsScreen
@@ -235,7 +234,9 @@ describe("ResultsScreen", () => {
       </ToastProvider>,
     );
     expect(screen.getByText("4/5")).toBeInTheDocument();
-    expect(screen.queryByText("More from Plimp")).not.toBeInTheDocument();
+    const more = screen.getByRole("navigation", { name: "More from Plimp" });
+    expect(within(more).getByRole("link", { name: /Ping/ })).toHaveAttribute("href", "/ping");
+    expect(within(more).queryByRole("link", { name: /Sticker Shock/ })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Share/ })).toBeInTheDocument();
   });
 });

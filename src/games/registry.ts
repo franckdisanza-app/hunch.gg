@@ -1,4 +1,6 @@
 import { devRoutesEnabled } from "@/lib/dev-routes";
+import { mascot as pingMascot } from "./ping/mascot";
+import { theme as pingTheme } from "./ping/theme";
 import { mascot as stickerShockMascot } from "./sticker-shock/mascot";
 import { theme as stickerShockTheme } from "./sticker-shock/theme";
 import type { GameDefinition, LiveGameDefinition } from "./types";
@@ -55,27 +57,19 @@ export const games: readonly GameDefinition[] = [
     ],
   },
   {
-    slug: "handshoe",
-    name: "Handshoe",
-    tagline: "Guess the thing from its literal name in another language.",
-    status: "hidden",
-    modes: ["daily", "unlimited"],
-    engine: "clue",
-    usesCrowdApi: [],
-  },
-  {
     slug: "ping",
     name: "Ping",
     tagline: "Pin the world's extremes: hottest, wettest, farthest.",
-    status: "hidden",
-    // PLACEHOLDER: the puzzle API needs a date to serve the sample dailies in development. Pick
-    // the real launch date (the date of puzzle #1) before going live, then run
-    // `pnpm ping:build --reset`: changing it renumbers the puzzles.
+    status: "live",
+    // PLACEHOLDER: confirm the real launch date (the date of puzzle #1) before going to production.
+    // Changing it renumbers the puzzles: run `pnpm ping:build --reset` before launch.
     launchDate: "2026-09-26",
     modes: ["daily", "unlimited"],
     engine: "map",
     // Guesses record each question's first-pin distance in km, for difficulty tuning.
     usesCrowdApi: ["guesses"],
+    theme: pingTheme,
+    mascot: pingMascot,
     credits: [
       {
         what: "Headings and big numbers",
@@ -107,6 +101,15 @@ export const games: readonly GameDefinition[] = [
         licence: "all rights reserved",
       },
     ],
+  },
+  {
+    slug: "handshoe",
+    name: "Handshoe",
+    tagline: "Guess the thing from its literal name in another language.",
+    status: "hidden",
+    modes: ["daily", "unlimited"],
+    engine: "clue",
+    usesCrowdApi: [],
   },
   {
     slug: "souvenir",
