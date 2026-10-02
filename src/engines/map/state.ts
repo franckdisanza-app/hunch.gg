@@ -1,4 +1,4 @@
-import { clampLat, nearestTarget, normalizeLon, type GeoPoint } from "./geo";
+import { clampLat, nearestTarget, normalizeLon, rhumbBearing, type GeoPoint } from "./geo";
 import {
   maxPins,
   roundScore,
@@ -26,6 +26,8 @@ export interface MapPin<Band extends string = string> extends PinScore<Band> {
   km: number;
   /** Index of the nearest target in `round.targets`. */
   targetIndex: number;
+  /** Map direction from the pin to that target: compass degrees along a rhumb line (geo.ts). */
+  bearing: number;
   /** 0-based: the first pin is attempt 0. */
   attempt: number;
 }
@@ -99,6 +101,7 @@ export function placePin<R extends MapRound, Band extends string>(
     point: at,
     km: nearest.km,
     targetIndex: nearest.index,
+    bearing: rhumbBearing(at, round.targets[nearest.index]!),
     attempt,
   };
 }

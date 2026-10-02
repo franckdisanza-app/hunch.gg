@@ -1,5 +1,6 @@
-/* The how-to loop: 7 s. Pin 1 drops (0–6%), its ring grows (6–26%) and freezes with a label;
-   pin 2 drops (34–40%), its ring grows (40–54%); everything holds, then fades before the loop. */
+/* The how-to loop: 7 s. Pin 1 drops (0–6%), its wedge opens towards the target (6–26%), then the
+   arrow and its label; pin 2 drops (34–40%), its ring grows (40–54%) to the target; everything
+   holds, then fades before the loop. */
 
 .demo {
   margin: 0;
@@ -18,10 +19,15 @@
   font-weight: 700;
 }
 
-.ring1,
 .ring2 {
   transform-box: fill-box;
   transform-origin: center;
+}
+
+/* The wedge opens out from its pin (118, 140 in the picture). */
+.wedge1 {
+  transform-box: view-box;
+  transform-origin: 118px 140px;
 }
 
 .pin1,
@@ -34,7 +40,7 @@
   animation: drop 7s ease-out infinite;
 }
 
-.ring1 {
+.wedge1 {
   animation: grow1 7s ease-out infinite;
 }
 
@@ -172,7 +178,7 @@
 /* Reduced motion: the final frame, still. */
 @media (prefers-reduced-motion: reduce) {
   .pin1,
-  .ring1,
+  .wedge1,
   .label1,
   .pin2,
   .ring2,

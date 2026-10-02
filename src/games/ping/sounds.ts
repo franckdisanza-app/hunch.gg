@@ -2,10 +2,12 @@ import { sound, type SoundSource } from "@/lib/sound";
 import type { Band } from "./config";
 
 // Ping's sounds, synthesised with Web Audio (no audio files). Off by default: the frame's one
-// sound toggle turns them on. The sonar ping rises in pitch the closer the pin.
+// sound toggle turns them on. The sonar ping rises in pitch the closer the pin; the direction hint
+// has a pitch of its own (a "this way" chirp), so it never tells how close.
 
 export const SOUNDS = {
   ping: (band: Band) => `ping:ping-${band}`,
+  bearing: "ping:bearing",
   sweep: "ping:sweep",
   squeak: "ping:squeak",
 } as const;
@@ -49,6 +51,22 @@ export function sonar(frequency: number): SoundSource {
     }
   };
 }
+
+/** The direction hint: two quick, soft blips stepping up, the same wherever the answer is. */
+export const bearing: SoundSource = (ctx, out) => {
+  const t = ctx.currentTime;
+  for (const [start, frequency] of [
+    [0, 660],
+    [0.11, 880],
+  ] as const) {
+    const osc = ctx.createOscillator();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(frequency, t + start);
+    osc.connect(decay(ctx, t + start, 0.5, 0.18)).connect(out);
+    osc.start(t + start);
+    osc.stop(t + start + 0.2);
+  }
+};
 
 /** The radar sweep at the reveal: filtered noise swelling up and away. */
 export const sweep: SoundSource = (ctx, out) => {
@@ -106,6 +124,7 @@ export function registerSounds() {
   for (const [band, frequency] of Object.entries(PITCH) as [Band, number][]) {
     sound.register(SOUNDS.ping(band), sonar(frequency));
   }
+  sound.register(SOUNDS.bearing, bearing);
   sound.register(SOUNDS.sweep, sweep);
   sound.register(SOUNDS.squeak, squeak);
 }

@@ -166,11 +166,14 @@ test.describe("known answers", () => {
     await expect(globe(page)).toBeVisible();
     const drop = page.getByRole("button", { name: "Drop pin" });
     await drop.click();
-    // The ping: the distance and a heat word, never colour alone.
+    // The first hint is the way to the answer, nothing about how far.
     const log = page.getByRole("list", { name: "Pings" });
-    await expect(log.getByText(/^\d{1,3}(,\d{3})* (km|mi) · Freezing$/)).toBeVisible();
+    await expect(log.getByText(/^Answer to the (north|south)?-?(east|west)?$/)).toBeAttached();
+    await expect(log.getByText(/(km|mi) · /)).toHaveCount(0);
     await expect(page.getByText("2 pins left", { exact: true })).toBeVisible();
     await drop.click();
+    // The second: the distance and a heat word, never colour alone.
+    await expect(log.getByText(/^\d{1,3}(,\d{3})* (km|mi) · Freezing$/)).toBeVisible();
     await drop.click();
 
     const card = page.getByRole("article");
@@ -209,8 +212,11 @@ test("a keyboard-only run, with what screen readers hear", async ({ page }) => {
   await page.keyboard.press("ArrowLeft");
 
   await page.keyboard.press("Enter");
-  await expect(page.getByText(/^Pin 1: .+ off\. Freezing\. 2 pins left\.$/)).toBeAttached();
+  await expect(
+    page.getByText(/^Pin 1: the answer lies to the [a-z-]+\. 2 pins left\.$/),
+  ).toBeAttached();
   await page.keyboard.press("Enter");
+  await expect(page.getByText(/^Pin 2: .+ off\. Freezing\. 1 pin left\.$/)).toBeAttached();
   await page.keyboard.press("Enter");
   const next = page.getByRole("button", { name: "Next question" });
   await expect(next).toBeFocused();

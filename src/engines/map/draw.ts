@@ -1,13 +1,22 @@
-import { geoDistance, geoGraticule10, geoInterpolate, geoPath, type GeoProjection } from "d3-geo";
-import type { LineString } from "geojson";
+import {
+  geoArea,
+  geoDistance,
+  geoGraticule10,
+  geoInterpolate,
+  geoPath,
+  type GeoProjection,
+} from "d3-geo";
+import type { LineString, Polygon } from "geojson";
 import type { Atlas } from "./atlas";
 import { easeOut, globeRadius, isVisible, type Camera } from "./camera";
 import { capBox, clipPolygon } from "./clip";
 import {
+  EARTH_RADIUS_KM,
   circleIntersections,
   geodesicCircle,
   kmToDegrees,
   normalizeLon,
+  rhumbLine,
   toLonLat,
   type GeoPoint,
 } from "./geo";
@@ -61,6 +70,26 @@ export interface GlobeBlip {
   label?: string;
 }
 
+/**
+ * A direction hint: a wedge fanning out from a point across `spread` degrees of map directions
+ * (rhumb lines, see geo.ts) as far as they go (a pole, or half the world east or west), fading with
+ * distance, with an arrow down its middle.
+ */
+export interface GlobeDirection {
+  id: string;
+  from: GeoPoint;
+  /** The wedge's middle: compass degrees, clockwise from north. */
+  bearing: number;
+  /** The wedge's width in degrees, e.g. 45 for one of 8 compass points. */
+  spread: number;
+  /** Defaults to the sweep colour. */
+  color?: string;
+  /** Drawn past the arrow's tip, e.g. "NE". */
+  label?: string;
+  /** performance.now() when the wedge started opening; unset: drawn open. */
+  startedAt?: number;
+}
+
 export interface GlobeArc {
   id: string;
   from: GeoPoint;
@@ -75,6 +104,7 @@ export interface GlobeScene {
   pins: readonly GlobePin[];
   blips: readonly GlobeBlip[];
   arcs?: readonly GlobeArc[];
+  directions?: readonly GlobeDirection[];
   /** Glow where fully grown rings cross. */
   glowCrossings?: boolean;
   /**
@@ -139,6 +169,7 @@ export function showsOnlyBackdrop(
     scene.pins.length === 0 &&
     scene.blips.length === 0 &&
     !scene.arcs?.length &&
+    !scene.directions?.length &&
     !scene.sweep;
   const near = (a: number, b: number) => Math.abs(a - b) < 1e-6;
   return (
@@ -262,6 +293,129 @@ function project(input: FrameInput, point: GeoPoint): [number, number] | null {
   return input.projection(toLonLat(point)) ?? null;
 }
 
+/** Rhumb lines across a wedge, and the step along them. */
+const WEDGE_LINES = 12;
+const WEDGE_STEP_KM = 250;
+/** Far enough for any rhumb line to reach a pole or half the world. */
+const WEDGE_REACH_KM = 4 * Math.PI * EARTH_RADIUS_KM;
+/** The arrow down a wedge's middle, CSS px. */
+const ARROW_PX = 58;
+
+/**
+ * A direction's wedge as a polygon: out along its first edge, across the ends of the rhumb lines
+ * in between, and back along the other edge. Never more than a hemisphere, so d3 fills the inside.
+ */
+export function wedgePolygon(
+  direction: Pick<GlobeDirection, "from" | "bearing" | "spread">,
+): Polygon {
+  const { from, bearing, spread } = direction;
+  const lines = Array.from({ length: WEDGE_LINES + 1 }, (_, k) =>
+    rhumbLine(
+      from,
+      bearing - spread / 2 + (spread * k) / WEDGE_LINES,
+      WEDGE_REACH_KM,
+      WEDGE_STEP_KM,
+    ),
+  );
+  const ring = [
+    ...lines[0]!,
+    ...lines.slice(1, -1).map((line) => line.at(-1)!),
+    ...[...lines.at(-1)!].reverse(),
+  ].map(toLonLat);
+  const polygon: Polygon = { type: "Polygon", coordinates: [ring] };
+  // d3 fills the smaller side of a ring wound clockwise; the other winding means the rest.
+  return geoArea(polygon) > 2 * Math.PI
+    ? { type: "Polygon", coordinates: [[...ring].reverse()] }
+    : polygon;
+}
+
+/** Wedges only change with their hint: computed once, by id. */
+const wedges = new Map<string, { key: string; polygon: Polygon }>();
+
+function wedgeFor(direction: GlobeDirection): Polygon {
+  const key = `${direction.from.lat},${direction.from.lon},${direction.bearing},${direction.spread}`;
+  const cached = wedges.get(direction.id);
+  if (cached?.key === key) return cached.polygon;
+  const polygon = wedgePolygon(direction);
+  wedges.set(direction.id, { key, polygon });
+  return polygon;
+}
+
+/**
+ * Paints a direction hint: the wedge, fading with distance from its point and opening out from it
+ * over RING_GROW_MS, then the arrow and its label. Returns true while it opens.
+ */
+function drawDirection(
+  input: FrameInput,
+  path: ReturnType<typeof geoPath>,
+  direction: GlobeDirection,
+  labels: Label[],
+): boolean {
+  const { ctx, projection, colors, now } = input;
+  const color = direction.color ?? colors.sweep;
+  const t = progress(now, direction.startedAt, RING_GROW_MS);
+  const origin = project(input, direction.from);
+  const globe = projection.scale();
+  const [cx, cy] = origin ?? projection.translate();
+  // How far out it fades: a globe's radius or so, never much past the view when zoomed in.
+  const reach = Math.min(globe * 1.25, Math.hypot(input.width, input.height) * 0.8);
+
+  ctx.save();
+  if (t < 1) {
+    // Opening: only what a circle growing from the point has reached so far.
+    ctx.beginPath();
+    ctx.arc(cx, cy, Math.max(1, easeOut(t) * reach * 1.8), 0, Math.PI * 2);
+    ctx.clip();
+  }
+  const fade = ctx.createRadialGradient(cx, cy, 0, cx, cy, reach);
+  fade.addColorStop(0, color);
+  fade.addColorStop(1, "transparent");
+  ctx.beginPath();
+  path(wedgeFor(direction));
+  ctx.globalAlpha = 0.24;
+  ctx.fillStyle = fade;
+  ctx.fill();
+  ctx.globalAlpha = 0.7;
+  ctx.lineWidth = 1.2;
+  ctx.strokeStyle = fade;
+  ctx.stroke();
+  ctx.restore();
+
+  // The arrow: a short stretch of the middle rhumb line, from the point.
+  if (origin && t >= 1) {
+    const km = (ARROW_PX * EARTH_RADIUS_KM) / globe;
+    const shaft = rhumbLine(direction.from, direction.bearing, km, km / 8)
+      .map((point) => project(input, point))
+      .filter((xy): xy is [number, number] => xy !== null);
+    const tip = shaft.at(-1);
+    const back = shaft.at(-2);
+    if (tip && back && shaft.length > 2) {
+      ctx.beginPath();
+      shaft.forEach(([x, y], i) => (i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)));
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = color;
+      ctx.stroke();
+      const angle = Math.atan2(tip[1] - back[1], tip[0] - back[0]);
+      ctx.beginPath();
+      ctx.moveTo(tip[0] + Math.cos(angle) * 6, tip[1] + Math.sin(angle) * 6);
+      ctx.lineTo(tip[0] + Math.cos(angle + 2.4) * 9, tip[1] + Math.sin(angle + 2.4) * 9);
+      ctx.lineTo(tip[0] + Math.cos(angle - 2.4) * 9, tip[1] + Math.sin(angle - 2.4) * 9);
+      ctx.closePath();
+      ctx.fillStyle = color;
+      ctx.fill();
+      if (direction.label) {
+        // Centred past the tip (placeLabels puts a label's box above its anchor).
+        const x = tip[0] + Math.cos(angle) * 26;
+        const y = tip[1] + Math.sin(angle) * 26 + 15;
+        labels.unshift({ text: direction.label, color, anchors: [[x, y]] });
+      }
+    }
+  }
+  return t < 1;
+}
+
 /** Paints one frame. Returns true while something is still moving (another frame is needed). */
 export function drawFrame(input: FrameInput): boolean {
   const { ctx, width, height, dpr, projection, atlas, scene, colors, now } = input;
@@ -322,10 +476,16 @@ export function drawFrame(input: FrameInput): boolean {
   ctx.strokeStyle = colors.rim;
   ctx.stroke();
 
-  // Rings grow from their pin to the target's distance, then freeze.
-  const grown: { center: GeoPoint; radiusKm: number }[] = [];
   const labels: Label[] = [];
   const obstacles: Rect[] = [];
+
+  // Direction hints, under the rings.
+  for (const direction of scene.directions ?? []) {
+    if (drawDirection(input, path, direction, labels)) animating = true;
+  }
+
+  // Rings grow from their pin to the target's distance, then freeze.
+  const grown: { center: GeoPoint; radiusKm: number }[] = [];
   for (const ring of scene.rings) {
     const t = progress(now, ring.startedAt, RING_GROW_MS);
     if (t < 1) animating = true;

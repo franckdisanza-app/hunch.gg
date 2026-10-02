@@ -128,6 +128,85 @@ export function circleIntersections(
   return t < 1e-9 ? [point(1)] : [point(1), point(-1)];
 }
 
+// ---------------------------------------------------------------------------------------------
+// Directions
+//
+// Map directions, as players read them off a map with north up: north is towards the North Pole,
+// east and west the shorter way round. That is the compass bearing of the rhumb line (the line of
+// constant bearing, straight on a Mercator map), not the starting bearing of the great circle,
+// which can point north to a place that lies due east. Rhumb lines follow the globe's grid.
+
+export const COMPASS_POINTS = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"] as const;
+export type CompassPoint = (typeof COMPASS_POINTS)[number];
+
+/** Latitudes are kept off the poles, where Mercator stretches to infinity. */
+const POLE_LAT = 89.999;
+
+/** Mercator's stretched latitude, ψ = ln tan(π/4 + φ/2). */
+function isometricLatitude(lat: number): number {
+  const phi = Math.max(-POLE_LAT, Math.min(POLE_LAT, lat)) * RAD;
+  return Math.log(Math.tan(Math.PI / 4 + phi / 2));
+}
+
+/**
+ * The compass bearing from `a` to `b` along a rhumb line, in degrees clockwise from north
+ * [0, 360). East and west go the shorter way round; the same point gives 0.
+ */
+export function rhumbBearing(a: GeoPoint, b: GeoPoint): number {
+  const dPsi = isometricLatitude(b.lat) - isometricLatitude(a.lat);
+  const dLon = normalizeLon(b.lon - a.lon) * RAD;
+  if (Math.abs(dPsi) < 1e-12 && Math.abs(dLon) < 1e-12) return 0;
+  const bearing = Math.atan2(dLon, dPsi) / RAD;
+  return (bearing + 360) % 360;
+}
+
+/**
+ * Where a rhumb line from `from` at `bearing` (degrees) arrives after `km`, or null once it would
+ * reach a pole (the line spirals into it).
+ */
+export function rhumbDestination(from: GeoPoint, bearing: number, km: number): GeoPoint | null {
+  const delta = km / EARTH_RADIUS_KM;
+  const theta = bearing * RAD;
+  const phi1 = from.lat * RAD;
+  const dPhi = delta * Math.cos(theta);
+  const phi2 = phi1 + dPhi;
+  if (Math.abs(phi2) > POLE_LAT * RAD) return null;
+  const dPsi = isometricLatitude(phi2 / RAD) - isometricLatitude(from.lat);
+  // Due east or west, ψ barely changes: the ratio tends to cos φ.
+  const q = Math.abs(dPsi) > 1e-12 ? dPhi / dPsi : Math.cos(phi1);
+  const dLon = (delta * Math.sin(theta)) / q;
+  return { lat: phi2 / RAD, lon: normalizeLon(from.lon + dLon / RAD) };
+}
+
+/**
+ * Points along a rhumb line from `from` at `bearing`, every `stepKm` up to `km`. It stops short at
+ * a pole, and once it is half the world east or west (beyond that the shorter way is the other
+ * way round, so the bearing no longer describes it).
+ */
+export function rhumbLine(from: GeoPoint, bearing: number, km: number, stepKm: number): GeoPoint[] {
+  const points: GeoPoint[] = [from];
+  const steps = Math.max(1, Math.ceil(km / stepKm));
+  const sin = Math.sin(bearing * RAD);
+  for (let i = 1; i <= steps; i++) {
+    const next = rhumbDestination(from, bearing, (km * i) / steps);
+    if (!next) break;
+    // How far east or west it has gone, unwrapped: δ·sin θ / q, in degrees.
+    const delta = (km * i) / steps / EARTH_RADIUS_KM;
+    const dPsi = isometricLatitude(next.lat) - isometricLatitude(from.lat);
+    const dPhi = (next.lat - from.lat) * RAD;
+    const q = Math.abs(dPsi) > 1e-12 ? dPhi / dPsi : Math.cos(from.lat * RAD);
+    if (Math.abs((delta * sin) / q / RAD) > 180) break;
+    points.push(next);
+  }
+  return points;
+}
+
+/** The nearest of the 8 compass points to a bearing in degrees. */
+export function compassPoint(bearing: number): CompassPoint {
+  const index = Math.round((((bearing % 360) + 360) % 360) / 45) % 8;
+  return COMPASS_POINTS[index]!;
+}
+
 /** Longitudes a bounding box spans, in degrees (0–360), antimeridian-safe. */
 export function bboxLonSpan([west, , east]: BBox): number {
   const span = (((east - west) % 360) + 360) % 360;

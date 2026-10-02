@@ -3,7 +3,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { frameFor, type Camera } from "@/engines/map/camera";
 import type { GlobeScene } from "@/engines/map/draw";
-import { bboxCenter, formatDistance, type GeoPoint } from "@/engines/map/geo";
+import {
+  bboxCenter,
+  compassPoint,
+  formatDistance,
+  type CompassPoint,
+  type GeoPoint,
+} from "@/engines/map/geo";
 import type { GlobeHandle } from "@/engines/map/Globe";
 import type { MapAnswer, MapPin, SavedMapAnswer } from "@/engines/map/state";
 import { useMapGame } from "@/engines/map/useMapGame";
@@ -14,11 +20,14 @@ import type { MascotPose } from "@/games/types";
 import { formatNumber } from "@/lib/format";
 import { Sonde } from "../art/Sonde";
 import {
+  DIRECTION_SPREAD,
   PINS_PER_QUESTION,
   SCORING,
   TIMING,
   WORLD_VIEW,
+  compassBearing,
   heatColor,
+  hintFor,
   roundFor,
   type Band,
 } from "../config";
@@ -65,11 +74,28 @@ export function startView(question: Pick<Question, "scope">): Camera {
   ]);
 }
 
+/** Arrows for the 8 directions, beside their letters in the hints. */
+const ARROWS: Record<CompassPoint, string> = {
+  N: "↑",
+  NE: "↗",
+  E: "→",
+  SE: "↘",
+  S: "↓",
+  SW: "↙",
+  W: "←",
+  NW: "↖",
+};
+
+/** Whether a pin is a miss whose hint is the direction (it tells nothing about the distance). */
+const pointsTheWay = (pin: MapPin<Band>) => !pin.perfect && hintFor(pin.attempt) === "direction";
+
 function poseFor(step: RevealStep, pins: readonly MapPin<Band>[], solved: boolean): MascotPose {
   if (step === "card") return solved ? "celebrate" : "point";
   if (step !== "none") return "thinking";
   const last = pins.at(-1);
   if (!last) return "idle";
+  // A direction hint: Sonde points the way, and gives nothing away about how close it was.
+  if (pointsTheWay(last)) return "point";
   if (last.band === "burning" || last.band === "hot") return "correct";
   return last.band === "warm" ? "thinking" : "wrong";
 }
@@ -112,7 +138,9 @@ export function Board({
         callbacks.current.onStart?.();
       const key = `${round.id}-${pin.attempt}`;
       if (!game.reducedMotion) setGrownAt((g) => ({ ...g, [key]: performance.now() }));
-      playSound(pin.perfect ? SOUNDS.squeak : SOUNDS.ping(pin.band));
+      playSound(
+        pin.perfect ? SOUNDS.squeak : pointsTheWay(pin) ? SOUNDS.bearing : SOUNDS.ping(pin.band),
+      );
       setAnnouncement(pinAnnouncement(pin, state.pinsLeft));
       callbacks.current.onProgress?.(game.saved());
     },
@@ -151,14 +179,20 @@ export function Board({
   useEffect(() => () => window.clearTimeout(revealTimer.current), []);
 
   function pinAnnouncement(pin: MapPin<Band>, pinsLeft: number): string {
-    return pin.perfect
-      ? strings.announce.bullseye(pin.attempt + 1)
-      : strings.announce.miss(
-          pin.attempt + 1,
-          formatDistance(pin.km, unit),
-          strings.heat[pin.band],
-          strings.pins.left(pinsLeft),
-        );
+    if (pin.perfect) return strings.announce.bullseye(pin.attempt + 1);
+    if (pointsTheWay(pin)) {
+      return strings.announce.direction(
+        pin.attempt + 1,
+        strings.compass[compassPoint(pin.bearing)].name,
+        strings.pins.left(pinsLeft),
+      );
+    }
+    return strings.announce.miss(
+      pin.attempt + 1,
+      formatDistance(pin.km, unit),
+      strings.heat[pin.band],
+      strings.pins.left(pinsLeft),
+    );
   }
 
   /** Shows the card; `before` is read out first (the last pin, when the reveal is instant). */
@@ -218,14 +252,32 @@ export function Board({
 
   const scene = useMemo((): GlobeScene => {
     const showTargets = step === "sweep" || step === "card";
+    // Labels help while aiming and through the reveal; under the card the globe is small.
+    const labelled = step !== "card";
     return {
       pins: state.pins.map((pin, i) => ({
         id: `${round.id}-${i}`,
         point: pin.point,
         label: `${i + 1}`,
       })),
+      // The first miss: a wedge towards the answer, as wide as its compass point (never the exact
+      // bearing, which would say more than "north-east").
+      directions: state.pins.filter(pointsTheWay).map((pin) => {
+        const id = `${round.id}-${pin.attempt}`;
+        const startedAt = grownAt[id];
+        const point = compassPoint(pin.bearing);
+        return {
+          id,
+          from: pin.point,
+          bearing: compassBearing(point),
+          spread: DIRECTION_SPREAD,
+          ...(labelled ? { label: strings.compass[point].short } : {}),
+          ...(startedAt !== undefined ? { startedAt } : {}),
+        };
+      }),
+      // Later misses: a ring at the answer's distance.
       rings: state.pins
-        .filter((pin) => !pin.perfect)
+        .filter((pin) => !pin.perfect && !pointsTheWay(pin))
         .map((pin) => {
           const id = `${round.id}-${pin.attempt}`;
           const startedAt = grownAt[id];
@@ -234,10 +286,14 @@ export function Board({
             center: pin.point,
             radiusKm: pin.km,
             color: heatColor(pin.km / round.scopeKm),
-            label: strings.log.miss(
-              formatDistance(pin.km, unit),
-              strings.heat[pin.band].toUpperCase(),
-            ),
+            ...(labelled
+              ? {
+                  label: strings.log.miss(
+                    formatDistance(pin.km, unit),
+                    strings.heat[pin.band].toUpperCase(),
+                  ),
+                }
+              : {}),
             ...(startedAt !== undefined ? { startedAt } : {}),
           };
         }),
@@ -249,7 +305,6 @@ export function Board({
             color: t.official ? HEAT.hot : HEAT.mild,
           }))
         : [],
-      glowCrossings: true,
       ...(showTargets ? { sweep: { key: round.id } } : {}),
     };
   }, [state.pins, round, question, step, grownAt, unit]);
@@ -319,27 +374,45 @@ export function Board({
             <Reveal question={question} answer={state.answer} unit={unit} />
           ) : state.pins.length > 0 ? (
             <ol aria-label={strings.log.title} className={cx(styles.hintStrip, styles.mono)}>
-              {state.pins.map((pin) => (
-                <li key={pin.attempt} className={styles.hintChip}>
-                  <span
-                    aria-hidden="true"
-                    className={styles.pinBadge}
-                    style={
-                      {
-                        "--swatch": pin.perfect ? HEAT.hot : heatColor(pin.km / round.scopeKm),
-                      } as CSSProperties
-                    }
-                  >
-                    {pin.attempt + 1}
-                  </span>
-                  <span className="sr-only">{strings.pins.label(pin.attempt + 1)}: </span>
-                  <span>
-                    {pin.perfect
-                      ? strings.bullseye
-                      : strings.log.miss(formatDistance(pin.km, unit), strings.heat[pin.band])}
-                  </span>
-                </li>
-              ))}
+              {state.pins.map((pin) => {
+                const point = compassPoint(pin.bearing);
+                return (
+                  <li key={pin.attempt} className={styles.hintChip}>
+                    <span
+                      aria-hidden="true"
+                      className={styles.pinBadge}
+                      style={
+                        {
+                          "--swatch": pin.perfect
+                            ? HEAT.hot
+                            : pointsTheWay(pin)
+                              ? "var(--game-accent-1)"
+                              : heatColor(pin.km / round.scopeKm),
+                        } as CSSProperties
+                      }
+                    >
+                      {pin.attempt + 1}
+                    </span>
+                    <span className="sr-only">{strings.pins.label(pin.attempt + 1)}: </span>
+                    {pin.perfect ? (
+                      <span>{strings.bullseye}</span>
+                    ) : pointsTheWay(pin) ? (
+                      <>
+                        <span aria-hidden="true">
+                          {ARROWS[point]} {strings.compass[point].short}
+                        </span>
+                        <span className="sr-only">
+                          {strings.log.direction(strings.compass[point].name)}
+                        </span>
+                      </>
+                    ) : (
+                      <span>
+                        {strings.log.miss(formatDistance(pin.km, unit), strings.heat[pin.band])}
+                      </span>
+                    )}
+                  </li>
+                );
+              })}
             </ol>
           ) : (
             <p

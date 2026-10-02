@@ -1,6 +1,6 @@
 import type { Camera } from "@/engines/map/camera";
 import { roundGeometry, type MapScoring } from "@/engines/map/scoring";
-import { scopeSizeKm } from "@/engines/map/geo";
+import { COMPASS_POINTS, scopeSizeKm, type CompassPoint } from "@/engines/map/geo";
 import type { MapRound } from "@/engines/map/state";
 import type { Category, Question } from "./content.schema";
 import { HEAT } from "./palette";
@@ -46,6 +46,27 @@ export const SCORING: MapScoring<Band> = {
 
 export const PINS_PER_QUESTION = SCORING.weights.length;
 export const DAILY_MAX = 3 * SCORING.maxPoints;
+
+export type Hint = "direction" | "distance";
+
+/**
+ * What a missed pin tells the player, pin by pin: the first, which way the answer lies (one of 8
+ * map directions, as a wedge); the second, how far it is (a ring). The third pin's ring leads into
+ * the reveal. One per pin.
+ */
+export const HINTS: readonly Hint[] = ["direction", "distance", "distance"];
+
+export function hintFor(attempt: number): Hint {
+  return HINTS[attempt] ?? "distance";
+}
+
+/** A direction hint's wedge: the 45° that round to its compass point. */
+export const DIRECTION_SPREAD = 360 / COMPASS_POINTS.length;
+
+/** The middle of a compass point's wedge, in degrees: NE is 45, whatever the exact bearing. */
+export function compassBearing(point: CompassPoint): number {
+  return COMPASS_POINTS.indexOf(point) * DIRECTION_SPREAD;
+}
 
 /** Share squares: a target for a perfect pin, then green to red by band. */
 export const SQUARES: Record<Band | "perfect", string> = {
