@@ -95,7 +95,7 @@ function quickBBox(geometry: Polygon | MultiPolygon): BBox {
 }
 
 /** A cap around some points: centred on their mean direction, reaching the farthest one. */
-function capOf(points: readonly Position[]): { center: [number, number]; radius: number } {
+export function capOf(points: readonly Position[]): { center: [number, number]; radius: number } {
   let [x, y, z] = [0, 0, 0];
   for (const [lon, lat] of points) {
     const phi = lat! * RAD;

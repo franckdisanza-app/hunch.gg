@@ -24,6 +24,7 @@ export const theme: GameTheme = {
       pin: PAPER.ink,
       "pin-ink": PAPER.panel,
       isobar: PAPER.isobar,
+      road: PAPER.road,
     },
   },
   dark: {
@@ -45,6 +46,7 @@ export const theme: GameTheme = {
       pin: NIGHT.ink,
       "pin-ink": NIGHT.bg,
       isobar: NIGHT.isobar,
+      road: NIGHT.road,
     },
   },
   wordmark: "/games/ping/wordmark.svg",

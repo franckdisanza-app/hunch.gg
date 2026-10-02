@@ -17,7 +17,17 @@ const nextConfig: NextConfig = {
     "/api/games/ping/practice": ["./content/ping/daily/*.json"],
   },
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders(process.env) }];
+    return [
+      { source: "/:path*", headers: securityHeaders(process.env) },
+      // The globe's cities and roads (pnpm map:data): a new format gets a new /map/vN/ folder, a
+      // data refresh within one shows up within a day.
+      {
+        source: "/map/:path*",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" },
+        ],
+      },
+    ];
   },
 };
 

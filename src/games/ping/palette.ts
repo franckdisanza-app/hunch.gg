@@ -17,6 +17,7 @@ export const NIGHT = {
   land: "#16304F",
   border: "#2A4666",
   isobar: "#16263D",
+  road: "#5A7499",
 } as const;
 
 export const PAPER = {
@@ -31,4 +32,5 @@ export const PAPER = {
   land: "#FFFFFF",
   border: "#C3CFDD",
   isobar: "#D5DEE9",
+  road: "#CBB089",
 } as const;

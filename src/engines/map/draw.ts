@@ -8,8 +8,9 @@ import {
 } from "d3-geo";
 import type { LineString, Polygon } from "geojson";
 import type { Atlas } from "./atlas";
-import { easeOut, globeRadius, isVisible, type Camera } from "./camera";
+import { easeOut, isVisible, viewAngle, type Camera } from "./camera";
 import { capBox, clipPolygon } from "./clip";
+import { MAJOR_ROAD_MAX_ZOOM, type Place, type RoadLine } from "./overlays";
 import {
   EARTH_RADIUS_KM,
   circleIntersections,
@@ -41,6 +42,10 @@ export interface GlobeColors {
   pinInk: string;
   labelInk: string;
   labelBg: string;
+  /** Roads (default: the border colour). */
+  road?: string;
+  /** City and town dots (default: the label ink). */
+  place?: string;
 }
 
 export interface GlobeRing {
@@ -152,6 +157,8 @@ export interface FrameInput {
   sweep: SweepState | null;
   /** Blip id → performance.now() when it lit up. */
   lit: ReadonlyMap<string, number>;
+  /** Cities and roads for this view (overlays.ts), most important places first. */
+  overlays?: { roads: readonly RoadLine[]; places: readonly Place[] };
 }
 
 /**
@@ -234,7 +241,11 @@ const around = ([x, y]: [number, number], r: number): Rect => ({
  * Draws each label at its first anchor that overlaps neither a label already drawn nor a marker
  * (pins, blips, glows), or skips it.
  */
-function placeLabels(input: FrameInput, labels: readonly Label[], obstacles: readonly Rect[]) {
+function placeLabels(
+  input: FrameInput,
+  labels: readonly Label[],
+  obstacles: readonly Rect[],
+): Rect[] {
   const { ctx, font, width, height } = input;
   const insets = input.labelInsets ?? DEFAULT_LABEL_INSETS;
   ctx.font = `600 11px ${font}`;
@@ -254,6 +265,64 @@ function placeLabels(input: FrameInput, labels: readonly Label[], obstacles: rea
       drawLabel(input, label.text, rect, label.color);
       break;
     }
+  }
+  return placed;
+}
+
+/** At most this many places get a label in one frame. */
+const MAX_PLACES = 60;
+
+/**
+ * Cities and towns: a dot and a name beside it (right, else left), most important first, each only
+ * where it overlaps nothing already on the globe (the game's labels and markers, the crosshair,
+ * other places).
+ */
+function drawPlaces(input: FrameInput, places: readonly Place[], taken: Rect[]) {
+  const { ctx, font, colors, width, height } = input;
+  const insets = input.labelInsets ?? DEFAULT_LABEL_INSETS;
+  let drawn = 0;
+  ctx.textBaseline = "middle";
+  ctx.lineJoin = "round";
+  for (const place of places) {
+    if (drawn >= MAX_PLACES) break;
+    const xy = project(input, place.point);
+    if (!xy) continue;
+    const [x, y] = xy;
+    if (x < insets.left || x > width - insets.right) continue;
+    if (y < insets.top || y > height - insets.bottom) continue;
+    ctx.font = `${place.capital ? 700 : 500} 11px ${font}`;
+    const w = ctx.measureText(place.name).width + 2;
+    const h = 14;
+    const dot = around(xy, 4);
+    const sides = [
+      { left: x + 6, top: y - h / 2, w, h },
+      { left: x - 6 - w, top: y - h / 2, w, h },
+    ];
+    const rect = sides.find(
+      (r) =>
+        r.left >= insets.left &&
+        r.left + r.w <= width - insets.right &&
+        !taken.some((other) => overlaps(r, other) || overlaps(dot, other)),
+    );
+    if (!rect) continue;
+    taken.push(rect, dot);
+    drawn++;
+
+    ctx.beginPath();
+    if (place.capital) ctx.rect(x - 3, y - 3, 6, 6);
+    else ctx.arc(x, y, 2.4, 0, Math.PI * 2);
+    ctx.fillStyle = colors.place ?? colors.labelInk;
+    ctx.fill();
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = colors.labelBg;
+    ctx.stroke();
+
+    ctx.textAlign = "left";
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = colors.labelBg;
+    ctx.strokeText(place.name, rect.left + 1, y + 0.5);
+    ctx.fillStyle = colors.labelInk;
+    ctx.fillText(place.name, rect.left + 1, y + 0.5);
   }
 }
 
@@ -437,17 +506,16 @@ export function drawFrame(input: FrameInput): boolean {
   ctx.strokeStyle = colors.graticule;
   ctx.stroke();
 
+  // Only what can show: in front of the horizon and, zoomed in, inside the view.
+  const visible = viewAngle(width, height, input.camera.zoom);
+  const center = toLonLat(input.camera.center);
+  const inView = (part: { center: [number, number]; radius: number }) =>
+    geoDistance(part.center, center) - part.radius < visible;
+
   if (atlas) {
-    // Only what can show: in front of the horizon and, zoomed in, inside the view. Zoomed in,
-    // big polygons (continents) are first cut to the box around the view, so d3 projects only
-    // their visible stretch.
-    const { width: w, height: h, camera } = input;
-    const reach = Math.hypot(w, h) / 2 / globeRadius(w, h, camera.zoom);
-    const visible = (reach >= 1 ? Math.PI / 2 : Math.asin(reach)) + 0.02;
-    const center = toLonLat(camera.center);
+    // Zoomed in, big polygons (continents) are first cut to the box around the view, so d3
+    // projects only their visible stretch.
     const box = visible < 0.5 ? capBox(center, visible) : null;
-    const inView = (part: { center: [number, number]; radius: number }) =>
-      geoDistance(part.center, center) - part.radius < visible;
     ctx.beginPath();
     for (const part of atlas.parts) {
       if (!inView(part)) continue;
@@ -469,6 +537,21 @@ export function drawFrame(input: FrameInput): boolean {
     ctx.lineWidth = 0.5;
     ctx.strokeStyle = colors.border;
     ctx.stroke();
+  }
+
+  // Roads: the major ones a little bolder.
+  const roads = input.overlays?.roads ?? [];
+  if (roads.length) {
+    for (const major of [false, true]) {
+      ctx.beginPath();
+      for (const road of roads) {
+        if (road.minZoom <= MAJOR_ROAD_MAX_ZOOM === major && inView(road)) path(road.line);
+      }
+      ctx.lineWidth = major ? 1.3 : 0.8;
+      ctx.lineCap = "round";
+      ctx.strokeStyle = colors.road ?? colors.border;
+      ctx.stroke();
+    }
   }
 
   ctx.beginPath();
@@ -646,7 +729,10 @@ export function drawFrame(input: FrameInput): boolean {
     }
   }
 
-  placeLabels(input, labels, obstacles);
+  const taken = placeLabels(input, labels, obstacles);
+  // Places keep clear of everything above, and of the crosshair in the middle.
+  taken.push(around([width / 2, height / 2], 26));
+  drawPlaces(input, input.overlays?.places ?? [], taken);
   return animating;
 }
 

@@ -46,6 +46,8 @@ export const GLOBE_COLORS: GlobeColors = {
   pinInk: "var(--game-pin-ink)",
   labelInk: "var(--game-ink)",
   labelBg: "var(--game-bg)",
+  road: "var(--game-road)",
+  place: "var(--game-ink)",
 };
 
 const coordinates = (point: GeoPoint) => formatLatLon(point, strings.globe.letters);
@@ -106,19 +108,29 @@ export function GlobeView({ globeRef, overlay, ...props }: GlobeViewProps) {
         font="var(--ping-font-mono)"
         label={strings.globe.label}
         instructions={strings.globe.instructions}
-        describeAim={({ point, country }) =>
-          strings.globe.aim(coordinates(point), country ?? strings.globe.openWater)
+        describeAim={({ point, country, place }) =>
+          strings.globe.aim(coordinates(point), country ?? strings.globe.openWater, place)
         }
         readout={(center) => coordinates(center)}
         readoutClassName={cx(styles.readout, styles.mono)}
         crosshair={<Crosshair />}
-        // Labels keep clear of the overlay at the top and the readout at the bottom.
-        labelInsets={{ top: overlay ? 40 : 28, bottom: 44 }}
+        // Labels keep clear of the overlay at the top, the readout and zoom buttons at the bottom.
+        labelInsets={{ top: overlay ? 40 : 28, bottom: 52 }}
         className={styles.globe}
       />
       {/* Only while the player aims: the game moves the globe itself the rest of the time. */}
       {props.interactive && (
         <div className={styles.zoom}>
+          <button
+            type="button"
+            aria-label={strings.globe.zoomOut}
+            onClick={() => handle.current?.zoomBy(1 / ZOOM_STEP)}
+            className={styles.zoomButton}
+          >
+            <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+              <path d="M3 9h12" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+            </svg>
+          </button>
           <button
             type="button"
             aria-label={strings.globe.zoomIn}
@@ -132,16 +144,6 @@ export function GlobeView({ globeRef, overlay, ...props }: GlobeViewProps) {
                 strokeWidth="2.2"
                 strokeLinecap="round"
               />
-            </svg>
-          </button>
-          <button
-            type="button"
-            aria-label={strings.globe.zoomOut}
-            onClick={() => handle.current?.zoomBy(1 / ZOOM_STEP)}
-            className={styles.zoomButton}
-          >
-            <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
-              <path d="M3 9h12" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
             </svg>
           </button>
         </div>

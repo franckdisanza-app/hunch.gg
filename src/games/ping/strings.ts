@@ -55,7 +55,10 @@ export const strings = {
       "Drag to turn the globe, pinch or scroll to zoom. With a keyboard: arrow keys turn it (Shift for bigger steps), plus and minus zoom, Enter drops a pin at the crosshair.",
     letters: { n: "N", s: "S", e: "E", w: "W" },
     openWater: "open water",
-    aim: (coordinates: string, place: string) => `Crosshair on ${coordinates}, ${place}.`,
+    aim: (coordinates: string, where: string, near: string | null) =>
+      near
+        ? `Crosshair on ${coordinates}, ${where}, near ${near}.`
+        : `Crosshair on ${coordinates}, ${where}.`,
     loading: "Loading the globe…",
     zoomIn: "Zoom in",
     zoomOut: "Zoom out",

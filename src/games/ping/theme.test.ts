@@ -15,8 +15,15 @@ describe("Ping's theme", () => {
         });
       }
     }
-    it(`${mode}: ring labels (ink on bg) reach AA`, () => {
+    it(`${mode}: ring and city labels (ink on its bg halo) reach AA`, () => {
       expect(contrastRatio(tokens.ink, tokens.bg)).toBeGreaterThanOrEqual(AA_NORMAL_TEXT);
+    });
+    it(`${mode}: roads stand out from the land and the borders`, () => {
+      // Roads are background detail, not content: visible, never louder than the game's marks.
+      expect(contrastRatio(extras.road!, extras.land!)).toBeGreaterThanOrEqual(1.5);
+      expect(contrastRatio(extras.road!, extras.land!)).toBeGreaterThan(
+        contrastRatio(extras.border!, extras.land!),
+      );
     });
   }
 });
