@@ -46,9 +46,14 @@ async function playDaily(page: Page, options: { keyboard?: boolean; axe?: boolea
 
 for (const scheme of ["light", "dark"] as const) {
   test.describe(`${scheme} scheme`, () => {
-    test.use({ colorScheme: scheme });
+    // This one covers the flow, the receipt and axe in each scheme, not motion (the share,
+    // keyboard and 360 px tests play with it). Reduced motion drops the pick delay before each
+    // reveal, most of the run, and axe checks the settled page rather than one mid-animation.
+    test.use({ colorScheme: scheme, reducedMotion: "reduce" });
 
     test("plays Daily 10 on sample data through to the receipt", async ({ page }) => {
+      // Still ten pairs and three axe scans: room for the whole suite running in parallel.
+      test.setTimeout(60_000);
       const errors = watchConsole(page);
       await page.goto(DAILY);
       await closeHowTo(page);
