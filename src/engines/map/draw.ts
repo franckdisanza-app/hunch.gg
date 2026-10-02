@@ -357,18 +357,19 @@ function drawDirection(
   const origin = project(input, direction.from);
   const globe = projection.scale();
   const [cx, cy] = origin ?? projection.translate();
-  // How far out it fades: a globe's radius or so, never much past the view when zoomed in.
-  const reach = Math.min(globe * 1.25, Math.hypot(input.width, input.height) * 0.8);
+  // How far out it fades: most of the globe, never much past the view when zoomed in.
+  const reach = Math.min(globe * 1.8, Math.hypot(input.width, input.height) * 0.9);
 
   ctx.save();
   if (t < 1) {
     // Opening: only what a circle growing from the point has reached so far.
     ctx.beginPath();
-    ctx.arc(cx, cy, Math.max(1, easeOut(t) * reach * 1.8), 0, Math.PI * 2);
+    ctx.arc(cx, cy, Math.max(1, easeOut(t) * reach * 1.2), 0, Math.PI * 2);
     ctx.clip();
   }
   const fade = ctx.createRadialGradient(cx, cy, 0, cx, cy, reach);
   fade.addColorStop(0, color);
+  fade.addColorStop(0.45, color);
   fade.addColorStop(1, "transparent");
   ctx.beginPath();
   path(wedgeFor(direction));
