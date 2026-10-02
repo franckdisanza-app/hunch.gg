@@ -55,6 +55,9 @@ pnpm new-game sticker-shock --name "Sticker Shock" --engine choice
       the same thing.
 - [ ] Scores in the hundreds or thousands: pass `scoreBucket` and `formatScore` to `GameShell`
       so the stats chart groups them (Ping groups by 500).
+- [ ] A play screen that needs the whole screen (a globe, a board) goes in `FillScreen`
+      (`src/frame/`): the page then never scrolls and the game gets the full width; lay it out
+      inside, scrolling only inner panels that must (Ping's play grid in `world.module.css`).
 - [ ] Every string in `src/games/<slug>/strings.ts`; format with `src/lib/format.ts`.
 - [ ] Keep first-load JS under budget: `ENABLE_DEV_ROUTES=1 pnpm build && pnpm size` measures
       the shelf, the empty shell and every game route (the game's pages are found on their own).

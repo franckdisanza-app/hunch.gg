@@ -257,6 +257,77 @@ test.describe("reduced motion", () => {
   });
 });
 
+test.describe("the play screen fits the screen", () => {
+  test.use({ reducedMotion: "reduce" });
+
+  /** The page never scrolls: no taller and no wider than the window. */
+  async function expectFits(page: Page, step: string) {
+    const size = await page.evaluate(() => ({
+      height: document.documentElement.scrollHeight,
+      width: document.documentElement.scrollWidth,
+      windowHeight: window.innerHeight,
+      windowWidth: window.innerWidth,
+    }));
+    expect(size.height, `${step}: page height`).toBeLessThanOrEqual(size.windowHeight);
+    expect(size.width, `${step}: page width`).toBeLessThanOrEqual(size.windowWidth);
+  }
+
+  for (const [width, height] of [
+    [360, 640],
+    [390, 844],
+    [844, 390],
+    [768, 1024],
+    [1440, 900],
+    [1920, 1080],
+  ] as const) {
+    test(`never scrolls while playing at ${width}×${height}`, async ({ page }) => {
+      await page.setViewportSize({ width, height });
+      await serveFakeDay(page, [FAR_AWAY, FAR_AWAY, FAR_AWAY]);
+      await page.goto(DAILY);
+      await closeHowTo(page);
+      await expect(globe(page)).toBeVisible();
+      await expectFits(page, "question");
+      const drop = page.getByRole("button", { name: "Drop pin" });
+      await expect(drop).toBeInViewport();
+      await drop.click();
+      await expectFits(page, "first hint");
+      await drop.click();
+      await drop.click();
+      // The answer card scrolls inside its panel if it must; the page does not.
+      await expect(page.getByRole("article")).toBeVisible();
+      await expect(page.getByRole("button", { name: "Next question" })).toBeInViewport();
+      await expectFits(page, "answer card");
+    });
+  }
+
+  test("gives the globe most of a desktop screen", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await serveFakeDay(page, [FAR_AWAY, FAR_AWAY, FAR_AWAY]);
+    await page.goto(DAILY);
+    await closeHowTo(page);
+    const box = (await globe(page).boundingBox())!;
+    expect(box.width).toBeGreaterThan(900);
+    expect(box.height).toBeGreaterThan(780);
+  });
+});
+
+test("cities and roads load only once the player zooms in", async ({ page }) => {
+  const mapData: string[] = [];
+  page.on("request", (request) => {
+    const { pathname } = new URL(request.url());
+    if (pathname.startsWith("/map/")) mapData.push(pathname);
+  });
+  await serveFakeDay(page, [FAR_AWAY, FAR_AWAY, FAR_AWAY]);
+  await page.goto(DAILY);
+  await closeHowTo(page);
+  await expect(globe(page)).toBeVisible();
+  await page.waitForLoadState("networkidle");
+  expect(mapData).toEqual([]);
+  await globe(page).focus();
+  for (let i = 0; i < 4; i++) await page.keyboard.press("+");
+  await expect.poll(() => mapData).toContain("/map/v1/places-1.json");
+});
+
 test.describe("at 360 px", () => {
   test.use({ viewport: { width: 360, height: 740 }, reducedMotion: "reduce" });
 
