@@ -2,80 +2,80 @@
   "puzzle": 48,
   "questions": [
     {
-      "id": "sample-02",
-      "category": "cold",
-      "prompt": "Sample 02 (fake data): where is the made-up coldest spot? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up coldest spot of sample 02?",
-      "scope": { "level": "world", "name": "the world" },
-      "targets": [
-        {
-          "lat": 67.6767,
-          "lon": -34.0384,
-          "label": "Fake place 02",
-          "official": true,
-          "value": 79.4,
-          "unit": "fake units",
-          "date": "2026-09"
-        }
-      ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-02",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
-      "sample": true,
-      "surface": "land"
-    },
-    {
-      "id": "sample-18",
-      "category": "wind",
-      "prompt": "Sample 18 (fake data): where is the made-up windiest spot? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up windiest spot of sample 18?",
-      "scope": { "level": "world", "name": "the world" },
-      "targets": [
-        {
-          "lat": 52.6642,
-          "lon": 91.9597,
-          "label": "Fake place 18",
-          "official": true,
-          "value": 94,
-          "unit": "fake units",
-          "date": "2026-09"
-        }
-      ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-18",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
-      "sample": true,
-      "surface": "land"
-    },
-    {
-      "id": "sample-10",
+      "id": "rain-longest-dry-spell",
       "category": "rain",
-      "prompt": "Sample 10 (fake data): where is the made-up wettest spot? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up wettest spot of sample 10?",
+      "prompt": "Where was the longest dry spell ever recorded, without any measurable rain (WMO)?",
+      "teaser": "Where did it go longest without rain?",
       "scope": { "level": "world", "name": "the world" },
       "targets": [
         {
-          "lat": 36.5151,
-          "lon": 106.3954,
-          "label": "Fake place 10",
+          "lat": -18.4833,
+          "lon": -70.3,
+          "label": "Arica, Chile",
           "official": true,
-          "value": 94.2,
-          "unit": "fake units",
-          "date": "2026-09"
+          "value": 172,
+          "unit": "months without rain",
+          "date": "1903-10/1918-01"
         }
       ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-10",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
+      "authority": "World Meteorological Organization",
+      "turnsOut": "Arica, on the edge of Chile's Atacama Desert: no measurable rain for 172 months, from October 1903 to January 1918. Over 59 years its rainfall averaged 0.76 mm a year, the lowest in South America.",
+      "sourceTitle": "WMO Weather and Climate Extremes Archive: records table (31 July 2025)",
+      "sourceUrl": "https://wmo.int/files/records-of-weather-and-climate-extremes-table",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
+      "sample": true,
+      "surface": "land"
+    },
+    {
+      "id": "heat-highest-temperature",
+      "category": "heat",
+      "prompt": "Where was the highest air temperature ever recorded on Earth (WMO)?",
+      "teaser": "Where was the hottest temperature ever recorded?",
+      "scope": { "level": "world", "name": "the world" },
+      "targets": [
+        {
+          "lat": 36.45,
+          "lon": -116.85,
+          "label": "Furnace Creek (Greenland Ranch), Death Valley, California, USA",
+          "official": true,
+          "value": 56.7,
+          "unit": "°C",
+          "date": "1913-07-10"
+        }
+      ],
+      "authority": "World Meteorological Organization",
+      "turnsOut": "Furnace Creek in Death Valley, California, 54 m below sea level: 56.7 °C (134 °F) on 10 July 1913. Libya's 58 °C from 1922 held the title until a WMO panel threw it out in 2012.",
+      "sourceTitle": "WMO Weather and Climate Extremes Archive: records table (31 July 2025)",
+      "sourceUrl": "https://wmo.int/files/records-of-weather-and-climate-extremes-table",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
+      "sample": true,
+      "surface": "land"
+    },
+    {
+      "id": "wind-strongest-gust",
+      "category": "wind",
+      "prompt": "Where was the strongest wind gust ever measured, outside a tornado (WMO)?",
+      "teaser": "Where was the strongest gust of wind ever measured?",
+      "scope": { "level": "world", "name": "the world" },
+      "targets": [
+        {
+          "lat": -20.8167,
+          "lon": 115.3833,
+          "label": "Barrow Island, Western Australia",
+          "official": true,
+          "value": 113.2,
+          "unit": "m/s (408 km/h)",
+          "date": "1996-04-10"
+        }
+      ],
+      "authority": "World Meteorological Organization",
+      "turnsOut": "Barrow Island, off Western Australia: 113.2 m/s (408 km/h) as Cyclone Olivia passed on 10 April 1996. The WMO only confirmed it in 2010, ending the reign of Mount Washington's 103.3 m/s gust from 1934.",
+      "sourceTitle": "WMO Weather and Climate Extremes Archive: records table (31 July 2025)",
+      "sourceUrl": "https://wmo.int/files/records-of-weather-and-climate-extremes-table",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
       "sample": true,
       "surface": "land"
     }

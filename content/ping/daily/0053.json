@@ -2,84 +2,80 @@
   "puzzle": 53,
   "questions": [
     {
-      "id": "sample-01",
-      "category": "heat",
-      "prompt": "Sample 01 (fake data): where is the made-up hottest spot? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up hottest spot of sample 01?",
+      "id": "geography-lowest-land",
+      "category": "geography",
+      "prompt": "Where is the lowest land on Earth that is not under water or ice?",
+      "teaser": "Where is the lowest dry land on Earth?",
       "scope": { "level": "world", "name": "the world" },
       "targets": [
         {
-          "lat": -30.4871,
-          "lon": -60.2233,
-          "label": "Fake place 01",
+          "lat": 31.5,
+          "lon": 35.5,
+          "label": "The shores of the Dead Sea",
           "official": true,
-          "value": 59.1,
-          "unit": "fake units",
-          "date": "2026-09"
+          "value": -441.33,
+          "unit": "m (lake level, vs sea level)",
+          "date": "2026-08-31"
         }
       ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-01",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
+      "authority": "Hydrological Service, Israel Water Authority",
+      "turnsOut": "The shores of the Dead Sea: on 31 August 2026 the lake stood 441.33 m below sea level. It drops about a metre a year as the Jordan and the Yarmouk are dammed upstream and its water is pumped away; in 1900 it stood at 392 m below.",
+      "sourceTitle": "Dead Sea level since 1976 (Israel Water Authority, data.gov.il)",
+      "sourceUrl": "https://data.gov.il/he/datasets/water_authority/https-www-data-gov-il-dataset-683",
+      "checkedOn": "2026-10-02",
+      "licence": "Open government data; fact, own wording",
       "sample": true,
       "surface": "land"
     },
     {
-      "id": "sample-14",
-      "category": "regional",
-      "prompt": "Sample 14 (fake data): where in Fake Region 14 is the made-up local record? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up local record of sample 14?",
-      "scope": {
-        "level": "region",
-        "name": "Fake Region 14",
-        "bbox": [67.158, 53.7311, 87.158, 69.7311]
-      },
-      "targets": [
-        {
-          "lat": 63.2404,
-          "lon": 79.4363,
-          "label": "Fake place 14",
-          "official": true,
-          "value": 67.1,
-          "unit": "fake units",
-          "date": "2026-09"
-        }
-      ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-14",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
-      "sample": true,
-      "surface": "land"
-    },
-    {
-      "id": "sample-10",
+      "id": "rain-24-hour-record",
       "category": "rain",
-      "prompt": "Sample 10 (fake data): where is the made-up wettest spot? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up wettest spot of sample 10?",
+      "prompt": "Where did the most rain ever recorded fall in 24 hours (WMO)?",
+      "teaser": "Where did the most rain ever fall in one day?",
       "scope": { "level": "world", "name": "the world" },
       "targets": [
         {
-          "lat": 36.5151,
-          "lon": 106.3954,
-          "label": "Fake place 10",
+          "lat": -21.2333,
+          "lon": 55.6833,
+          "label": "Foc-Foc, La Réunion (France)",
           "official": true,
-          "value": 94.2,
-          "unit": "fake units",
-          "date": "2026-09"
+          "value": 1825,
+          "unit": "mm in 24 hours",
+          "date": "1966-01-07/1966-01-08"
         }
       ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-10",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
+      "authority": "World Meteorological Organization",
+      "turnsOut": "Foc-Foc, 2,290 m up on the volcanic island of La Réunion: 1,825 mm in 24 hours on 7–8 January 1966, as Tropical Cyclone Denise passed. The same storm set the 12-hour record too: 1,144 mm.",
+      "sourceTitle": "WMO Weather and Climate Extremes Archive: records table (31 July 2025)",
+      "sourceUrl": "https://wmo.int/files/records-of-weather-and-climate-extremes-table",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
+      "sample": true,
+      "surface": "land"
+    },
+    {
+      "id": "wind-strongest-gust",
+      "category": "wind",
+      "prompt": "Where was the strongest wind gust ever measured, outside a tornado (WMO)?",
+      "teaser": "Where was the strongest gust of wind ever measured?",
+      "scope": { "level": "world", "name": "the world" },
+      "targets": [
+        {
+          "lat": -20.8167,
+          "lon": 115.3833,
+          "label": "Barrow Island, Western Australia",
+          "official": true,
+          "value": 113.2,
+          "unit": "m/s (408 km/h)",
+          "date": "1996-04-10"
+        }
+      ],
+      "authority": "World Meteorological Organization",
+      "turnsOut": "Barrow Island, off Western Australia: 113.2 m/s (408 km/h) as Cyclone Olivia passed on 10 April 1996. The WMO only confirmed it in 2010, ending the reign of Mount Washington's 103.3 m/s gust from 1934.",
+      "sourceTitle": "WMO Weather and Climate Extremes Archive: records table (31 July 2025)",
+      "sourceUrl": "https://wmo.int/files/records-of-weather-and-climate-extremes-table",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
       "sample": true,
       "surface": "land"
     }

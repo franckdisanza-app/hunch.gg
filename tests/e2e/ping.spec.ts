@@ -1,9 +1,9 @@
 import { expect, test, type Page } from "@playwright/test";
 import { expectNoSeriousAxeViolations, watchConsole } from "./helpers";
 
-// Ping on draft data: the committed fake sample set (content/ping, every question sample: true),
-// and fake days served through route interception where a test needs to know the answers.
-// Nothing here is a real fact.
+// Ping on draft data: the committed questions (content/ping, real records still marked sample:
+// true until verified), and fake days served through route interception where a test needs to
+// know the answers. Nothing a test asserts depends on a real fact.
 
 const DAILY = "/ping";
 const PRACTICE = "/ping/unlimited";
@@ -108,7 +108,7 @@ for (const scheme of ["light", "dark"] as const) {
   test.describe(`${scheme} scheme`, () => {
     test.use({ colorScheme: scheme });
 
-    test("plays a daily round on the sample set through to the results", async ({ page }) => {
+    test("plays a daily round on the draft set through to the results", async ({ page }) => {
       test.setTimeout(90_000);
       const errors = watchConsole(page);
       await page.goto(DAILY);

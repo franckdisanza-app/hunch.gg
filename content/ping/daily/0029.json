@@ -2,102 +2,80 @@
   "puzzle": 29,
   "questions": [
     {
-      "id": "sample-14",
-      "category": "regional",
-      "prompt": "Sample 14 (fake data): where in Fake Region 14 is the made-up local record? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up local record of sample 14?",
-      "scope": {
-        "level": "region",
-        "name": "Fake Region 14",
-        "bbox": [67.158, 53.7311, 87.158, 69.7311]
-      },
-      "targets": [
-        {
-          "lat": 63.2404,
-          "lon": 79.4363,
-          "label": "Fake place 14",
-          "official": true,
-          "value": 67.1,
-          "unit": "fake units",
-          "date": "2026-09"
-        }
-      ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-14",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
-      "sample": true,
-      "surface": "land"
-    },
-    {
-      "id": "sample-03",
-      "category": "rain",
-      "prompt": "Sample 03 (fake data): where is the made-up wettest spot? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up wettest spot of sample 03?",
-      "scope": { "level": "world", "name": "the world" },
-      "targets": [
-        {
-          "lat": 50.9401,
-          "lon": 19.4499,
-          "label": "Fake place 03",
-          "official": true,
-          "value": 99.9,
-          "unit": "fake units",
-          "date": "2026-09"
-        },
-        {
-          "lat": 54.6373,
-          "lon": 43.0023,
-          "label": "Fake contender 03b",
-          "official": false,
-          "value": 89.1,
-          "unit": "fake units",
-          "date": "2026-09"
-        },
-        {
-          "lat": 47.7421,
-          "lon": 27.6519,
-          "label": "Fake contender 03c",
-          "official": false,
-          "value": 34.7,
-          "unit": "fake units",
-          "date": "2026-09"
-        }
-      ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this fake record has fake contenders too. The reveal shows every one, with the official one marked.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-03",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
-      "sample": true,
-      "surface": "land"
-    },
-    {
-      "id": "sample-15",
+      "id": "heat-hottest-average",
       "category": "heat",
-      "prompt": "Sample 15 (fake data): where is the made-up hottest spot? A random spot, placed by a script to test how Ping lays out a long question on a small phone screen without scrolling.",
-      "teaser": "Where is the made-up hottest spot of sample 15?",
+      "prompt": "Where is the highest average annual temperature on record, measured from 1960 to 1966 (Meteorological Magazine)?",
+      "teaser": "Where is the hottest place on average, all year round?",
       "scope": { "level": "world", "name": "the world" },
       "targets": [
         {
-          "lat": -3.5524,
-          "lon": 35.6397,
-          "label": "Fake place 15",
+          "lat": 14.24,
+          "lon": 40.3,
+          "label": "Dallol, Danakil Depression, Ethiopia",
           "official": true,
-          "value": 94.5,
-          "unit": "fake units",
-          "date": "2026-09"
+          "value": 34.7,
+          "unit": "°C average, day and night",
+          "date": "1960/1966"
         }
       ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-15",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
+      "authority": "D. E. Pedgley, Meteorological Magazine (UK Met Office), 1967",
+      "turnsOut": "Dallol, in Ethiopia's Danakil Depression: a prospecting camp's weather station there averaged 41 °C (106 °F) by day and 28 °C (83 °F) by night over 1960–66, hotter on both counts than anywhere in the world tables of the time.",
+      "sourceTitle": "Air temperature at Dallol, Ethiopia (Meteorological Magazine, September 1967)",
+      "sourceUrl": "https://digital.nmla.metoffice.gov.uk/IO_43e9b8d3-2438-48e3-b503-0596ab9a4942/",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
+      "sample": true,
+      "surface": "land"
+    },
+    {
+      "id": "rain-longest-dry-spell",
+      "category": "rain",
+      "prompt": "Where was the longest dry spell ever recorded, without any measurable rain (WMO)?",
+      "teaser": "Where did it go longest without rain?",
+      "scope": { "level": "world", "name": "the world" },
+      "targets": [
+        {
+          "lat": -18.4833,
+          "lon": -70.3,
+          "label": "Arica, Chile",
+          "official": true,
+          "value": 172,
+          "unit": "months without rain",
+          "date": "1903-10/1918-01"
+        }
+      ],
+      "authority": "World Meteorological Organization",
+      "turnsOut": "Arica, on the edge of Chile's Atacama Desert: no measurable rain for 172 months, from October 1903 to January 1918. Over 59 years its rainfall averaged 0.76 mm a year, the lowest in South America.",
+      "sourceTitle": "WMO Weather and Climate Extremes Archive: records table (31 July 2025)",
+      "sourceUrl": "https://wmo.int/files/records-of-weather-and-climate-extremes-table",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
+      "sample": true,
+      "surface": "land"
+    },
+    {
+      "id": "geography-highest-point",
+      "category": "geography",
+      "prompt": "Where is the highest point above sea level on Earth (joint government survey, 2020)?",
+      "teaser": "Where is the highest point on Earth?",
+      "scope": { "level": "world", "name": "the world" },
+      "targets": [
+        {
+          "lat": 27.9881,
+          "lon": 86.9253,
+          "label": "Mount Everest (Sagarmatha, Chomolungma), Nepal–China border",
+          "official": true,
+          "value": 8848.86,
+          "unit": "m above sea level",
+          "date": "2020-12-08"
+        }
+      ],
+      "authority": "Governments of Nepal and China (joint survey)",
+      "turnsOut": "Mount Everest, on the Nepal–China border: 8,848.86 m, Nepal and China announced together on 8 December 2020. Until then Nepal had used 8,848 m, from a 1954 Survey of India, and China 8,844.43 m, the rock without its snow cap.",
+      "sourceTitle": "8848.86 metres. That's the height of Mt Everest now (The Kathmandu Post)",
+      "sourceUrl": "https://kathmandupost.com/national/2020/12/08/it-s-official-mount-everest-is-8-848-86-metres-tall",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
       "sample": true,
       "surface": "land"
     }

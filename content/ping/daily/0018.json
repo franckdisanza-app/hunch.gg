@@ -2,109 +2,80 @@
   "puzzle": 18,
   "questions": [
     {
-      "id": "sample-03",
-      "category": "rain",
-      "prompt": "Sample 03 (fake data): where is the made-up wettest spot? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up wettest spot of sample 03?",
+      "id": "heat-hottest-average",
+      "category": "heat",
+      "prompt": "Where is the highest average annual temperature on record, measured from 1960 to 1966 (Meteorological Magazine)?",
+      "teaser": "Where is the hottest place on average, all year round?",
       "scope": { "level": "world", "name": "the world" },
       "targets": [
         {
-          "lat": 50.9401,
-          "lon": 19.4499,
-          "label": "Fake place 03",
+          "lat": 14.24,
+          "lon": 40.3,
+          "label": "Dallol, Danakil Depression, Ethiopia",
           "official": true,
-          "value": 99.9,
-          "unit": "fake units",
-          "date": "2026-09"
-        },
-        {
-          "lat": 54.6373,
-          "lon": 43.0023,
-          "label": "Fake contender 03b",
-          "official": false,
-          "value": 89.1,
-          "unit": "fake units",
-          "date": "2026-09"
-        },
-        {
-          "lat": 47.7421,
-          "lon": 27.6519,
-          "label": "Fake contender 03c",
-          "official": false,
           "value": 34.7,
-          "unit": "fake units",
-          "date": "2026-09"
+          "unit": "°C average, day and night",
+          "date": "1960/1966"
         }
       ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this fake record has fake contenders too. The reveal shows every one, with the official one marked.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-03",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
+      "authority": "D. E. Pedgley, Meteorological Magazine (UK Met Office), 1967",
+      "turnsOut": "Dallol, in Ethiopia's Danakil Depression: a prospecting camp's weather station there averaged 41 °C (106 °F) by day and 28 °C (83 °F) by night over 1960–66, hotter on both counts than anywhere in the world tables of the time.",
+      "sourceTitle": "Air temperature at Dallol, Ethiopia (Meteorological Magazine, September 1967)",
+      "sourceUrl": "https://digital.nmla.metoffice.gov.uk/IO_43e9b8d3-2438-48e3-b503-0596ab9a4942/",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
       "sample": true,
       "surface": "land"
     },
     {
-      "id": "sample-20",
-      "category": "furthest-from",
-      "prompt": "Sample 20 (fake data): where is the made-up most remote spot, as of September 2026? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up most remote spot of sample 20?",
+      "id": "rain-24-hour-record",
+      "category": "rain",
+      "prompt": "Where did the most rain ever recorded fall in 24 hours (WMO)?",
+      "teaser": "Where did the most rain ever fall in one day?",
       "scope": { "level": "world", "name": "the world" },
       "targets": [
         {
-          "lat": 63.4259,
-          "lon": 84.4525,
-          "label": "Fake place 20",
+          "lat": -21.2333,
+          "lon": 55.6833,
+          "label": "Foc-Foc, La Réunion (France)",
           "official": true,
-          "value": 13.6,
-          "unit": "fake units",
-          "date": "2026-09"
+          "value": 1825,
+          "unit": "mm in 24 hours",
+          "date": "1966-01-07/1966-01-08"
         }
       ],
-      "authority": "Fake computation (sample)",
-      "turnsOut": "this sample was not computed from anything: the place and its nearest features are made up.",
-      "computedOn": "2026-09-30",
-      "dataAsOf": "2026-09-30",
-      "nearest": [
-        { "name": "Fake feature 20-1", "town": "Fake Town", "lat": 63.9153, "lon": 85.1549 },
-        { "name": "Fake feature 20-2", "town": "Fake Town", "lat": 63.942, "lon": 84.5486 },
-        { "name": "Fake feature 20-3", "town": "Fake Town", "lat": 63.7861, "lon": 84.0284 }
-      ],
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-20",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
+      "authority": "World Meteorological Organization",
+      "turnsOut": "Foc-Foc, 2,290 m up on the volcanic island of La Réunion: 1,825 mm in 24 hours on 7–8 January 1966, as Tropical Cyclone Denise passed. The same storm set the 12-hour record too: 1,144 mm.",
+      "sourceTitle": "WMO Weather and Climate Extremes Archive: records table (31 July 2025)",
+      "sourceUrl": "https://wmo.int/files/records-of-weather-and-climate-extremes-table",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
       "sample": true,
       "surface": "land"
     },
     {
-      "id": "sample-05",
+      "id": "geography-lowest-land",
       "category": "geography",
-      "prompt": "Sample 05 (fake data): where in Fake Continent 05 is the made-up landmark? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up landmark of sample 05?",
-      "scope": {
-        "level": "continent",
-        "name": "Fake Continent 05",
-        "bbox": [19.8368, 21.7565, 69.8368, 57.7565]
-      },
+      "prompt": "Where is the lowest land on Earth that is not under water or ice?",
+      "teaser": "Where is the lowest dry land on Earth?",
+      "scope": { "level": "world", "name": "the world" },
       "targets": [
         {
-          "lat": 34.6926,
-          "lon": 48.4029,
-          "label": "Fake place 05",
+          "lat": 31.5,
+          "lon": 35.5,
+          "label": "The shores of the Dead Sea",
           "official": true,
-          "value": 91.3,
-          "unit": "fake units",
-          "date": "2026-09"
+          "value": -441.33,
+          "unit": "m (lake level, vs sea level)",
+          "date": "2026-08-31"
         }
       ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-05",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
+      "authority": "Hydrological Service, Israel Water Authority",
+      "turnsOut": "The shores of the Dead Sea: on 31 August 2026 the lake stood 441.33 m below sea level. It drops about a metre a year as the Jordan and the Yarmouk are dammed upstream and its water is pumped away; in 1900 it stood at 392 m below.",
+      "sourceTitle": "Dead Sea level since 1976 (Israel Water Authority, data.gov.il)",
+      "sourceUrl": "https://data.gov.il/he/datasets/water_authority/https-www-data-gov-il-dataset-683",
+      "checkedOn": "2026-10-02",
+      "licence": "Open government data; fact, own wording",
       "sample": true,
       "surface": "land"
     }

@@ -8,7 +8,8 @@
 // Antarctica, one on the antimeridian, one in the far north, contenders, computed questions with
 // nearest features, smaller scopes and a perfect-radius override.
 //
-// Refuses to overwrite questions that are not samples. Then run: pnpm ping:build --repeat
+// Refuses to overwrite anything but its own fakes (example.test sources): real questions, drafts
+// included, are never replaced. Then run: pnpm ping:build --repeat
 import { existsSync, mkdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseArgs } from "node:util";
@@ -26,9 +27,12 @@ const dir = join(root, "content", "ping");
 const file = join(dir, "questions.json");
 
 if (existsSync(file) && !values.force) {
-  const existing = JSON.parse(readFileSync(file, "utf8")) as { sample?: boolean }[];
-  if (existing.some((q) => q.sample !== true)) {
-    console.error("questions.json holds questions that are not samples. Refusing to overwrite.");
+  const existing = JSON.parse(readFileSync(file, "utf8")) as { sourceUrl?: string }[];
+  // Drafts are real questions waiting for verification (sample: true too): only fakes may go.
+  if (existing.some((q) => !q.sourceUrl?.startsWith("https://example.test/"))) {
+    console.error(
+      "questions.json holds real questions (verified or drafts). Refusing to overwrite them.",
+    );
     process.exit(1);
   }
 }

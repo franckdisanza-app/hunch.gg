@@ -2,84 +2,80 @@
   "puzzle": 1,
   "questions": [
     {
-      "id": "sample-17",
-      "category": "rain",
-      "prompt": "Sample 17 (fake data): where in Fake Country 17 is the made-up wettest spot? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up wettest spot of sample 17?",
-      "scope": {
-        "level": "country",
-        "name": "Fake Country 17",
-        "bbox": [-55.5026, 0.9725, -47.5026, 6.9725]
-      },
-      "targets": [
-        {
-          "lat": 3.3584,
-          "lon": -52.1992,
-          "label": "Fake place 17",
-          "official": true,
-          "value": 22.7,
-          "unit": "fake units",
-          "date": "2026-09"
-        }
-      ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-17",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
-      "sample": true,
-      "surface": "land"
-    },
-    {
-      "id": "sample-18",
+      "id": "wind-strongest-gust",
       "category": "wind",
-      "prompt": "Sample 18 (fake data): where is the made-up windiest spot? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up windiest spot of sample 18?",
+      "prompt": "Where was the strongest wind gust ever measured, outside a tornado (WMO)?",
+      "teaser": "Where was the strongest gust of wind ever measured?",
       "scope": { "level": "world", "name": "the world" },
       "targets": [
         {
-          "lat": 52.6642,
-          "lon": 91.9597,
-          "label": "Fake place 18",
+          "lat": -20.8167,
+          "lon": 115.3833,
+          "label": "Barrow Island, Western Australia",
           "official": true,
-          "value": 94,
-          "unit": "fake units",
-          "date": "2026-09"
+          "value": 113.2,
+          "unit": "m/s (408 km/h)",
+          "date": "1996-04-10"
         }
       ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-18",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
+      "authority": "World Meteorological Organization",
+      "turnsOut": "Barrow Island, off Western Australia: 113.2 m/s (408 km/h) as Cyclone Olivia passed on 10 April 1996. The WMO only confirmed it in 2010, ending the reign of Mount Washington's 103.3 m/s gust from 1934.",
+      "sourceTitle": "WMO Weather and Climate Extremes Archive: records table (31 July 2025)",
+      "sourceUrl": "https://wmo.int/files/records-of-weather-and-climate-extremes-table",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
       "sample": true,
       "surface": "land"
     },
     {
-      "id": "sample-01",
-      "category": "heat",
-      "prompt": "Sample 01 (fake data): where is the made-up hottest spot? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up hottest spot of sample 01?",
+      "id": "rain-24-hour-record",
+      "category": "rain",
+      "prompt": "Where did the most rain ever recorded fall in 24 hours (WMO)?",
+      "teaser": "Where did the most rain ever fall in one day?",
       "scope": { "level": "world", "name": "the world" },
       "targets": [
         {
-          "lat": -30.4871,
-          "lon": -60.2233,
-          "label": "Fake place 01",
+          "lat": -21.2333,
+          "lon": 55.6833,
+          "label": "Foc-Foc, La Réunion (France)",
           "official": true,
-          "value": 59.1,
-          "unit": "fake units",
-          "date": "2026-09"
+          "value": 1825,
+          "unit": "mm in 24 hours",
+          "date": "1966-01-07/1966-01-08"
         }
       ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-01",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
+      "authority": "World Meteorological Organization",
+      "turnsOut": "Foc-Foc, 2,290 m up on the volcanic island of La Réunion: 1,825 mm in 24 hours on 7–8 January 1966, as Tropical Cyclone Denise passed. The same storm set the 12-hour record too: 1,144 mm.",
+      "sourceTitle": "WMO Weather and Climate Extremes Archive: records table (31 July 2025)",
+      "sourceUrl": "https://wmo.int/files/records-of-weather-and-climate-extremes-table",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
+      "sample": true,
+      "surface": "land"
+    },
+    {
+      "id": "heat-highest-temperature",
+      "category": "heat",
+      "prompt": "Where was the highest air temperature ever recorded on Earth (WMO)?",
+      "teaser": "Where was the hottest temperature ever recorded?",
+      "scope": { "level": "world", "name": "the world" },
+      "targets": [
+        {
+          "lat": 36.45,
+          "lon": -116.85,
+          "label": "Furnace Creek (Greenland Ranch), Death Valley, California, USA",
+          "official": true,
+          "value": 56.7,
+          "unit": "°C",
+          "date": "1913-07-10"
+        }
+      ],
+      "authority": "World Meteorological Organization",
+      "turnsOut": "Furnace Creek in Death Valley, California, 54 m below sea level: 56.7 °C (134 °F) on 10 July 1913. Libya's 58 °C from 1922 held the title until a WMO panel threw it out in 2012.",
+      "sourceTitle": "WMO Weather and Climate Extremes Archive: records table (31 July 2025)",
+      "sourceUrl": "https://wmo.int/files/records-of-weather-and-climate-extremes-table",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
       "sample": true,
       "surface": "land"
     }

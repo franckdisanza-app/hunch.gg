@@ -2,81 +2,80 @@
   "puzzle": 40,
   "questions": [
     {
-      "id": "sample-04",
+      "id": "wind-strongest-gust",
       "category": "wind",
-      "prompt": "Sample 04 (fake data): where is the made-up windiest spot? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up windiest spot of sample 04?",
+      "prompt": "Where was the strongest wind gust ever measured, outside a tornado (WMO)?",
+      "teaser": "Where was the strongest gust of wind ever measured?",
       "scope": { "level": "world", "name": "the world" },
       "targets": [
         {
-          "lat": 16.4783,
-          "lon": -129.2848,
-          "label": "Fake place 04",
+          "lat": -20.8167,
+          "lon": 115.3833,
+          "label": "Barrow Island, Western Australia",
           "official": true,
-          "value": 34.2,
-          "unit": "fake units",
-          "date": "2026-09"
+          "value": 113.2,
+          "unit": "m/s (408 km/h)",
+          "date": "1996-04-10"
         }
       ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-04",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
-      "sample": true,
-      "surface": "ocean"
-    },
-    {
-      "id": "sample-16",
-      "category": "cold",
-      "prompt": "Sample 16 (fake data): where is the made-up coldest spot? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up coldest spot of sample 16?",
-      "scope": { "level": "world", "name": "the world" },
-      "targets": [
-        {
-          "lat": 26.9811,
-          "lon": 1.8395,
-          "label": "Fake place 16",
-          "official": true,
-          "value": 80.1,
-          "unit": "fake units",
-          "date": "2026-09"
-        }
-      ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-16",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
+      "authority": "World Meteorological Organization",
+      "turnsOut": "Barrow Island, off Western Australia: 113.2 m/s (408 km/h) as Cyclone Olivia passed on 10 April 1996. The WMO only confirmed it in 2010, ending the reign of Mount Washington's 103.3 m/s gust from 1934.",
+      "sourceTitle": "WMO Weather and Climate Extremes Archive: records table (31 July 2025)",
+      "sourceUrl": "https://wmo.int/files/records-of-weather-and-climate-extremes-table",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
       "sample": true,
       "surface": "land"
     },
     {
-      "id": "sample-12",
-      "category": "geography",
-      "prompt": "Sample 12 (fake data): where is the made-up landmark? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up landmark of sample 12?",
+      "id": "heat-hottest-average",
+      "category": "heat",
+      "prompt": "Where is the highest average annual temperature on record, measured from 1960 to 1966 (Meteorological Magazine)?",
+      "teaser": "Where is the hottest place on average, all year round?",
       "scope": { "level": "world", "name": "the world" },
       "targets": [
         {
-          "lat": -19.4407,
-          "lon": -50.6815,
-          "label": "Fake place 12",
+          "lat": 14.24,
+          "lon": 40.3,
+          "label": "Dallol, Danakil Depression, Ethiopia",
           "official": true,
-          "value": 49.6,
-          "unit": "fake units",
-          "date": "2026-09"
+          "value": 34.7,
+          "unit": "°C average, day and night",
+          "date": "1960/1966"
         }
       ],
-      "perfectRadiusKm": 150,
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-12",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
+      "authority": "D. E. Pedgley, Meteorological Magazine (UK Met Office), 1967",
+      "turnsOut": "Dallol, in Ethiopia's Danakil Depression: a prospecting camp's weather station there averaged 41 °C (106 °F) by day and 28 °C (83 °F) by night over 1960–66, hotter on both counts than anywhere in the world tables of the time.",
+      "sourceTitle": "Air temperature at Dallol, Ethiopia (Meteorological Magazine, September 1967)",
+      "sourceUrl": "https://digital.nmla.metoffice.gov.uk/IO_43e9b8d3-2438-48e3-b503-0596ab9a4942/",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
+      "sample": true,
+      "surface": "land"
+    },
+    {
+      "id": "rain-longest-dry-spell",
+      "category": "rain",
+      "prompt": "Where was the longest dry spell ever recorded, without any measurable rain (WMO)?",
+      "teaser": "Where did it go longest without rain?",
+      "scope": { "level": "world", "name": "the world" },
+      "targets": [
+        {
+          "lat": -18.4833,
+          "lon": -70.3,
+          "label": "Arica, Chile",
+          "official": true,
+          "value": 172,
+          "unit": "months without rain",
+          "date": "1903-10/1918-01"
+        }
+      ],
+      "authority": "World Meteorological Organization",
+      "turnsOut": "Arica, on the edge of Chile's Atacama Desert: no measurable rain for 172 months, from October 1903 to January 1918. Over 59 years its rainfall averaged 0.76 mm a year, the lowest in South America.",
+      "sourceTitle": "WMO Weather and Climate Extremes Archive: records table (31 July 2025)",
+      "sourceUrl": "https://wmo.int/files/records-of-weather-and-climate-extremes-table",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
       "sample": true,
       "surface": "land"
     }
