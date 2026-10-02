@@ -2,88 +2,81 @@
   "puzzle": 44,
   "questions": [
     {
-      "id": "sample-05",
-      "category": "geography",
-      "prompt": "Sample 05 (fake data): where in Fake Continent 05 is the made-up landmark? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up landmark of sample 05?",
-      "scope": {
-        "level": "continent",
-        "name": "Fake Continent 05",
-        "bbox": [19.8368, 21.7565, 69.8368, 57.7565]
-      },
-      "targets": [
-        {
-          "lat": 34.6926,
-          "lon": 48.4029,
-          "label": "Fake place 05",
-          "official": true,
-          "value": 91.3,
-          "unit": "fake units",
-          "date": "2026-09"
-        }
-      ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-05",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
-      "sample": true,
-      "surface": "land"
-    },
-    {
-      "id": "sample-08",
-      "category": "heat",
-      "prompt": "Sample 08 (fake data): where is the made-up hottest spot? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up hottest spot of sample 08?",
+      "id": "wind-windiest-place",
+      "category": "wind",
+      "prompt": "Where is the windiest place on Earth near sea level, by average wind speed over a year (International Journal of Climatology)?",
+      "teaser": "Where is the windiest place near sea level?",
       "scope": { "level": "world", "name": "the world" },
       "targets": [
         {
-          "lat": -38.394,
-          "lon": 174.8257,
-          "label": "Fake place 08",
+          "lat": -67.0086,
+          "lon": 142.6611,
+          "label": "Cape Denison, Commonwealth Bay, Antarctica",
           "official": true,
-          "value": 13.8,
-          "unit": "fake units",
-          "date": "2026-09"
+          "value": 20,
+          "unit": "m/s average (about 72 km/h)",
+          "date": "1912/1913"
         }
       ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-08",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
+      "perfectRadiusKm": 65,
+      "authority": "Australasian Antarctic Expedition 1911–14, analysed in the International Journal of Climatology",
+      "turnsOut": "Cape Denison, where Mawson's 1911–14 expedition had its base: the wind averaged about 20 m/s (72 km/h) over a year. The same gales sweep the coast at least 60 km west, to the old French base of Port Martin, so a pin there counts too.",
+      "sourceTitle": "Parish & Wendler, The katabatic wind regime at Adelie Land, Antarctica (International Journal of Climatology, 1991)",
+      "sourceUrl": "https://doi.org/10.1002/joc.3370110108",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
+      "sample": true,
+      "surface": "antarctica"
+    },
+    {
+      "id": "heat-highest-temperature",
+      "category": "heat",
+      "prompt": "Where was the highest air temperature ever recorded on Earth (WMO)?",
+      "teaser": "Where was the hottest temperature ever recorded?",
+      "scope": { "level": "world", "name": "the world" },
+      "targets": [
+        {
+          "lat": 36.45,
+          "lon": -116.85,
+          "label": "Furnace Creek (Greenland Ranch), Death Valley, California, USA",
+          "official": true,
+          "value": 56.7,
+          "unit": "°C",
+          "date": "1913-07-10"
+        }
+      ],
+      "authority": "World Meteorological Organization",
+      "turnsOut": "Furnace Creek in Death Valley, California, 54 m below sea level: 56.7 °C (134 °F) on 10 July 1913. Libya's 58 °C from 1922 held the title until a WMO panel threw it out in 2012.",
+      "sourceTitle": "WMO Weather and Climate Extremes Archive: records table (31 July 2025)",
+      "sourceUrl": "https://wmo.int/files/records-of-weather-and-climate-extremes-table",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
       "sample": true,
       "surface": "land"
     },
     {
-      "id": "sample-17",
+      "id": "rain-24-hour-record",
       "category": "rain",
-      "prompt": "Sample 17 (fake data): where in Fake Country 17 is the made-up wettest spot? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up wettest spot of sample 17?",
-      "scope": {
-        "level": "country",
-        "name": "Fake Country 17",
-        "bbox": [-55.5026, 0.9725, -47.5026, 6.9725]
-      },
+      "prompt": "Where did the most rain ever recorded fall in 24 hours (WMO)?",
+      "teaser": "Where did the most rain ever fall in one day?",
+      "scope": { "level": "world", "name": "the world" },
       "targets": [
         {
-          "lat": 3.3584,
-          "lon": -52.1992,
-          "label": "Fake place 17",
+          "lat": -21.2333,
+          "lon": 55.6833,
+          "label": "Foc-Foc, La Réunion (France)",
           "official": true,
-          "value": 22.7,
-          "unit": "fake units",
-          "date": "2026-09"
+          "value": 1825,
+          "unit": "mm in 24 hours",
+          "date": "1966-01-07/1966-01-08"
         }
       ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-17",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
+      "authority": "World Meteorological Organization",
+      "turnsOut": "Foc-Foc, 2,290 m up on the volcanic island of La Réunion: 1,825 mm in 24 hours on 7–8 January 1966, as Tropical Cyclone Denise passed. The same storm set the 12-hour record too: 1,144 mm.",
+      "sourceTitle": "WMO Weather and Climate Extremes Archive: records table (31 July 2025)",
+      "sourceUrl": "https://wmo.int/files/records-of-weather-and-climate-extremes-table",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
       "sample": true,
       "surface": "land"
     }

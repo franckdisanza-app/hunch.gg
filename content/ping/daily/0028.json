@@ -2,85 +2,80 @@
   "puzzle": 28,
   "questions": [
     {
-      "id": "sample-07",
-      "category": "regional",
-      "prompt": "Sample 07 (fake data): where in Fake Country 07 is the made-up local record? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up local record of sample 07?",
-      "scope": {
-        "level": "country",
-        "name": "Fake Country 07",
-        "bbox": [28.4977, -31.7423, 36.4977, -25.7423]
-      },
-      "targets": [
-        {
-          "lat": -29.3321,
-          "lon": 30.3843,
-          "label": "Fake place 07",
-          "official": true,
-          "value": 48.4,
-          "unit": "fake units",
-          "date": "2026-09"
-        }
-      ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-07",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
-      "sample": true,
-      "surface": "land"
-    },
-    {
-      "id": "sample-01",
+      "id": "heat-highest-temperature",
       "category": "heat",
-      "prompt": "Sample 01 (fake data): where is the made-up hottest spot? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up hottest spot of sample 01?",
+      "prompt": "Where was the highest air temperature ever recorded on Earth (WMO)?",
+      "teaser": "Where was the hottest temperature ever recorded?",
       "scope": { "level": "world", "name": "the world" },
       "targets": [
         {
-          "lat": -30.4871,
-          "lon": -60.2233,
-          "label": "Fake place 01",
+          "lat": 36.45,
+          "lon": -116.85,
+          "label": "Furnace Creek (Greenland Ranch), Death Valley, California, USA",
           "official": true,
-          "value": 59.1,
-          "unit": "fake units",
-          "date": "2026-09"
+          "value": 56.7,
+          "unit": "°C",
+          "date": "1913-07-10"
         }
       ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-01",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
+      "authority": "World Meteorological Organization",
+      "turnsOut": "Furnace Creek in Death Valley, California, 54 m below sea level: 56.7 °C (134 °F) on 10 July 1913. Libya's 58 °C from 1922 held the title until a WMO panel threw it out in 2012.",
+      "sourceTitle": "WMO Weather and Climate Extremes Archive: records table (31 July 2025)",
+      "sourceUrl": "https://wmo.int/files/records-of-weather-and-climate-extremes-table",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
       "sample": true,
       "surface": "land"
     },
     {
-      "id": "sample-12",
-      "category": "geography",
-      "prompt": "Sample 12 (fake data): where is the made-up landmark? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up landmark of sample 12?",
+      "id": "rain-24-hour-record",
+      "category": "rain",
+      "prompt": "Where did the most rain ever recorded fall in 24 hours (WMO)?",
+      "teaser": "Where did the most rain ever fall in one day?",
       "scope": { "level": "world", "name": "the world" },
       "targets": [
         {
-          "lat": -19.4407,
-          "lon": -50.6815,
-          "label": "Fake place 12",
+          "lat": -21.2333,
+          "lon": 55.6833,
+          "label": "Foc-Foc, La Réunion (France)",
           "official": true,
-          "value": 49.6,
-          "unit": "fake units",
-          "date": "2026-09"
+          "value": 1825,
+          "unit": "mm in 24 hours",
+          "date": "1966-01-07/1966-01-08"
         }
       ],
-      "perfectRadiusKm": 150,
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-12",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
+      "authority": "World Meteorological Organization",
+      "turnsOut": "Foc-Foc, 2,290 m up on the volcanic island of La Réunion: 1,825 mm in 24 hours on 7–8 January 1966, as Tropical Cyclone Denise passed. The same storm set the 12-hour record too: 1,144 mm.",
+      "sourceTitle": "WMO Weather and Climate Extremes Archive: records table (31 July 2025)",
+      "sourceUrl": "https://wmo.int/files/records-of-weather-and-climate-extremes-table",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
+      "sample": true,
+      "surface": "land"
+    },
+    {
+      "id": "geography-lowest-land",
+      "category": "geography",
+      "prompt": "Where is the lowest land on Earth that is not under water or ice?",
+      "teaser": "Where is the lowest dry land on Earth?",
+      "scope": { "level": "world", "name": "the world" },
+      "targets": [
+        {
+          "lat": 31.5,
+          "lon": 35.5,
+          "label": "The shores of the Dead Sea",
+          "official": true,
+          "value": -441.33,
+          "unit": "m (lake level, vs sea level)",
+          "date": "2026-08-31"
+        }
+      ],
+      "authority": "Hydrological Service, Israel Water Authority",
+      "turnsOut": "The shores of the Dead Sea: on 31 August 2026 the lake stood 441.33 m below sea level. It drops about a metre a year as the Jordan and the Yarmouk are dammed upstream and its water is pumped away; in 1900 it stood at 392 m below.",
+      "sourceTitle": "Dead Sea level since 1976 (Israel Water Authority, data.gov.il)",
+      "sourceUrl": "https://data.gov.il/he/datasets/water_authority/https-www-data-gov-il-dataset-683",
+      "checkedOn": "2026-10-02",
+      "licence": "Open government data; fact, own wording",
       "sample": true,
       "surface": "land"
     }

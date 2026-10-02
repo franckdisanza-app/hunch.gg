@@ -2,102 +2,80 @@
   "puzzle": 37,
   "questions": [
     {
-      "id": "sample-03",
+      "id": "cold-lowest-temperature",
+      "category": "cold",
+      "prompt": "Where was the lowest air temperature ever recorded on Earth (WMO)?",
+      "teaser": "Where was the coldest temperature ever recorded?",
+      "scope": { "level": "world", "name": "the world" },
+      "targets": [
+        {
+          "lat": -78.4642,
+          "lon": 106.8658,
+          "label": "Vostok Station, East Antarctica",
+          "official": true,
+          "value": -89.2,
+          "unit": "°C",
+          "date": "1983-07-21"
+        }
+      ],
+      "authority": "World Meteorological Organization",
+      "turnsOut": "Vostok Station, high on the East Antarctic ice sheet: −89.2 °C (−128.6 °F) on 21 July 1983. Satellites have since found snow surfaces nearby at around −98 °C, but that is the ground, not the air the record is about.",
+      "sourceTitle": "WMO Weather and Climate Extremes Archive: records table (31 July 2025)",
+      "sourceUrl": "https://wmo.int/files/records-of-weather-and-climate-extremes-table",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
+      "sample": true,
+      "surface": "antarctica"
+    },
+    {
+      "id": "rain-24-hour-record",
       "category": "rain",
-      "prompt": "Sample 03 (fake data): where is the made-up wettest spot? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up wettest spot of sample 03?",
+      "prompt": "Where did the most rain ever recorded fall in 24 hours (WMO)?",
+      "teaser": "Where did the most rain ever fall in one day?",
       "scope": { "level": "world", "name": "the world" },
       "targets": [
         {
-          "lat": 50.9401,
-          "lon": 19.4499,
-          "label": "Fake place 03",
+          "lat": -21.2333,
+          "lon": 55.6833,
+          "label": "Foc-Foc, La Réunion (France)",
           "official": true,
-          "value": 99.9,
-          "unit": "fake units",
-          "date": "2026-09"
-        },
-        {
-          "lat": 54.6373,
-          "lon": 43.0023,
-          "label": "Fake contender 03b",
-          "official": false,
-          "value": 89.1,
-          "unit": "fake units",
-          "date": "2026-09"
-        },
-        {
-          "lat": 47.7421,
-          "lon": 27.6519,
-          "label": "Fake contender 03c",
-          "official": false,
-          "value": 34.7,
-          "unit": "fake units",
-          "date": "2026-09"
+          "value": 1825,
+          "unit": "mm in 24 hours",
+          "date": "1966-01-07/1966-01-08"
         }
       ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this fake record has fake contenders too. The reveal shows every one, with the official one marked.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-03",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
+      "authority": "World Meteorological Organization",
+      "turnsOut": "Foc-Foc, 2,290 m up on the volcanic island of La Réunion: 1,825 mm in 24 hours on 7–8 January 1966, as Tropical Cyclone Denise passed. The same storm set the 12-hour record too: 1,144 mm.",
+      "sourceTitle": "WMO Weather and Climate Extremes Archive: records table (31 July 2025)",
+      "sourceUrl": "https://wmo.int/files/records-of-weather-and-climate-extremes-table",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
       "sample": true,
       "surface": "land"
     },
     {
-      "id": "sample-05",
-      "category": "geography",
-      "prompt": "Sample 05 (fake data): where in Fake Continent 05 is the made-up landmark? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up landmark of sample 05?",
-      "scope": {
-        "level": "continent",
-        "name": "Fake Continent 05",
-        "bbox": [19.8368, 21.7565, 69.8368, 57.7565]
-      },
-      "targets": [
-        {
-          "lat": 34.6926,
-          "lon": 48.4029,
-          "label": "Fake place 05",
-          "official": true,
-          "value": 91.3,
-          "unit": "fake units",
-          "date": "2026-09"
-        }
-      ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-05",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
-      "sample": true,
-      "surface": "land"
-    },
-    {
-      "id": "sample-08",
-      "category": "heat",
-      "prompt": "Sample 08 (fake data): where is the made-up hottest spot? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up hottest spot of sample 08?",
+      "id": "wind-strongest-gust",
+      "category": "wind",
+      "prompt": "Where was the strongest wind gust ever measured, outside a tornado (WMO)?",
+      "teaser": "Where was the strongest gust of wind ever measured?",
       "scope": { "level": "world", "name": "the world" },
       "targets": [
         {
-          "lat": -38.394,
-          "lon": 174.8257,
-          "label": "Fake place 08",
+          "lat": -20.8167,
+          "lon": 115.3833,
+          "label": "Barrow Island, Western Australia",
           "official": true,
-          "value": 13.8,
-          "unit": "fake units",
-          "date": "2026-09"
+          "value": 113.2,
+          "unit": "m/s (408 km/h)",
+          "date": "1996-04-10"
         }
       ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-08",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
+      "authority": "World Meteorological Organization",
+      "turnsOut": "Barrow Island, off Western Australia: 113.2 m/s (408 km/h) as Cyclone Olivia passed on 10 April 1996. The WMO only confirmed it in 2010, ending the reign of Mount Washington's 103.3 m/s gust from 1934.",
+      "sourceTitle": "WMO Weather and Climate Extremes Archive: records table (31 July 2025)",
+      "sourceUrl": "https://wmo.int/files/records-of-weather-and-climate-extremes-table",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
       "sample": true,
       "surface": "land"
     }

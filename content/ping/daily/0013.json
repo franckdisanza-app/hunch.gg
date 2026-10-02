@@ -2,93 +2,79 @@
   "puzzle": 13,
   "questions": [
     {
-      "id": "sample-11",
-      "category": "wind",
-      "prompt": "Sample 11 (fake data): where is the made-up windiest spot? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up windiest spot of sample 11?",
+      "id": "heat-highest-temperature",
+      "category": "heat",
+      "prompt": "Where was the highest air temperature ever recorded on Earth (WMO)?",
+      "teaser": "Where was the hottest temperature ever recorded?",
       "scope": { "level": "world", "name": "the world" },
       "targets": [
         {
-          "lat": 45.0655,
-          "lon": -91.0714,
-          "label": "Fake place 11",
+          "lat": 36.45,
+          "lon": -116.85,
+          "label": "Furnace Creek (Greenland Ranch), Death Valley, California, USA",
           "official": true,
-          "value": 57.9,
-          "unit": "fake units",
-          "date": "2026-09"
-        },
-        {
-          "lat": 55.891,
-          "lon": -98.791,
-          "label": "Fake contender 11b",
-          "official": false,
-          "value": 44.9,
-          "unit": "fake units",
-          "date": "2026-09"
+          "value": 56.7,
+          "unit": "°C",
+          "date": "1913-07-10"
         }
       ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this fake record has fake contenders too. The reveal shows every one, with the official one marked.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-11",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
+      "authority": "World Meteorological Organization",
+      "turnsOut": "Furnace Creek in Death Valley, California, 54 m below sea level: 56.7 °C (134 °F) on 10 July 1913. Libya's 58 °C from 1922 held the title until a WMO panel threw it out in 2012.",
+      "sourceTitle": "WMO Weather and Climate Extremes Archive: records table (31 July 2025)",
+      "sourceUrl": "https://wmo.int/files/records-of-weather-and-climate-extremes-table",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
       "sample": true,
       "surface": "land"
     },
     {
-      "id": "sample-17",
+      "id": "rain-wettest-average",
       "category": "rain",
-      "prompt": "Sample 17 (fake data): where in Fake Country 17 is the made-up wettest spot? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up wettest spot of sample 17?",
-      "scope": {
-        "level": "country",
-        "name": "Fake Country 17",
-        "bbox": [-55.5026, 0.9725, -47.5026, 6.9725]
-      },
+      "prompt": "Where is the highest average annual rainfall in the WMO's records?",
+      "teaser": "Where does the most rain fall in a year, on average?",
+      "scope": { "level": "world", "name": "the world" },
       "targets": [
         {
-          "lat": 3.3584,
-          "lon": -52.1992,
-          "label": "Fake place 17",
+          "lat": 25.3,
+          "lon": 91.5833,
+          "label": "Mawsynram, Meghalaya, India",
           "official": true,
-          "value": 22.7,
-          "unit": "fake units",
-          "date": "2026-09"
+          "value": 11872,
+          "unit": "mm a year (average)"
         }
       ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-17",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
+      "authority": "World Meteorological Organization",
+      "turnsOut": "Mawsynram, in the Khasi Hills of north-east India: 11,872 mm a year, averaged over 38 years. The WMO keeps this record by region, and Asia's is the highest. Neighbouring Cherrapunji holds the 12-month record: 26,470 mm from August 1860 to July 1861.",
+      "sourceTitle": "WMO Weather and Climate Extremes Archive: records table (31 July 2025)",
+      "sourceUrl": "https://wmo.int/files/records-of-weather-and-climate-extremes-table",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
       "sample": true,
       "surface": "land"
     },
     {
-      "id": "sample-19",
+      "id": "geography-lowest-land",
       "category": "geography",
-      "prompt": "Sample 19 (fake data): where is the made-up landmark? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up landmark of sample 19?",
+      "prompt": "Where is the lowest land on Earth that is not under water or ice?",
+      "teaser": "Where is the lowest dry land on Earth?",
       "scope": { "level": "world", "name": "the world" },
       "targets": [
         {
-          "lat": -26.6535,
-          "lon": -49.0181,
-          "label": "Fake place 19",
+          "lat": 31.5,
+          "lon": 35.5,
+          "label": "The shores of the Dead Sea",
           "official": true,
-          "value": 43.3,
-          "unit": "fake units",
-          "date": "2026-09"
+          "value": -441.33,
+          "unit": "m (lake level, vs sea level)",
+          "date": "2026-08-31"
         }
       ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-19",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
+      "authority": "Hydrological Service, Israel Water Authority",
+      "turnsOut": "The shores of the Dead Sea: on 31 August 2026 the lake stood 441.33 m below sea level. It drops about a metre a year as the Jordan and the Yarmouk are dammed upstream and its water is pumped away; in 1900 it stood at 392 m below.",
+      "sourceTitle": "Dead Sea level since 1976 (Israel Water Authority, data.gov.il)",
+      "sourceUrl": "https://data.gov.il/he/datasets/water_authority/https-www-data-gov-il-dataset-683",
+      "checkedOn": "2026-10-02",
+      "licence": "Open government data; fact, own wording",
       "sample": true,
       "surface": "land"
     }

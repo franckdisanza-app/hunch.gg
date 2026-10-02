@@ -1,37 +1,48 @@
 import type { Route } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { FillScreen } from "@/frame/FillScreen";
 import { cx } from "@/frame/ui/cx";
 import type { MascotPose } from "@/games/types";
 import { Sonde } from "../art/Sonde";
 import { strings } from "../strings";
-import { GlobePicture } from "./GlobePicture";
-import { Isobars } from "./Isobars";
+import { GlobeStage } from "./GlobeView";
 import styles from "./world.module.css";
 
 export const DAILY_HREF = "/ping" as Route;
 export const PRACTICE_HREF = "/ping/unlimited" as Route;
 
 /**
- * While the day loads (and in the server HTML): the header and an empty radar where the globe
- * goes, so the page is laid out from the first paint.
+ * While the day loads (and in the server HTML): the play screen's layout with an empty question
+ * and the globe picture, so nothing moves when the board takes over.
  */
 export function LoadingRadar({ title }: { title: string }) {
   return (
-    <div aria-busy="true" className="flex flex-col gap-3">
-      <header className="flex items-center gap-3">
-        <Sonde pose="thinking" size={48} className="shrink-0" />
-        <h1 className={cx(styles.display, "text-2xl")}>{title}</h1>
-      </header>
-      <p className="sr-only" role="status">
-        {strings.loading}
-      </p>
-      <div aria-hidden="true" className={cx(styles.panel, "h-24")} />
-      <div aria-hidden="true" className={styles.globeWrap}>
-        <Isobars className={styles.isobars} />
-        <GlobePicture />
+    <FillScreen aria-busy="true">
+      <div className={styles.play}>
+        <header className={styles.status}>
+          <Sonde pose="thinking" size={44} className="shrink-0" />
+          <div className="flex min-w-0 flex-1 flex-col gap-1">
+            <h1 className={cx(styles.display, "text-xl")}>{title}</h1>
+            {/* The board's question chips, unfilled: the same height. */}
+            <p aria-hidden="true" className={cx(styles.mono, "flex gap-2 text-xs opacity-0")}>
+              <span className="rounded-full border px-2 py-0.5">Q</span>
+            </p>
+          </div>
+        </header>
+        <p className="sr-only" role="status">
+          {strings.loading}
+        </p>
+        <div aria-hidden="true" className={cx(styles.panel, styles.question, "h-24")} />
+        <GlobeStage />
+        <div aria-hidden="true" className={styles.hints}>
+          <div className={styles.hintStrip} />
+        </div>
+        <div aria-hidden="true" className={styles.action}>
+          <div className={cx(styles.bigButton, styles.placeholder)} />
+        </div>
       </div>
-    </div>
+    </FillScreen>
   );
 }
 

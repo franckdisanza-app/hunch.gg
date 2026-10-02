@@ -55,6 +55,9 @@ flowchart LR
   RevealCard takes one source or several (a reveal that compares facts). ResultsScreen has an
   `extras` slot (e.g. the poll), a label for the unlimited mode, and `summaryShowsStats` for a
   game-styled summary (a receipt) that shows the score, streak and countdown itself.
+  FillScreen wraps a play screen that must fill the screen (Ping's globe): while it is mounted,
+  CSS in `globals.css` (`:has([data-frame-fill])`) locks the page to the screen's height and gives
+  the game the full width under the top bar; the game's other screens stay ordinary pages.
 - **Shared game plumbing:** `useJson` loads what a game plays (a day's puzzle, an unlimited
   pool) once per URL, validated with the game's schema; `prefetchTodaysPuzzle` / `prefetchJson`
   start that request at module load, before hydration, and a failed early request is retried
@@ -81,7 +84,8 @@ flowchart LR
   options, daily lists and unlimited generators, a React hook for keys, focus, live announcements
   and animation hooks, and `ChoiceBoard` with render slots. `map` exists (Ping): pure rules for
   pin rounds scored relative to each round's scope, spherical helpers on d3-geo, and a lazy-loaded
-  canvas `Globe` with lazy world-atlas shapes. See `src/engines/README.md`.
+  canvas `Globe` with lazy world-atlas shapes, direction wedges, and cities and roads fetched as
+  the player zooms in (`public/map/v1/`, from `pnpm map:data`). See `src/engines/README.md`.
 - Games whose scores run into the thousands pass `scoreBucket` (and `formatScore`) to
   `GameShell`: the stats chart then groups scores, while history keeps them exact.
 - `credits` in a registry entry (fonts, art, data) are listed on the About page once it is live.
@@ -175,7 +179,7 @@ Plimp renders no user-supplied HTML.
 | Bare Next 16.3 + React 19.3 "hello world" | 136 KB     |             |
 | Shelf `/`                                 | 158 KB     | 185 KB      |
 | Empty GameShell (`/dev/game-shell`)       | 183 KB     | 185 KB      |
-| Each game page (found on its own)         | 207–211 KB | 215 KB      |
+| Each game page (found on its own)         | 207–212 KB | 215 KB      |
 
 Plimp's own share is about 43 KB on a game page, half of it Zod (mini) plus storage validation;
 the shelf skips that half by loading its "played today" badge lazily. A game page cannot: every

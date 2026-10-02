@@ -1,3 +1,4 @@
+import type { CompassPoint } from "@/engines/map/geo";
 import type { Band } from "./config";
 import type { Category, ScopeLevel } from "./content.schema";
 
@@ -14,14 +15,14 @@ export const strings = {
   howTo: {
     lines: [
       "Three questions about the world's extremes. Drop a pin where you think the answer is.",
-      "Miss, and you get a ping: how far off you were, drawn as a ring. You have three pins per question.",
+      "Miss, and you get a hint: after your first pin, which way the answer lies; after your second, how far off you were. Three pins per question.",
       "Your first pin counts most, so trust your hunch. Every answer comes with its source.",
     ],
   },
   demo: {
     label:
-      "Example with a made-up target: the first pin misses and its ring shows the distance, then a second pin lands closer.",
-    first: "2,140 km · COLD",
+      "Example with a made-up target: the first pin misses and a wedge points north-east towards the answer, then a second pin lands closer and its ring shows the distance.",
+    first: "NE",
     second: "380 km · HOT",
   },
   draftBanner: "Draft content — facts not yet verified",
@@ -54,8 +55,13 @@ export const strings = {
       "Drag to turn the globe, pinch or scroll to zoom. With a keyboard: arrow keys turn it (Shift for bigger steps), plus and minus zoom, Enter drops a pin at the crosshair.",
     letters: { n: "N", s: "S", e: "E", w: "W" },
     openWater: "open water",
-    aim: (coordinates: string, place: string) => `Crosshair on ${coordinates}, ${place}.`,
+    aim: (coordinates: string, where: string, near: string | null) =>
+      near
+        ? `Crosshair on ${coordinates}, ${where}, near ${near}.`
+        : `Crosshair on ${coordinates}, ${where}.`,
     loading: "Loading the globe…",
+    zoomIn: "Zoom in",
+    zoomOut: "Zoom out",
   },
   heat: {
     burning: "Burning",
@@ -65,15 +71,29 @@ export const strings = {
     freezing: "Freezing",
   } satisfies Record<Band, string>,
   bullseye: "Bullseye",
+  /** The 8 map directions: short labels on the globe and in the hints, names for screen readers. */
+  compass: {
+    N: { short: "N", name: "north" },
+    NE: { short: "NE", name: "north-east" },
+    E: { short: "E", name: "east" },
+    SE: { short: "SE", name: "south-east" },
+    S: { short: "S", name: "south" },
+    SW: { short: "SW", name: "south-west" },
+    W: { short: "W", name: "west" },
+    NW: { short: "NW", name: "north-west" },
+  } satisfies Record<CompassPoint, { short: string; name: string }>,
   log: {
     title: "Pings",
     empty: "No pins yet. Your first one counts most.",
     miss: (distance: string, word: string) => `${distance} · ${word}`,
+    direction: (name: string) => `Answer to the ${name}`,
     points: (points: string) => `${points} pts`,
   },
   announce: {
     miss: (pin: number, distance: string, word: string, left: string) =>
       `Pin ${pin}: ${distance} off. ${word}. ${left}.`,
+    direction: (pin: number, name: string, left: string) =>
+      `Pin ${pin}: the answer lies to the ${name}. ${left}.`,
     bullseye: (pin: number) => `Pin ${pin}: bullseye!`,
     reveal: (place: string, points: string) => `The answer: ${place}. You score ${points} points.`,
   },

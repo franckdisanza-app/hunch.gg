@@ -1,9 +1,9 @@
 import { expect, test, type Page } from "@playwright/test";
 import { expectNoSeriousAxeViolations, watchConsole } from "./helpers";
 
-// Ping on draft data: the committed fake sample set (content/ping, every question sample: true),
-// and fake days served through route interception where a test needs to know the answers.
-// Nothing here is a real fact.
+// Ping on draft data: the committed questions (content/ping, real records still marked sample:
+// true until verified), and fake days served through route interception where a test needs to
+// know the answers. Nothing a test asserts depends on a real fact.
 
 const DAILY = "/ping";
 const PRACTICE = "/ping/unlimited";
@@ -108,7 +108,7 @@ for (const scheme of ["light", "dark"] as const) {
   test.describe(`${scheme} scheme`, () => {
     test.use({ colorScheme: scheme });
 
-    test("plays a daily round on the sample set through to the results", async ({ page }) => {
+    test("plays a daily round on the draft set through to the results", async ({ page }) => {
       test.setTimeout(90_000);
       const errors = watchConsole(page);
       await page.goto(DAILY);
@@ -166,11 +166,14 @@ test.describe("known answers", () => {
     await expect(globe(page)).toBeVisible();
     const drop = page.getByRole("button", { name: "Drop pin" });
     await drop.click();
-    // The ping: the distance and a heat word, never colour alone.
+    // The first hint is the way to the answer, nothing about how far.
     const log = page.getByRole("list", { name: "Pings" });
-    await expect(log.getByText(/^\d{1,3}(,\d{3})* (km|mi) · Freezing$/)).toBeVisible();
+    await expect(log.getByText(/^Answer to the (north|south)?-?(east|west)?$/)).toBeAttached();
+    await expect(log.getByText(/(km|mi) · /)).toHaveCount(0);
     await expect(page.getByText("2 pins left", { exact: true })).toBeVisible();
     await drop.click();
+    // The second: the distance and a heat word, never colour alone.
+    await expect(log.getByText(/^\d{1,3}(,\d{3})* (km|mi) · Freezing$/)).toBeVisible();
     await drop.click();
 
     const card = page.getByRole("article");
@@ -209,8 +212,11 @@ test("a keyboard-only run, with what screen readers hear", async ({ page }) => {
   await page.keyboard.press("ArrowLeft");
 
   await page.keyboard.press("Enter");
-  await expect(page.getByText(/^Pin 1: .+ off\. Freezing\. 2 pins left\.$/)).toBeAttached();
+  await expect(
+    page.getByText(/^Pin 1: the answer lies to the [a-z-]+\. 2 pins left\.$/),
+  ).toBeAttached();
   await page.keyboard.press("Enter");
+  await expect(page.getByText(/^Pin 2: .+ off\. Freezing\. 1 pin left\.$/)).toBeAttached();
   await page.keyboard.press("Enter");
   const next = page.getByRole("button", { name: "Next question" });
   await expect(next).toBeFocused();
@@ -249,6 +255,77 @@ test.describe("reduced motion", () => {
     await expect(page.getByRole("button", { name: "Next question" })).toBeFocused({ timeout: 500 });
     await expect(page.getByText(/^Turns out/)).toBeVisible({ timeout: 500 });
   });
+});
+
+test.describe("the play screen fits the screen", () => {
+  test.use({ reducedMotion: "reduce" });
+
+  /** The page never scrolls: no taller and no wider than the window. */
+  async function expectFits(page: Page, step: string) {
+    const size = await page.evaluate(() => ({
+      height: document.documentElement.scrollHeight,
+      width: document.documentElement.scrollWidth,
+      windowHeight: window.innerHeight,
+      windowWidth: window.innerWidth,
+    }));
+    expect(size.height, `${step}: page height`).toBeLessThanOrEqual(size.windowHeight);
+    expect(size.width, `${step}: page width`).toBeLessThanOrEqual(size.windowWidth);
+  }
+
+  for (const [width, height] of [
+    [360, 640],
+    [390, 844],
+    [844, 390],
+    [768, 1024],
+    [1440, 900],
+    [1920, 1080],
+  ] as const) {
+    test(`never scrolls while playing at ${width}×${height}`, async ({ page }) => {
+      await page.setViewportSize({ width, height });
+      await serveFakeDay(page, [FAR_AWAY, FAR_AWAY, FAR_AWAY]);
+      await page.goto(DAILY);
+      await closeHowTo(page);
+      await expect(globe(page)).toBeVisible();
+      await expectFits(page, "question");
+      const drop = page.getByRole("button", { name: "Drop pin" });
+      await expect(drop).toBeInViewport();
+      await drop.click();
+      await expectFits(page, "first hint");
+      await drop.click();
+      await drop.click();
+      // The answer card scrolls inside its panel if it must; the page does not.
+      await expect(page.getByRole("article")).toBeVisible();
+      await expect(page.getByRole("button", { name: "Next question" })).toBeInViewport();
+      await expectFits(page, "answer card");
+    });
+  }
+
+  test("gives the globe most of a desktop screen", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await serveFakeDay(page, [FAR_AWAY, FAR_AWAY, FAR_AWAY]);
+    await page.goto(DAILY);
+    await closeHowTo(page);
+    const box = (await globe(page).boundingBox())!;
+    expect(box.width).toBeGreaterThan(900);
+    expect(box.height).toBeGreaterThan(780);
+  });
+});
+
+test("cities and roads load only once the player zooms in", async ({ page }) => {
+  const mapData: string[] = [];
+  page.on("request", (request) => {
+    const { pathname } = new URL(request.url());
+    if (pathname.startsWith("/map/")) mapData.push(pathname);
+  });
+  await serveFakeDay(page, [FAR_AWAY, FAR_AWAY, FAR_AWAY]);
+  await page.goto(DAILY);
+  await closeHowTo(page);
+  await expect(globe(page)).toBeVisible();
+  await page.waitForLoadState("networkidle");
+  expect(mapData).toEqual([]);
+  await globe(page).focus();
+  for (let i = 0; i < 4; i++) await page.keyboard.press("+");
+  await expect.poll(() => mapData).toContain("/map/v1/places-1.json");
 });
 
 test.describe("at 360 px", () => {

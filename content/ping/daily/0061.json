@@ -2,80 +2,79 @@
   "puzzle": 61,
   "questions": [
     {
-      "id": "sample-09",
-      "category": "cold",
-      "prompt": "Sample 09 (fake data): where is the made-up coldest spot? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up coldest spot of sample 09?",
+      "id": "rain-wettest-average",
+      "category": "rain",
+      "prompt": "Where is the highest average annual rainfall in the WMO's records?",
+      "teaser": "Where does the most rain fall in a year, on average?",
       "scope": { "level": "world", "name": "the world" },
       "targets": [
         {
-          "lat": -76.8316,
-          "lon": 128.1102,
-          "label": "Fake place 09",
+          "lat": 25.3,
+          "lon": 91.5833,
+          "label": "Mawsynram, Meghalaya, India",
           "official": true,
-          "value": 41.5,
-          "unit": "fake units",
-          "date": "2026-09"
+          "value": 11872,
+          "unit": "mm a year (average)"
         }
       ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-09",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
-      "sample": true,
-      "surface": "antarctica"
-    },
-    {
-      "id": "sample-18",
-      "category": "wind",
-      "prompt": "Sample 18 (fake data): where is the made-up windiest spot? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up windiest spot of sample 18?",
-      "scope": { "level": "world", "name": "the world" },
-      "targets": [
-        {
-          "lat": 52.6642,
-          "lon": 91.9597,
-          "label": "Fake place 18",
-          "official": true,
-          "value": 94,
-          "unit": "fake units",
-          "date": "2026-09"
-        }
-      ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-18",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
+      "authority": "World Meteorological Organization",
+      "turnsOut": "Mawsynram, in the Khasi Hills of north-east India: 11,872 mm a year, averaged over 38 years. The WMO keeps this record by region, and Asia's is the highest. Neighbouring Cherrapunji holds the 12-month record: 26,470 mm from August 1860 to July 1861.",
+      "sourceTitle": "WMO Weather and Climate Extremes Archive: records table (31 July 2025)",
+      "sourceUrl": "https://wmo.int/files/records-of-weather-and-climate-extremes-table",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
       "sample": true,
       "surface": "land"
     },
     {
-      "id": "sample-15",
+      "id": "heat-highest-temperature",
       "category": "heat",
-      "prompt": "Sample 15 (fake data): where is the made-up hottest spot? A random spot, placed by a script to test how Ping lays out a long question on a small phone screen without scrolling.",
-      "teaser": "Where is the made-up hottest spot of sample 15?",
+      "prompt": "Where was the highest air temperature ever recorded on Earth (WMO)?",
+      "teaser": "Where was the hottest temperature ever recorded?",
       "scope": { "level": "world", "name": "the world" },
       "targets": [
         {
-          "lat": -3.5524,
-          "lon": 35.6397,
-          "label": "Fake place 15",
+          "lat": 36.45,
+          "lon": -116.85,
+          "label": "Furnace Creek (Greenland Ranch), Death Valley, California, USA",
           "official": true,
-          "value": 94.5,
-          "unit": "fake units",
-          "date": "2026-09"
+          "value": 56.7,
+          "unit": "°C",
+          "date": "1913-07-10"
         }
       ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-15",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
+      "authority": "World Meteorological Organization",
+      "turnsOut": "Furnace Creek in Death Valley, California, 54 m below sea level: 56.7 °C (134 °F) on 10 July 1913. Libya's 58 °C from 1922 held the title until a WMO panel threw it out in 2012.",
+      "sourceTitle": "WMO Weather and Climate Extremes Archive: records table (31 July 2025)",
+      "sourceUrl": "https://wmo.int/files/records-of-weather-and-climate-extremes-table",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
+      "sample": true,
+      "surface": "land"
+    },
+    {
+      "id": "wind-strongest-gust",
+      "category": "wind",
+      "prompt": "Where was the strongest wind gust ever measured, outside a tornado (WMO)?",
+      "teaser": "Where was the strongest gust of wind ever measured?",
+      "scope": { "level": "world", "name": "the world" },
+      "targets": [
+        {
+          "lat": -20.8167,
+          "lon": 115.3833,
+          "label": "Barrow Island, Western Australia",
+          "official": true,
+          "value": 113.2,
+          "unit": "m/s (408 km/h)",
+          "date": "1996-04-10"
+        }
+      ],
+      "authority": "World Meteorological Organization",
+      "turnsOut": "Barrow Island, off Western Australia: 113.2 m/s (408 km/h) as Cyclone Olivia passed on 10 April 1996. The WMO only confirmed it in 2010, ending the reign of Mount Washington's 103.3 m/s gust from 1934.",
+      "sourceTitle": "WMO Weather and Climate Extremes Archive: records table (31 July 2025)",
+      "sourceUrl": "https://wmo.int/files/records-of-weather-and-climate-extremes-table",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
       "sample": true,
       "surface": "land"
     }

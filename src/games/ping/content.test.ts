@@ -182,11 +182,25 @@ describe("the committed content", () => {
     expect(result.warnings).toEqual([]);
   });
 
-  it("is still the fake sample set, with example.test sources", () => {
+  it("keeps fake questions obviously fake, and fake sources out of real ones", () => {
     for (const question of questions) {
-      if (!question.sample) continue;
-      expect(question.sourceUrl).toMatch(/^https:\/\/example\.test\//);
-      expect(question.prompt).toMatch(/fake data/);
+      const fake = question.sourceUrl.startsWith("https://example.test/");
+      if (fake) {
+        expect(question.sample).toBe(true);
+        expect(question.prompt).toMatch(/fake data/);
+      } else {
+        expect(question.sourceUrl).toMatch(/^https:\/\//);
+      }
+    }
+  });
+
+  it("marks every unverified question a draft, and every day that serves one", () => {
+    // Real questions stay drafts (sample: true) until a person has checked them against their
+    // source (docs/games/ping/content-guide.md): the game shows its banner and production refuses
+    // them.
+    const drafts = new Set(questions.filter((q) => q.sample).map((q) => q.id));
+    for (const day of daily.values()) {
+      if (day.questions.some((q) => drafts.has(q.id))) expect(day.sample).toBe(true);
     }
   });
 });

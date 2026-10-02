@@ -2,93 +2,80 @@
   "puzzle": 58,
   "questions": [
     {
-      "id": "sample-11",
+      "id": "wind-windiest-place",
       "category": "wind",
-      "prompt": "Sample 11 (fake data): where is the made-up windiest spot? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up windiest spot of sample 11?",
+      "prompt": "Where is the windiest place on Earth near sea level, by average wind speed over a year (International Journal of Climatology)?",
+      "teaser": "Where is the windiest place near sea level?",
       "scope": { "level": "world", "name": "the world" },
       "targets": [
         {
-          "lat": 45.0655,
-          "lon": -91.0714,
-          "label": "Fake place 11",
+          "lat": -67.0086,
+          "lon": 142.6611,
+          "label": "Cape Denison, Commonwealth Bay, Antarctica",
           "official": true,
-          "value": 57.9,
-          "unit": "fake units",
-          "date": "2026-09"
-        },
-        {
-          "lat": 55.891,
-          "lon": -98.791,
-          "label": "Fake contender 11b",
-          "official": false,
-          "value": 44.9,
-          "unit": "fake units",
-          "date": "2026-09"
+          "value": 20,
+          "unit": "m/s average (about 72 km/h)",
+          "date": "1912/1913"
         }
       ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this fake record has fake contenders too. The reveal shows every one, with the official one marked.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-11",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
+      "perfectRadiusKm": 65,
+      "authority": "Australasian Antarctic Expedition 1911–14, analysed in the International Journal of Climatology",
+      "turnsOut": "Cape Denison, where Mawson's 1911–14 expedition had its base: the wind averaged about 20 m/s (72 km/h) over a year. The same gales sweep the coast at least 60 km west, to the old French base of Port Martin, so a pin there counts too.",
+      "sourceTitle": "Parish & Wendler, The katabatic wind regime at Adelie Land, Antarctica (International Journal of Climatology, 1991)",
+      "sourceUrl": "https://doi.org/10.1002/joc.3370110108",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
+      "sample": true,
+      "surface": "antarctica"
+    },
+    {
+      "id": "rain-wettest-average",
+      "category": "rain",
+      "prompt": "Where is the highest average annual rainfall in the WMO's records?",
+      "teaser": "Where does the most rain fall in a year, on average?",
+      "scope": { "level": "world", "name": "the world" },
+      "targets": [
+        {
+          "lat": 25.3,
+          "lon": 91.5833,
+          "label": "Mawsynram, Meghalaya, India",
+          "official": true,
+          "value": 11872,
+          "unit": "mm a year (average)"
+        }
+      ],
+      "authority": "World Meteorological Organization",
+      "turnsOut": "Mawsynram, in the Khasi Hills of north-east India: 11,872 mm a year, averaged over 38 years. The WMO keeps this record by region, and Asia's is the highest. Neighbouring Cherrapunji holds the 12-month record: 26,470 mm from August 1860 to July 1861.",
+      "sourceTitle": "WMO Weather and Climate Extremes Archive: records table (31 July 2025)",
+      "sourceUrl": "https://wmo.int/files/records-of-weather-and-climate-extremes-table",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
       "sample": true,
       "surface": "land"
     },
     {
-      "id": "sample-19",
-      "category": "geography",
-      "prompt": "Sample 19 (fake data): where is the made-up landmark? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up landmark of sample 19?",
+      "id": "heat-highest-temperature",
+      "category": "heat",
+      "prompt": "Where was the highest air temperature ever recorded on Earth (WMO)?",
+      "teaser": "Where was the hottest temperature ever recorded?",
       "scope": { "level": "world", "name": "the world" },
       "targets": [
         {
-          "lat": -26.6535,
-          "lon": -49.0181,
-          "label": "Fake place 19",
+          "lat": 36.45,
+          "lon": -116.85,
+          "label": "Furnace Creek (Greenland Ranch), Death Valley, California, USA",
           "official": true,
-          "value": 43.3,
-          "unit": "fake units",
-          "date": "2026-09"
+          "value": 56.7,
+          "unit": "°C",
+          "date": "1913-07-10"
         }
       ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-19",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
-      "sample": true,
-      "surface": "land"
-    },
-    {
-      "id": "sample-07",
-      "category": "regional",
-      "prompt": "Sample 07 (fake data): where in Fake Country 07 is the made-up local record? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up local record of sample 07?",
-      "scope": {
-        "level": "country",
-        "name": "Fake Country 07",
-        "bbox": [28.4977, -31.7423, 36.4977, -25.7423]
-      },
-      "targets": [
-        {
-          "lat": -29.3321,
-          "lon": 30.3843,
-          "label": "Fake place 07",
-          "official": true,
-          "value": 48.4,
-          "unit": "fake units",
-          "date": "2026-09"
-        }
-      ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-07",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
+      "authority": "World Meteorological Organization",
+      "turnsOut": "Furnace Creek in Death Valley, California, 54 m below sea level: 56.7 °C (134 °F) on 10 July 1913. Libya's 58 °C from 1922 held the title until a WMO panel threw it out in 2012.",
+      "sourceTitle": "WMO Weather and Climate Extremes Archive: records table (31 July 2025)",
+      "sourceUrl": "https://wmo.int/files/records-of-weather-and-climate-extremes-table",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
       "sample": true,
       "surface": "land"
     }

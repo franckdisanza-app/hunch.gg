@@ -34,6 +34,24 @@ export function globeRadius(width: number, height: number, zoom: number): number
   return (Math.min(width, height) / 2) * FIT * zoom;
 }
 
+/**
+ * The globe's zoom as a web map's zoom level (256 px tiles), the scale map data such as Natural
+ * Earth uses to say what to show when. It depends on the view's size: a desktop globe at zoom 1
+ * shows as much detail as a phone's at zoom 2.
+ */
+export function mapZoom(width: number, height: number, zoom: number): number {
+  return Math.log2((2 * Math.PI * globeRadius(width, height, zoom)) / 256);
+}
+
+/**
+ * How far from the centre of the view, in radians on the sphere, the view can show anything: the
+ * horizon when the whole globe fits, less when zoomed in (with a small margin).
+ */
+export function viewAngle(width: number, height: number, zoom: number): number {
+  const reach = Math.hypot(width, height) / 2 / globeRadius(width, height, zoom);
+  return (reach >= 1 ? Math.PI / 2 : Math.asin(reach)) + 0.02;
+}
+
 /** Degrees of arc per CSS pixel at the centre of the view. */
 export function degreesPerPixel(width: number, height: number, zoom: number): number {
   return 180 / Math.PI / globeRadius(width, height, zoom);
@@ -127,11 +145,12 @@ export function easeOut(t: number): number {
 /**
  * A fly-to path: the centre follows the great circle, the zoom eases out and back in (so long
  * flights pull back to show where they go). Returns the camera at t in [0, 1] and a duration in ms
- * that grows with the distance.
+ * that grows with the distance, unless `durationMs` sets it.
  */
 export function flightPath(
   from: Camera,
   to: Camera,
+  durationMs?: number,
 ): { at(t: number): Camera; durationMs: number } {
   const a = toLonLat(from.center);
   const b = toLonLat(to.center);
@@ -142,11 +161,10 @@ export function flightPath(
   const logFrom = Math.log(from.zoom);
   const logTo = Math.log(to.zoom);
   const logCruise = Math.log(cruise);
-  const durationMs = Math.round(
-    500 + 700 * Math.min(1, angle / Math.PI) + 150 * Math.abs(logTo - logFrom),
-  );
   return {
-    durationMs,
+    durationMs:
+      durationMs ??
+      Math.round(500 + 700 * Math.min(1, angle / Math.PI) + 150 * Math.abs(logTo - logFrom)),
     at(t: number): Camera {
       const e = easeInOut(Math.min(1, Math.max(0, t)));
       // Straight log-zoom blend, dipped towards the cruise zoom in the middle.

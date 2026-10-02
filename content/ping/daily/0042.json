@@ -2,91 +2,79 @@
   "puzzle": 42,
   "questions": [
     {
-      "id": "sample-02",
-      "category": "cold",
-      "prompt": "Sample 02 (fake data): where is the made-up coldest spot? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up coldest spot of sample 02?",
+      "id": "geography-highest-point",
+      "category": "geography",
+      "prompt": "Where is the highest point above sea level on Earth (joint government survey, 2020)?",
+      "teaser": "Where is the highest point on Earth?",
       "scope": { "level": "world", "name": "the world" },
       "targets": [
         {
-          "lat": 67.6767,
-          "lon": -34.0384,
-          "label": "Fake place 02",
+          "lat": 27.9881,
+          "lon": 86.9253,
+          "label": "Mount Everest (Sagarmatha, Chomolungma), Nepal–China border",
           "official": true,
-          "value": 79.4,
-          "unit": "fake units",
-          "date": "2026-09"
+          "value": 8848.86,
+          "unit": "m above sea level",
+          "date": "2020-12-08"
         }
       ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-02",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
+      "authority": "Governments of Nepal and China (joint survey)",
+      "turnsOut": "Mount Everest, on the Nepal–China border: 8,848.86 m, Nepal and China announced together on 8 December 2020. Until then Nepal had used 8,848 m, from a 1954 Survey of India, and China 8,844.43 m, the rock without its snow cap.",
+      "sourceTitle": "8848.86 metres. That's the height of Mt Everest now (The Kathmandu Post)",
+      "sourceUrl": "https://kathmandupost.com/national/2020/12/08/it-s-official-mount-everest-is-8-848-86-metres-tall",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
       "sample": true,
       "surface": "land"
     },
     {
-      "id": "sample-15",
-      "category": "heat",
-      "prompt": "Sample 15 (fake data): where is the made-up hottest spot? A random spot, placed by a script to test how Ping lays out a long question on a small phone screen without scrolling.",
-      "teaser": "Where is the made-up hottest spot of sample 15?",
+      "id": "rain-wettest-average",
+      "category": "rain",
+      "prompt": "Where is the highest average annual rainfall in the WMO's records?",
+      "teaser": "Where does the most rain fall in a year, on average?",
       "scope": { "level": "world", "name": "the world" },
       "targets": [
         {
-          "lat": -3.5524,
-          "lon": 35.6397,
-          "label": "Fake place 15",
+          "lat": 25.3,
+          "lon": 91.5833,
+          "label": "Mawsynram, Meghalaya, India",
           "official": true,
-          "value": 94.5,
-          "unit": "fake units",
-          "date": "2026-09"
+          "value": 11872,
+          "unit": "mm a year (average)"
         }
       ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-15",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
+      "authority": "World Meteorological Organization",
+      "turnsOut": "Mawsynram, in the Khasi Hills of north-east India: 11,872 mm a year, averaged over 38 years. The WMO keeps this record by region, and Asia's is the highest. Neighbouring Cherrapunji holds the 12-month record: 26,470 mm from August 1860 to July 1861.",
+      "sourceTitle": "WMO Weather and Climate Extremes Archive: records table (31 July 2025)",
+      "sourceUrl": "https://wmo.int/files/records-of-weather-and-climate-extremes-table",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
       "sample": true,
       "surface": "land"
     },
     {
-      "id": "sample-13",
-      "category": "furthest-from",
-      "prompt": "Sample 13 (fake data): where in Fake Region 13 is the made-up most remote spot, as of September 2026? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up most remote spot of sample 13?",
-      "scope": {
-        "level": "region",
-        "name": "Fake Region 13",
-        "bbox": [-147.9476, 49.256, -127.9476, 65.256]
-      },
+      "id": "wind-strongest-gust",
+      "category": "wind",
+      "prompt": "Where was the strongest wind gust ever measured, outside a tornado (WMO)?",
+      "teaser": "Where was the strongest gust of wind ever measured?",
+      "scope": { "level": "world", "name": "the world" },
       "targets": [
         {
-          "lat": 61.9746,
-          "lon": -133.5228,
-          "label": "Fake place 13",
+          "lat": -20.8167,
+          "lon": 115.3833,
+          "label": "Barrow Island, Western Australia",
           "official": true,
-          "value": 60.7,
-          "unit": "fake units",
-          "date": "2026-09"
+          "value": 113.2,
+          "unit": "m/s (408 km/h)",
+          "date": "1996-04-10"
         }
       ],
-      "authority": "Fake computation (sample)",
-      "turnsOut": "this sample was not computed from anything: the place and its nearest features are made up.",
-      "computedOn": "2026-09-30",
-      "dataAsOf": "2026-09-30",
-      "nearest": [
-        { "name": "Fake feature 13-1", "town": "Fake Town", "lat": 61.6344, "lon": -132.8818 },
-        { "name": "Fake feature 13-2", "town": "Fake Town", "lat": 62.4127, "lon": -133.1599 },
-        { "name": "Fake feature 13-3", "town": "Fake Town", "lat": 62.2395, "lon": -133.2596 }
-      ],
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-13",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
+      "authority": "World Meteorological Organization",
+      "turnsOut": "Barrow Island, off Western Australia: 113.2 m/s (408 km/h) as Cyclone Olivia passed on 10 April 1996. The WMO only confirmed it in 2010, ending the reign of Mount Washington's 103.3 m/s gust from 1934.",
+      "sourceTitle": "WMO Weather and Climate Extremes Archive: records table (31 July 2025)",
+      "sourceUrl": "https://wmo.int/files/records-of-weather-and-climate-extremes-table",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
       "sample": true,
       "surface": "land"
     }

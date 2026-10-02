@@ -54,6 +54,8 @@ describe("a round", () => {
     expect(state.pinsLeft).toBe(2);
     expect(state.pins[0]).toMatchObject({ attempt: 0, perfect: false, targetIndex: 0 });
     expect(state.pins[0]!.km).toBeCloseTo(20 * 111.195, 0);
+    // The target lies due west of the pin.
+    expect(state.pins[0]!.bearing).toBeCloseTo(270, 9);
 
     state = dropPin(state, CONFIG, { lat: 0, lon: 0.1 });
     expect(state.phase).toBe("revealed");
@@ -70,6 +72,9 @@ describe("a round", () => {
 
     state = dropPin(state, CONFIG, { lat: -9, lon: -9 });
     expect(state.pins[0]!.targetIndex).toBe(1);
+    // The direction points at that nearer contender (south-west), not at the other one.
+    expect(state.pins[0]!.bearing).toBeGreaterThan(180);
+    expect(state.pins[0]!.bearing).toBeLessThan(270);
     state = dropPin(state, CONFIG, { lat: 40, lon: 40 });
     state = dropPin(state, CONFIG, { lat: -60, lon: 100 });
     expect(state.phase).toBe("revealed");

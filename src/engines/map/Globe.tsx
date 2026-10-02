@@ -20,27 +20,33 @@ import {
   clampCamera,
   dragBy,
   flightPath,
+  globeRadius,
   nudge,
+  viewAngle,
   zoomBy,
   type Camera,
   type CameraLimits,
 } from "./camera";
 import {
+  DEFAULT_LABEL_INSETS,
   drawFrame,
   showsOnlyBackdrop,
   sweepAngle,
   type GlobeColors,
   type GlobeScene,
+  type LabelInsets,
   type SweepState,
 } from "./draw";
-import { normalizeLon, type GeoPoint } from "./geo";
+import { EARTH_RADIUS_KM, distanceKm, normalizeLon, type GeoPoint } from "./geo";
+import { MAJOR_ROAD_MAX_ZOOM, MapOverlays } from "./overlays";
 import { projectionFor } from "./projection";
 
 // The globe: an orthographic d3-geo globe on a canvas at the device pixel ratio, turned by
 // dragging (with inertia), zoomed by pinching, the wheel or +/−, and aimed with a fixed crosshair
 // in the middle. Keyboard: arrows turn it (Shift for bigger steps), +/− zoom, Enter drops a pin.
-// Screen readers hear the coordinates and country under the crosshair when it settles. Under
-// reduced motion there is no inertia, fly-to or sweep: every change is a jump cut.
+// Zoomed in, cities and roads appear (overlays.ts). Screen readers hear the coordinates, country
+// and nearest labelled place under the crosshair when it settles. Under reduced motion there is
+// no inertia, fly-to or sweep: every change is a jump cut.
 
 export interface GlobeHandle {
   /** The point under the crosshair. */
@@ -52,6 +58,8 @@ export interface GlobeHandle {
   flyTo(view: Camera): Promise<void>;
   /** Jumps to a view at once. */
   setView(view: Camera): void;
+  /** Zooms in (factor > 1) or out on the crosshair with a short glide (at once under reduced motion). */
+  zoomBy(factor: number): void;
   /** Moves keyboard focus to the globe. */
   focus(): void;
 }
@@ -60,6 +68,8 @@ export interface AimDescription {
   point: GeoPoint;
   /** The country under the crosshair, null over the sea. */
   country: string | null;
+  /** The labelled city or town next to the crosshair, if any. */
+  place: string | null;
   zoom: number;
 }
 
@@ -78,6 +88,8 @@ export interface GlobeProps {
    */
   backdrop?: { view: Camera; visible?: () => boolean };
   limits?: Partial<CameraLimits>;
+  /** Margins along the edges where labels never go: under the game's overlays. */
+  labelInsets?: Partial<LabelInsets>;
   /** False while the game animates the globe itself (e.g. during a reveal). */
   interactive?: boolean;
   reducedMotion: boolean;
@@ -114,7 +126,11 @@ const INERTIA_STOP = 0.0008;
 /** Fastest glide at zoom 1, deg/ms (slower when zoomed in). */
 const INERTIA_MAX = 0.12;
 const SETTLE_MS = 450;
+/** A place this close to the crosshair (CSS px on screen) is read out as "near" it. */
+const NEAR_PX = 70;
 const MAX_DPR = 2;
+/** How long a zoom step from zoomBy() glides. */
+const ZOOM_STEP_MS = 280;
 
 type Velocity = { lon: number; lat: number };
 type Sample = { t: number; lon: number; lat: number };
@@ -141,6 +157,7 @@ export function Globe({
   initialView,
   backdrop,
   limits: limitOverrides,
+  labelInsets,
   interactive = true,
   reducedMotion,
   label,
@@ -190,8 +207,11 @@ export function Globe({
   const drawnCamera = useRef<Camera | null>(null);
   // Whether the canvas has drawn anything yet (see `backdrop`).
   const painted = useRef(false);
+  // Cities and roads, loaded as the player zooms in.
+  const overlays = useRef<MapOverlays | null>(null);
 
   // Latest props for the frame loop and event handlers.
+  const insets: LabelInsets = { ...DEFAULT_LABEL_INSETS, ...labelInsets };
   const props = useRef({
     scene,
     colors,
@@ -200,6 +220,7 @@ export function Globe({
     interactive,
     reducedMotion,
     limits,
+    insets,
     describeAim,
   });
   const callbacks = useRef({ readout, onDrop, onSweepEnd });
@@ -212,6 +233,7 @@ export function Globe({
       interactive,
       reducedMotion,
       limits,
+      insets,
       describeAim,
     };
     callbacks.current = { readout, onDrop, onSweepEnd };
@@ -247,10 +269,22 @@ export function Globe({
       if (!describe || !canAim || flight.current) return;
       const atlas = bestAtlas();
       const point = camera.current.center;
+      // The nearest place the view may show, labelled or not (the one under the crosshair is
+      // hidden by it).
+      const { width, height } = size.current;
+      let nearKm = (NEAR_PX * EARTH_RADIUS_KM) / globeRadius(width, height, camera.current.zoom);
+      let near: string | null = null;
+      for (const place of overlays.current?.placesFor(camera.current, width, height) ?? []) {
+        const km = distanceKm(point, place.point);
+        if (km > nearKm) continue;
+        nearKm = km;
+        near = place.name;
+      }
       setAnnouncement(
         describe({
           point,
           country: atlas ? countryAt(atlas, point) : null,
+          place: near,
           zoom: camera.current.zoom,
         }),
       );
@@ -305,6 +339,11 @@ export function Globe({
       const moved = drawnCamera.current !== camera.current;
       drawnCamera.current = camera.current;
       const projection = projectionFor(camera.current, width, height);
+      const angle = viewAngle(width, height, camera.current.zoom);
+      // Cities and roads: only once the player (or the game) has moved the globe.
+      overlays.current ??= new MapOverlays(requestFrame);
+      const layers = overlays.current;
+      if (engaged.current) layers.update(camera.current, width, height, angle);
 
       // The sweep lights blips as the beam passes them, and every blip when it ends.
       const running = sweep.current;
@@ -338,28 +377,39 @@ export function Globe({
         (picture.visible?.() ?? true) &&
         showsOnlyBackdrop(camera.current, currentScene, picture.view);
       if (!onBackdrop) painted.current = true;
-      const animating =
-        !onBackdrop &&
-        drawFrame({
-          ctx,
-          width,
-          height,
-          dpr,
-          projection,
-          camera: camera.current,
-          // While the globe moves (dragged, pinched, gliding, flying) the light 1:110m shapes keep
-          // frames fast; the detail comes back the frame it stops.
-          atlas:
-            moving || pointers.current.size > 0
-              ? (atlases.current["110m"] ?? bestAtlas())
-              : bestAtlas(),
-          scene: currentScene,
-          colors: resolved.current!.colors,
-          font: resolved.current!.font,
-          now,
-          sweep: sweep.current,
-          lit: lit.current,
-        });
+      const light = moving || pointers.current.size > 0;
+      const drawn = onBackdrop
+        ? null
+        : drawFrame({
+            ctx,
+            width,
+            height,
+            dpr,
+            labelInsets: props.current.insets,
+            projection,
+            camera: camera.current,
+            // While the globe moves (dragged, pinched, gliding, flying) the light 1:110m shapes keep
+            // frames fast; the detail comes back the frame it stops.
+            atlas: light ? (atlases.current["110m"] ?? bestAtlas()) : bestAtlas(),
+            scene: currentScene,
+            colors: resolved.current!.colors,
+            font: resolved.current!.font,
+            now,
+            sweep: sweep.current,
+            lit: lit.current,
+            ...(engaged.current
+              ? {
+                  overlays: {
+                    // Like the land, roads are lighter while the globe moves: the major ones only.
+                    roads: layers
+                      .roads(camera.current, width, height, angle)
+                      .filter((road) => !light || road.minZoom <= MAJOR_ROAD_MAX_ZOOM),
+                    places: layers.placesFor(camera.current, width, height),
+                  },
+                }
+              : {}),
+          });
+      const animating = drawn ?? false;
 
       if (readoutRef.current && callbacks.current.readout) {
         readoutRef.current.textContent = callbacks.current.readout(
@@ -523,6 +573,24 @@ export function Globe({
           };
           requestFrame();
         });
+      },
+      zoomBy(factor) {
+        // From where a zoom already under way is going, so quick taps add up.
+        const base = flight.current?.target ?? camera.current;
+        const target = zoomBy(base, factor, props.current.limits);
+        stopMotion();
+        if (props.current.reducedMotion) {
+          moveTo(target);
+          return;
+        }
+        engaged.current = true;
+        flight.current = {
+          path: flightPath(camera.current, target, ZOOM_STEP_MS),
+          target,
+          startedAt: performance.now(),
+          resolve: () => {},
+        };
+        requestFrame();
       },
       focus: () => containerRef.current?.focus({ preventScroll: true }),
     }),

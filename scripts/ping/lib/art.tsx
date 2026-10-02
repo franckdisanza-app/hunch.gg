@@ -41,7 +41,9 @@ export function artFiles(root: string): Record<string, string> {
 /**
  * The globe as a world question first shows it (WORLD_VIEW, 1:110m land), as a picture: the page
  * shows it from the first paint, and the canvas globe leaves it showing until the view changes or
- * a pin lands. Same geometry and colours as the canvas (radius 92% of half the box).
+ * a pin lands. Same geometry and colours as the canvas (radius 92% of half the box), and the same
+ * line widths in CSS pixels at any size (non-scaling strokes): a phone shows it ~340 px wide, a
+ * desktop over 700.
  */
 function globe(
   root: string,
@@ -60,19 +62,20 @@ function globe(
     .rotate([-WORLD_VIEW.center.lon, -WORLD_VIEW.center.lat]);
   // Whole units: under half a pixel at phone size, and a smaller file.
   const path = geoPath(projection).digits(0);
-  // Canvas line widths are in CSS pixels on a ~340 px globe; this box is 400 wide.
-  const k = size / 340;
   // The sphere is the projection's circle. The picture is the page's largest paint: keep it small.
   const [cx, cy] = projection.translate();
   const sphere = `cx="${cx}" cy="${cy}" r="${projection.scale()}"`;
   const d = (object: Parameters<typeof path>[0]) => relativePath(path(object) ?? "");
+  // Line widths as the canvas draws them, in CSS pixels whatever the picture's size.
+  const stroke = (color: string, width: number) =>
+    `stroke="${color}" stroke-width="${width}" vector-effect="non-scaling-stroke"`;
   return [
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">`,
     `<circle ${sphere} fill="${colors.ocean}"/>`,
-    `<path d="${d(geoGraticule10())}" fill="none" stroke="${colors.grid}" stroke-width="${0.6 * k}"/>`,
-    `<path d="${d(atlas.land)}" fill="${colors.land}" stroke="${colors.coast}" stroke-width="${0.8 * k}"/>`,
-    `<path d="${d(atlas.borders)}" fill="none" stroke="${colors.border}" stroke-width="${0.5 * k}"/>`,
-    `<circle ${sphere} fill="none" stroke="${colors.rim}" stroke-width="${1.2 * k}"/>`,
+    `<path d="${d(geoGraticule10())}" fill="none" ${stroke(colors.grid, 0.6)}/>`,
+    `<path d="${d(atlas.land)}" fill="${colors.land}" ${stroke(colors.coast, 0.8)}/>`,
+    `<path d="${d(atlas.borders)}" fill="none" ${stroke(colors.border, 0.5)}/>`,
+    `<circle ${sphere} fill="none" ${stroke(colors.rim, 1.2)}/>`,
     `</svg>`,
     "",
   ].join("\n");

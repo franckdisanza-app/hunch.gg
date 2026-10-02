@@ -2,84 +2,79 @@
   "puzzle": 8,
   "questions": [
     {
-      "id": "sample-19",
-      "category": "geography",
-      "prompt": "Sample 19 (fake data): where is the made-up landmark? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up landmark of sample 19?",
-      "scope": { "level": "world", "name": "the world" },
-      "targets": [
-        {
-          "lat": -26.6535,
-          "lon": -49.0181,
-          "label": "Fake place 19",
-          "official": true,
-          "value": 43.3,
-          "unit": "fake units",
-          "date": "2026-09"
-        }
-      ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-19",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
-      "sample": true,
-      "surface": "land"
-    },
-    {
-      "id": "sample-01",
+      "id": "heat-hottest-average",
       "category": "heat",
-      "prompt": "Sample 01 (fake data): where is the made-up hottest spot? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up hottest spot of sample 01?",
+      "prompt": "Where is the highest average annual temperature on record, measured from 1960 to 1966 (Meteorological Magazine)?",
+      "teaser": "Where is the hottest place on average, all year round?",
       "scope": { "level": "world", "name": "the world" },
       "targets": [
         {
-          "lat": -30.4871,
-          "lon": -60.2233,
-          "label": "Fake place 01",
+          "lat": 14.24,
+          "lon": 40.3,
+          "label": "Dallol, Danakil Depression, Ethiopia",
           "official": true,
-          "value": 59.1,
-          "unit": "fake units",
-          "date": "2026-09"
+          "value": 34.7,
+          "unit": "°C average, day and night",
+          "date": "1960/1966"
         }
       ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-01",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
+      "authority": "D. E. Pedgley, Meteorological Magazine (UK Met Office), 1967",
+      "turnsOut": "Dallol, in Ethiopia's Danakil Depression: a prospecting camp's weather station there averaged 41 °C (106 °F) by day and 28 °C (83 °F) by night over 1960–66, hotter on both counts than anywhere in the world tables of the time.",
+      "sourceTitle": "Air temperature at Dallol, Ethiopia (Meteorological Magazine, September 1967)",
+      "sourceUrl": "https://digital.nmla.metoffice.gov.uk/IO_43e9b8d3-2438-48e3-b503-0596ab9a4942/",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
       "sample": true,
       "surface": "land"
     },
     {
-      "id": "sample-17",
+      "id": "rain-wettest-average",
       "category": "rain",
-      "prompt": "Sample 17 (fake data): where in Fake Country 17 is the made-up wettest spot? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up wettest spot of sample 17?",
-      "scope": {
-        "level": "country",
-        "name": "Fake Country 17",
-        "bbox": [-55.5026, 0.9725, -47.5026, 6.9725]
-      },
+      "prompt": "Where is the highest average annual rainfall in the WMO's records?",
+      "teaser": "Where does the most rain fall in a year, on average?",
+      "scope": { "level": "world", "name": "the world" },
       "targets": [
         {
-          "lat": 3.3584,
-          "lon": -52.1992,
-          "label": "Fake place 17",
+          "lat": 25.3,
+          "lon": 91.5833,
+          "label": "Mawsynram, Meghalaya, India",
           "official": true,
-          "value": 22.7,
-          "unit": "fake units",
-          "date": "2026-09"
+          "value": 11872,
+          "unit": "mm a year (average)"
         }
       ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-17",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
+      "authority": "World Meteorological Organization",
+      "turnsOut": "Mawsynram, in the Khasi Hills of north-east India: 11,872 mm a year, averaged over 38 years. The WMO keeps this record by region, and Asia's is the highest. Neighbouring Cherrapunji holds the 12-month record: 26,470 mm from August 1860 to July 1861.",
+      "sourceTitle": "WMO Weather and Climate Extremes Archive: records table (31 July 2025)",
+      "sourceUrl": "https://wmo.int/files/records-of-weather-and-climate-extremes-table",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
+      "sample": true,
+      "surface": "land"
+    },
+    {
+      "id": "geography-lowest-land",
+      "category": "geography",
+      "prompt": "Where is the lowest land on Earth that is not under water or ice?",
+      "teaser": "Where is the lowest dry land on Earth?",
+      "scope": { "level": "world", "name": "the world" },
+      "targets": [
+        {
+          "lat": 31.5,
+          "lon": 35.5,
+          "label": "The shores of the Dead Sea",
+          "official": true,
+          "value": -441.33,
+          "unit": "m (lake level, vs sea level)",
+          "date": "2026-08-31"
+        }
+      ],
+      "authority": "Hydrological Service, Israel Water Authority",
+      "turnsOut": "The shores of the Dead Sea: on 31 August 2026 the lake stood 441.33 m below sea level. It drops about a metre a year as the Jordan and the Yarmouk are dammed upstream and its water is pumped away; in 1900 it stood at 392 m below.",
+      "sourceTitle": "Dead Sea level since 1976 (Israel Water Authority, data.gov.il)",
+      "sourceUrl": "https://data.gov.il/he/datasets/water_authority/https-www-data-gov-il-dataset-683",
+      "checkedOn": "2026-10-02",
+      "licence": "Open government data; fact, own wording",
       "sample": true,
       "surface": "land"
     }

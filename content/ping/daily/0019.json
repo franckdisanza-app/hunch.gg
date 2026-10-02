@@ -2,80 +2,80 @@
   "puzzle": 19,
   "questions": [
     {
-      "id": "sample-09",
-      "category": "cold",
-      "prompt": "Sample 09 (fake data): where is the made-up coldest spot? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up coldest spot of sample 09?",
+      "id": "rain-longest-dry-spell",
+      "category": "rain",
+      "prompt": "Where was the longest dry spell ever recorded, without any measurable rain (WMO)?",
+      "teaser": "Where did it go longest without rain?",
       "scope": { "level": "world", "name": "the world" },
       "targets": [
         {
-          "lat": -76.8316,
-          "lon": 128.1102,
-          "label": "Fake place 09",
+          "lat": -18.4833,
+          "lon": -70.3,
+          "label": "Arica, Chile",
           "official": true,
-          "value": 41.5,
-          "unit": "fake units",
-          "date": "2026-09"
+          "value": 172,
+          "unit": "months without rain",
+          "date": "1903-10/1918-01"
         }
       ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-09",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
-      "sample": true,
-      "surface": "antarctica"
-    },
-    {
-      "id": "sample-19",
-      "category": "geography",
-      "prompt": "Sample 19 (fake data): where is the made-up landmark? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up landmark of sample 19?",
-      "scope": { "level": "world", "name": "the world" },
-      "targets": [
-        {
-          "lat": -26.6535,
-          "lon": -49.0181,
-          "label": "Fake place 19",
-          "official": true,
-          "value": 43.3,
-          "unit": "fake units",
-          "date": "2026-09"
-        }
-      ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-19",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
+      "authority": "World Meteorological Organization",
+      "turnsOut": "Arica, on the edge of Chile's Atacama Desert: no measurable rain for 172 months, from October 1903 to January 1918. Over 59 years its rainfall averaged 0.76 mm a year, the lowest in South America.",
+      "sourceTitle": "WMO Weather and Climate Extremes Archive: records table (31 July 2025)",
+      "sourceUrl": "https://wmo.int/files/records-of-weather-and-climate-extremes-table",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
       "sample": true,
       "surface": "land"
     },
     {
-      "id": "sample-08",
-      "category": "heat",
-      "prompt": "Sample 08 (fake data): where is the made-up hottest spot? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up hottest spot of sample 08?",
+      "id": "geography-highest-point",
+      "category": "geography",
+      "prompt": "Where is the highest point above sea level on Earth (joint government survey, 2020)?",
+      "teaser": "Where is the highest point on Earth?",
       "scope": { "level": "world", "name": "the world" },
       "targets": [
         {
-          "lat": -38.394,
-          "lon": 174.8257,
-          "label": "Fake place 08",
+          "lat": 27.9881,
+          "lon": 86.9253,
+          "label": "Mount Everest (Sagarmatha, Chomolungma), Nepal–China border",
           "official": true,
-          "value": 13.8,
-          "unit": "fake units",
-          "date": "2026-09"
+          "value": 8848.86,
+          "unit": "m above sea level",
+          "date": "2020-12-08"
         }
       ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-08",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
+      "authority": "Governments of Nepal and China (joint survey)",
+      "turnsOut": "Mount Everest, on the Nepal–China border: 8,848.86 m, Nepal and China announced together on 8 December 2020. Until then Nepal had used 8,848 m, from a 1954 Survey of India, and China 8,844.43 m, the rock without its snow cap.",
+      "sourceTitle": "8848.86 metres. That's the height of Mt Everest now (The Kathmandu Post)",
+      "sourceUrl": "https://kathmandupost.com/national/2020/12/08/it-s-official-mount-everest-is-8-848-86-metres-tall",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
+      "sample": true,
+      "surface": "land"
+    },
+    {
+      "id": "wind-strongest-gust",
+      "category": "wind",
+      "prompt": "Where was the strongest wind gust ever measured, outside a tornado (WMO)?",
+      "teaser": "Where was the strongest gust of wind ever measured?",
+      "scope": { "level": "world", "name": "the world" },
+      "targets": [
+        {
+          "lat": -20.8167,
+          "lon": 115.3833,
+          "label": "Barrow Island, Western Australia",
+          "official": true,
+          "value": 113.2,
+          "unit": "m/s (408 km/h)",
+          "date": "1996-04-10"
+        }
+      ],
+      "authority": "World Meteorological Organization",
+      "turnsOut": "Barrow Island, off Western Australia: 113.2 m/s (408 km/h) as Cyclone Olivia passed on 10 April 1996. The WMO only confirmed it in 2010, ending the reign of Mount Washington's 103.3 m/s gust from 1934.",
+      "sourceTitle": "WMO Weather and Climate Extremes Archive: records table (31 July 2025)",
+      "sourceUrl": "https://wmo.int/files/records-of-weather-and-climate-extremes-table",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
       "sample": true,
       "surface": "land"
     }

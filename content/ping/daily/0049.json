@@ -2,105 +2,79 @@
   "puzzle": 49,
   "questions": [
     {
-      "id": "sample-15",
-      "category": "heat",
-      "prompt": "Sample 15 (fake data): where is the made-up hottest spot? A random spot, placed by a script to test how Ping lays out a long question on a small phone screen without scrolling.",
-      "teaser": "Where is the made-up hottest spot of sample 15?",
-      "scope": { "level": "world", "name": "the world" },
-      "targets": [
-        {
-          "lat": -3.5524,
-          "lon": 35.6397,
-          "label": "Fake place 15",
-          "official": true,
-          "value": 94.5,
-          "unit": "fake units",
-          "date": "2026-09"
-        }
-      ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-15",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
-      "sample": true,
-      "surface": "land"
-    },
-    {
-      "id": "sample-03",
+      "id": "rain-wettest-average",
       "category": "rain",
-      "prompt": "Sample 03 (fake data): where is the made-up wettest spot? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up wettest spot of sample 03?",
+      "prompt": "Where is the highest average annual rainfall in the WMO's records?",
+      "teaser": "Where does the most rain fall in a year, on average?",
       "scope": { "level": "world", "name": "the world" },
       "targets": [
         {
-          "lat": 50.9401,
-          "lon": 19.4499,
-          "label": "Fake place 03",
+          "lat": 25.3,
+          "lon": 91.5833,
+          "label": "Mawsynram, Meghalaya, India",
           "official": true,
-          "value": 99.9,
-          "unit": "fake units",
-          "date": "2026-09"
-        },
-        {
-          "lat": 54.6373,
-          "lon": 43.0023,
-          "label": "Fake contender 03b",
-          "official": false,
-          "value": 89.1,
-          "unit": "fake units",
-          "date": "2026-09"
-        },
-        {
-          "lat": 47.7421,
-          "lon": 27.6519,
-          "label": "Fake contender 03c",
-          "official": false,
-          "value": 34.7,
-          "unit": "fake units",
-          "date": "2026-09"
+          "value": 11872,
+          "unit": "mm a year (average)"
         }
       ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this fake record has fake contenders too. The reveal shows every one, with the official one marked.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-03",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
+      "authority": "World Meteorological Organization",
+      "turnsOut": "Mawsynram, in the Khasi Hills of north-east India: 11,872 mm a year, averaged over 38 years. The WMO keeps this record by region, and Asia's is the highest. Neighbouring Cherrapunji holds the 12-month record: 26,470 mm from August 1860 to July 1861.",
+      "sourceTitle": "WMO Weather and Climate Extremes Archive: records table (31 July 2025)",
+      "sourceUrl": "https://wmo.int/files/records-of-weather-and-climate-extremes-table",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
       "sample": true,
       "surface": "land"
     },
     {
-      "id": "sample-20",
-      "category": "furthest-from",
-      "prompt": "Sample 20 (fake data): where is the made-up most remote spot, as of September 2026? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up most remote spot of sample 20?",
+      "id": "geography-highest-point",
+      "category": "geography",
+      "prompt": "Where is the highest point above sea level on Earth (joint government survey, 2020)?",
+      "teaser": "Where is the highest point on Earth?",
       "scope": { "level": "world", "name": "the world" },
       "targets": [
         {
-          "lat": 63.4259,
-          "lon": 84.4525,
-          "label": "Fake place 20",
+          "lat": 27.9881,
+          "lon": 86.9253,
+          "label": "Mount Everest (Sagarmatha, Chomolungma), Nepal–China border",
           "official": true,
-          "value": 13.6,
-          "unit": "fake units",
-          "date": "2026-09"
+          "value": 8848.86,
+          "unit": "m above sea level",
+          "date": "2020-12-08"
         }
       ],
-      "authority": "Fake computation (sample)",
-      "turnsOut": "this sample was not computed from anything: the place and its nearest features are made up.",
-      "computedOn": "2026-09-30",
-      "dataAsOf": "2026-09-30",
-      "nearest": [
-        { "name": "Fake feature 20-1", "town": "Fake Town", "lat": 63.9153, "lon": 85.1549 },
-        { "name": "Fake feature 20-2", "town": "Fake Town", "lat": 63.942, "lon": 84.5486 },
-        { "name": "Fake feature 20-3", "town": "Fake Town", "lat": 63.7861, "lon": 84.0284 }
+      "authority": "Governments of Nepal and China (joint survey)",
+      "turnsOut": "Mount Everest, on the Nepal–China border: 8,848.86 m, Nepal and China announced together on 8 December 2020. Until then Nepal had used 8,848 m, from a 1954 Survey of India, and China 8,844.43 m, the rock without its snow cap.",
+      "sourceTitle": "8848.86 metres. That's the height of Mt Everest now (The Kathmandu Post)",
+      "sourceUrl": "https://kathmandupost.com/national/2020/12/08/it-s-official-mount-everest-is-8-848-86-metres-tall",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
+      "sample": true,
+      "surface": "land"
+    },
+    {
+      "id": "heat-hottest-average",
+      "category": "heat",
+      "prompt": "Where is the highest average annual temperature on record, measured from 1960 to 1966 (Meteorological Magazine)?",
+      "teaser": "Where is the hottest place on average, all year round?",
+      "scope": { "level": "world", "name": "the world" },
+      "targets": [
+        {
+          "lat": 14.24,
+          "lon": 40.3,
+          "label": "Dallol, Danakil Depression, Ethiopia",
+          "official": true,
+          "value": 34.7,
+          "unit": "°C average, day and night",
+          "date": "1960/1966"
+        }
       ],
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-20",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
+      "authority": "D. E. Pedgley, Meteorological Magazine (UK Met Office), 1967",
+      "turnsOut": "Dallol, in Ethiopia's Danakil Depression: a prospecting camp's weather station there averaged 41 °C (106 °F) by day and 28 °C (83 °F) by night over 1960–66, hotter on both counts than anywhere in the world tables of the time.",
+      "sourceTitle": "Air temperature at Dallol, Ethiopia (Meteorological Magazine, September 1967)",
+      "sourceUrl": "https://digital.nmla.metoffice.gov.uk/IO_43e9b8d3-2438-48e3-b503-0596ab9a4942/",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
       "sample": true,
       "surface": "land"
     }

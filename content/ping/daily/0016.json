@@ -2,85 +2,80 @@
   "puzzle": 16,
   "questions": [
     {
-      "id": "sample-12",
-      "category": "geography",
-      "prompt": "Sample 12 (fake data): where is the made-up landmark? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up landmark of sample 12?",
+      "id": "wind-windiest-place",
+      "category": "wind",
+      "prompt": "Where is the windiest place on Earth near sea level, by average wind speed over a year (International Journal of Climatology)?",
+      "teaser": "Where is the windiest place near sea level?",
       "scope": { "level": "world", "name": "the world" },
       "targets": [
         {
-          "lat": -19.4407,
-          "lon": -50.6815,
-          "label": "Fake place 12",
+          "lat": -67.0086,
+          "lon": 142.6611,
+          "label": "Cape Denison, Commonwealth Bay, Antarctica",
           "official": true,
-          "value": 49.6,
-          "unit": "fake units",
-          "date": "2026-09"
+          "value": 20,
+          "unit": "m/s average (about 72 km/h)",
+          "date": "1912/1913"
         }
       ],
-      "perfectRadiusKm": 150,
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-12",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
+      "perfectRadiusKm": 65,
+      "authority": "Australasian Antarctic Expedition 1911–14, analysed in the International Journal of Climatology",
+      "turnsOut": "Cape Denison, where Mawson's 1911–14 expedition had its base: the wind averaged about 20 m/s (72 km/h) over a year. The same gales sweep the coast at least 60 km west, to the old French base of Port Martin, so a pin there counts too.",
+      "sourceTitle": "Parish & Wendler, The katabatic wind regime at Adelie Land, Antarctica (International Journal of Climatology, 1991)",
+      "sourceUrl": "https://doi.org/10.1002/joc.3370110108",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
       "sample": true,
-      "surface": "land"
+      "surface": "antarctica"
     },
     {
-      "id": "sample-10",
+      "id": "rain-wettest-average",
       "category": "rain",
-      "prompt": "Sample 10 (fake data): where is the made-up wettest spot? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up wettest spot of sample 10?",
+      "prompt": "Where is the highest average annual rainfall in the WMO's records?",
+      "teaser": "Where does the most rain fall in a year, on average?",
       "scope": { "level": "world", "name": "the world" },
       "targets": [
         {
-          "lat": 36.5151,
-          "lon": 106.3954,
-          "label": "Fake place 10",
+          "lat": 25.3,
+          "lon": 91.5833,
+          "label": "Mawsynram, Meghalaya, India",
           "official": true,
-          "value": 94.2,
-          "unit": "fake units",
-          "date": "2026-09"
+          "value": 11872,
+          "unit": "mm a year (average)"
         }
       ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-10",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
+      "authority": "World Meteorological Organization",
+      "turnsOut": "Mawsynram, in the Khasi Hills of north-east India: 11,872 mm a year, averaged over 38 years. The WMO keeps this record by region, and Asia's is the highest. Neighbouring Cherrapunji holds the 12-month record: 26,470 mm from August 1860 to July 1861.",
+      "sourceTitle": "WMO Weather and Climate Extremes Archive: records table (31 July 2025)",
+      "sourceUrl": "https://wmo.int/files/records-of-weather-and-climate-extremes-table",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
       "sample": true,
       "surface": "land"
     },
     {
-      "id": "sample-14",
-      "category": "regional",
-      "prompt": "Sample 14 (fake data): where in Fake Region 14 is the made-up local record? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up local record of sample 14?",
-      "scope": {
-        "level": "region",
-        "name": "Fake Region 14",
-        "bbox": [67.158, 53.7311, 87.158, 69.7311]
-      },
+      "id": "geography-lowest-land",
+      "category": "geography",
+      "prompt": "Where is the lowest land on Earth that is not under water or ice?",
+      "teaser": "Where is the lowest dry land on Earth?",
+      "scope": { "level": "world", "name": "the world" },
       "targets": [
         {
-          "lat": 63.2404,
-          "lon": 79.4363,
-          "label": "Fake place 14",
+          "lat": 31.5,
+          "lon": 35.5,
+          "label": "The shores of the Dead Sea",
           "official": true,
-          "value": 67.1,
-          "unit": "fake units",
-          "date": "2026-09"
+          "value": -441.33,
+          "unit": "m (lake level, vs sea level)",
+          "date": "2026-08-31"
         }
       ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-14",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
+      "authority": "Hydrological Service, Israel Water Authority",
+      "turnsOut": "The shores of the Dead Sea: on 31 August 2026 the lake stood 441.33 m below sea level. It drops about a metre a year as the Jordan and the Yarmouk are dammed upstream and its water is pumped away; in 1900 it stood at 392 m below.",
+      "sourceTitle": "Dead Sea level since 1976 (Israel Water Authority, data.gov.il)",
+      "sourceUrl": "https://data.gov.il/he/datasets/water_authority/https-www-data-gov-il-dataset-683",
+      "checkedOn": "2026-10-02",
+      "licence": "Open government data; fact, own wording",
       "sample": true,
       "surface": "land"
     }

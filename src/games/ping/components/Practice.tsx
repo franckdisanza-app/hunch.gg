@@ -79,18 +79,24 @@ export function PracticeGame() {
     );
   }
   return (
-    <div className="flex flex-col gap-4">
-      {pool.data.sample && <DraftBanner />}
-      <PracticeRound
-        key={round}
-        pool={pool.data.questions}
-        onAgain={() => setRound((n) => n + 1)}
-      />
-    </div>
+    <PracticeRound
+      key={round}
+      pool={pool.data.questions}
+      draft={pool.data.sample ?? false}
+      onAgain={() => setRound((n) => n + 1)}
+    />
   );
 }
 
-function PracticeRound({ pool, onAgain }: { pool: readonly DailyQuestion[]; onAgain: () => void }) {
+function PracticeRound({
+  pool,
+  draft,
+  onAgain,
+}: {
+  pool: readonly DailyQuestion[];
+  draft: boolean;
+  onAgain: () => void;
+}) {
   const { player } = useGame();
   const unit = useDistanceUnit();
   // Picked once per round (the pool arrives after hydration, so randomness is safe here).
@@ -102,6 +108,7 @@ function PracticeRound({ pool, onAgain }: { pool: readonly DailyQuestion[]; onAg
       <Board
         questions={questions}
         title={strings.practiceHeading}
+        draft={draft}
         onStart={() => player.start()}
         onFinish={(answers) => {
           player.complete({ answers: [], score: summarizeMap(answers, SCORING).score });
@@ -116,6 +123,7 @@ function PracticeRound({ pool, onAgain }: { pool: readonly DailyQuestion[]; onAg
   const result = strings.results.score(formatNumber(score), formatNumber(DAILY_MAX));
   return (
     <section className="flex flex-col items-center gap-4">
+      {draft && <DraftBanner className="self-stretch" />}
       <h1 className="sr-only">{strings.practiceHeading}</h1>
       <Sonde pose={score >= DAILY_MAX * 0.66 ? "celebrate" : "point"} size={104} />
       <h2 className={cx(styles.display, "text-xl")}>{strings.practice.over}</h2>

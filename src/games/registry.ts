@@ -90,6 +90,12 @@ export const games: readonly GameDefinition[] = [
         url: "https://github.com/topojson/world-atlas",
       },
       {
+        what: "Cities and roads on the globe",
+        work: "Natural Earth (populated places and roads, 1:10m)",
+        licence: "Public domain",
+        url: "https://www.naturalearthdata.com/",
+      },
+      {
         what: "Computed questions",
         work: "OpenStreetMap contributors",
         licence: "Open Database License (ODbL) 1.0",

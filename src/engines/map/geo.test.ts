@@ -3,6 +3,7 @@ import {
   MAX_DISTANCE_KM,
   bboxCenter,
   bboxLonSpan,
+  compassPoint,
   distanceKm,
   formatDistance,
   formatLatLon,
@@ -10,6 +11,9 @@ import {
   inBBox,
   nearestTarget,
   normalizeLon,
+  rhumbBearing,
+  rhumbDestination,
+  rhumbLine,
   scopeSizeKm,
   unitForLocale,
   type GeoPoint,
@@ -129,6 +133,60 @@ describe("geodesicCircle", () => {
         radiusKm * 1e-3,
       );
     }
+  });
+});
+
+describe("directions", () => {
+  const origin = { lat: 0, lon: 0 };
+
+  it("reads bearings as on a map: north to the pole, east and west the shorter way", () => {
+    expect(rhumbBearing(origin, { lat: 10, lon: 0 })).toBeCloseTo(0, 9);
+    expect(rhumbBearing(origin, { lat: 0, lon: 10 })).toBeCloseTo(90, 9);
+    expect(rhumbBearing(origin, { lat: -10, lon: 0 })).toBeCloseTo(180, 9);
+    expect(rhumbBearing(origin, { lat: 0, lon: -10 })).toBeCloseTo(270, 9);
+    expect(compassPoint(rhumbBearing(CITIES.london, CITIES.paris))).toBe("SE");
+    // Across the antimeridian, the short way: Fiji to Samoa is east, Alaska to Kamchatka west.
+    expect(compassPoint(rhumbBearing(CITIES.suva, CITIES.apia))).toBe("NE");
+    expect(compassPoint(rhumbBearing(CITIES.anchorage, CITIES.petropavlovsk))).toBe("W");
+    // Not the great circle's starting bearing, which heads north over the pole.
+    expect(compassPoint(rhumbBearing({ lat: 70, lon: 0 }, { lat: 70, lon: 170 }))).toBe("E");
+    expect(rhumbBearing(origin, origin)).toBe(0);
+  });
+
+  it("rounds bearings to 8 compass points", () => {
+    expect([0, 22.4, 22.6, 90, 180, 247, 359, -45, 405].map(compassPoint)).toEqual([
+      "N",
+      "N",
+      "NE",
+      "E",
+      "S",
+      "SW",
+      "N",
+      "NW",
+      "NE",
+    ]);
+  });
+
+  it("follows a rhumb line out and back", () => {
+    const east = rhumbDestination(origin, 90, ONE_DEGREE_KM)!;
+    expect(east.lat).toBeCloseTo(0, 9);
+    expect(east.lon).toBeCloseTo(1, 9);
+    expect(rhumbDestination(origin, 0, 10 * ONE_DEGREE_KM)!.lat).toBeCloseTo(10, 9);
+    const there = rhumbDestination(CITIES.santiago, 37, 2000)!;
+    expect(rhumbBearing(CITIES.santiago, there)).toBeCloseTo(37, 6);
+    // A line that would run past a pole stops.
+    expect(rhumbDestination({ lat: 80, lon: 0 }, 0, 2000)).toBeNull();
+  });
+
+  it("samples a rhumb line up to half the world east or west", () => {
+    const line = rhumbLine(origin, 90, 30_000, 1000);
+    // 1,000 km is 8.99° along the equator: 20 steps reach 179.9°, the 21st would pass 180°.
+    expect(line).toHaveLength(21);
+    expect(line.at(-1)!.lon).toBeCloseTo(179.9, 0);
+    // Northward lines stop short of the pole.
+    const north = rhumbLine({ lat: 60, lon: 0 }, 10, 5000, 500);
+    expect(north.length).toBeLessThan(11);
+    expect(Math.max(...north.map((p) => p.lat))).toBeLessThan(90);
   });
 });
 

@@ -3,21 +3,31 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { frameFor, type Camera } from "@/engines/map/camera";
 import type { GlobeScene } from "@/engines/map/draw";
-import { bboxCenter, formatDistance, type GeoPoint } from "@/engines/map/geo";
+import {
+  bboxCenter,
+  compassPoint,
+  formatDistance,
+  type CompassPoint,
+  type GeoPoint,
+} from "@/engines/map/geo";
 import type { GlobeHandle } from "@/engines/map/Globe";
 import type { MapAnswer, MapPin, SavedMapAnswer } from "@/engines/map/state";
 import { useMapGame } from "@/engines/map/useMapGame";
+import { FillScreen } from "@/frame/FillScreen";
 import { useGame } from "@/frame/GameContext";
 import { cx } from "@/frame/ui/cx";
 import type { MascotPose } from "@/games/types";
 import { formatNumber } from "@/lib/format";
 import { Sonde } from "../art/Sonde";
 import {
+  DIRECTION_SPREAD,
   PINS_PER_QUESTION,
   SCORING,
   TIMING,
   WORLD_VIEW,
+  compassBearing,
   heatColor,
+  hintFor,
   roundFor,
   type Band,
 } from "../config";
@@ -26,7 +36,7 @@ import { HEAT } from "../palette";
 import { SOUNDS, registerSounds } from "../sounds";
 import { strings } from "../strings";
 import { useDistanceUnit } from "../useDistanceUnit";
-import { CategoryTag, PinsLeft } from "./Bits";
+import { CategoryTag, DraftBanner, PinsLeft } from "./Bits";
 import { GlobeView } from "./GlobeView";
 import { Reveal } from "./Reveal";
 import styles from "./world.module.css";
@@ -37,6 +47,8 @@ type RevealStep = "none" | "flying" | "sweep" | "card";
 export interface BoardProps {
   questions: readonly DailyQuestion[];
   title: string;
+  /** The questions are drafts: show the draft banner. */
+  draft?: boolean;
   restore?: readonly SavedMapAnswer[];
   /** After every pin: what to save so a reload can resume. */
   onProgress?(saved: SavedMapAnswer[]): void;
@@ -62,11 +74,28 @@ export function startView(question: Pick<Question, "scope">): Camera {
   ]);
 }
 
+/** Arrows for the 8 directions, beside their letters in the hints. */
+const ARROWS: Record<CompassPoint, string> = {
+  N: "↑",
+  NE: "↗",
+  E: "→",
+  SE: "↘",
+  S: "↓",
+  SW: "↙",
+  W: "←",
+  NW: "↖",
+};
+
+/** Whether a pin is a miss whose hint is the direction (it tells nothing about the distance). */
+const pointsTheWay = (pin: MapPin<Band>) => !pin.perfect && hintFor(pin.attempt) === "direction";
+
 function poseFor(step: RevealStep, pins: readonly MapPin<Band>[], solved: boolean): MascotPose {
   if (step === "card") return solved ? "celebrate" : "point";
   if (step !== "none") return "thinking";
   const last = pins.at(-1);
   if (!last) return "idle";
+  // A direction hint: Sonde points the way, and gives nothing away about how close it was.
+  if (pointsTheWay(last)) return "point";
   if (last.band === "burning" || last.band === "hot") return "correct";
   return last.band === "warm" ? "thinking" : "wrong";
 }
@@ -74,6 +103,7 @@ function poseFor(step: RevealStep, pins: readonly MapPin<Band>[], solved: boolea
 export function Board({
   questions,
   title,
+  draft = false,
   restore,
   onProgress,
   onStart,
@@ -84,7 +114,7 @@ export function Board({
   const unit = useDistanceUnit();
   const globe = useRef<GlobeHandle>(null);
   const nextButton = useRef<HTMLButtonElement>(null);
-  const card = useRef<HTMLDivElement>(null);
+  const hints = useRef<HTMLDivElement>(null);
   const [step, setStep] = useState<RevealStep>("none");
   const [announcement, setAnnouncement] = useState("");
   // When each pin dropped this session started its ring (restored pins draw at once).
@@ -108,7 +138,9 @@ export function Board({
         callbacks.current.onStart?.();
       const key = `${round.id}-${pin.attempt}`;
       if (!game.reducedMotion) setGrownAt((g) => ({ ...g, [key]: performance.now() }));
-      playSound(pin.perfect ? SOUNDS.squeak : SOUNDS.ping(pin.band));
+      playSound(
+        pin.perfect ? SOUNDS.squeak : pointsTheWay(pin) ? SOUNDS.bearing : SOUNDS.ping(pin.band),
+      );
       setAnnouncement(pinAnnouncement(pin, state.pinsLeft));
       callbacks.current.onProgress?.(game.saved());
     },
@@ -147,14 +179,20 @@ export function Board({
   useEffect(() => () => window.clearTimeout(revealTimer.current), []);
 
   function pinAnnouncement(pin: MapPin<Band>, pinsLeft: number): string {
-    return pin.perfect
-      ? strings.announce.bullseye(pin.attempt + 1)
-      : strings.announce.miss(
-          pin.attempt + 1,
-          formatDistance(pin.km, unit),
-          strings.heat[pin.band],
-          strings.pins.left(pinsLeft),
-        );
+    if (pin.perfect) return strings.announce.bullseye(pin.attempt + 1);
+    if (pointsTheWay(pin)) {
+      return strings.announce.direction(
+        pin.attempt + 1,
+        strings.compass[compassPoint(pin.bearing)].name,
+        strings.pins.left(pinsLeft),
+      );
+    }
+    return strings.announce.miss(
+      pin.attempt + 1,
+      formatDistance(pin.km, unit),
+      strings.heat[pin.band],
+      strings.pins.left(pinsLeft),
+    );
   }
 
   /** Shows the card; `before` is read out first (the last pin, when the reveal is instant). */
@@ -187,12 +225,13 @@ export function Board({
     }, wait);
   }
 
-  // The card: bring it into view and hand focus to Next.
+  // The card: show it from its top and hand focus to Next. (Never scrollIntoView: the page is a
+  // fill screen, locked to the screen; only the hints panel scrolls.)
   useEffect(() => {
     if (step !== "card") return;
-    card.current?.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "nearest" });
+    hints.current?.scrollTo({ top: 0 });
     nextButton.current?.focus({ preventScroll: true });
-  }, [step, reducedMotion]);
+  }, [step]);
 
   function drop() {
     const point = globe.current?.aim();
@@ -213,14 +252,32 @@ export function Board({
 
   const scene = useMemo((): GlobeScene => {
     const showTargets = step === "sweep" || step === "card";
+    // Labels help while aiming and through the reveal; under the card the globe is small.
+    const labelled = step !== "card";
     return {
       pins: state.pins.map((pin, i) => ({
         id: `${round.id}-${i}`,
         point: pin.point,
         label: `${i + 1}`,
       })),
+      // The first miss: a wedge towards the answer, as wide as its compass point (never the exact
+      // bearing, which would say more than "north-east").
+      directions: state.pins.filter(pointsTheWay).map((pin) => {
+        const id = `${round.id}-${pin.attempt}`;
+        const startedAt = grownAt[id];
+        const point = compassPoint(pin.bearing);
+        return {
+          id,
+          from: pin.point,
+          bearing: compassBearing(point),
+          spread: DIRECTION_SPREAD,
+          ...(labelled ? { label: strings.compass[point].short } : {}),
+          ...(startedAt !== undefined ? { startedAt } : {}),
+        };
+      }),
+      // Later misses: a ring at the answer's distance.
       rings: state.pins
-        .filter((pin) => !pin.perfect)
+        .filter((pin) => !pin.perfect && !pointsTheWay(pin))
         .map((pin) => {
           const id = `${round.id}-${pin.attempt}`;
           const startedAt = grownAt[id];
@@ -229,10 +286,14 @@ export function Board({
             center: pin.point,
             radiusKm: pin.km,
             color: heatColor(pin.km / round.scopeKm),
-            label: strings.log.miss(
-              formatDistance(pin.km, unit),
-              strings.heat[pin.band].toUpperCase(),
-            ),
+            ...(labelled
+              ? {
+                  label: strings.log.miss(
+                    formatDistance(pin.km, unit),
+                    strings.heat[pin.band].toUpperCase(),
+                  ),
+                }
+              : {}),
             ...(startedAt !== undefined ? { startedAt } : {}),
           };
         }),
@@ -244,7 +305,6 @@ export function Board({
             color: t.official ? HEAT.hot : HEAT.mild,
           }))
         : [],
-      glowCrossings: true,
       ...(showTargets ? { sweep: { key: round.id } } : {}),
     };
   }, [state.pins, round, question, step, grownAt, unit]);
@@ -253,134 +313,154 @@ export function Board({
   const solved = state.answer?.solved ?? false;
 
   return (
-    <div className="flex flex-col gap-3">
-      <header className="flex items-center gap-3">
-        <Sonde pose={poseFor(step, state.pins, solved)} size={48} className="shrink-0" />
-        <div className="flex min-w-0 flex-1 flex-col gap-1">
-          <h1 className={cx(styles.display, "text-2xl")}>{title}</h1>
-          <ol aria-hidden="true" className={cx(styles.mono, "flex gap-2 text-xs")}>
-            {questions.map((q, i) => {
-              const answer = state.answers[i];
-              return (
-                <li
-                  key={q.id}
-                  className={cx(
-                    "rounded-full border px-2 py-0.5",
-                    i === state.index && state.phase !== "finished"
-                      ? "border-game-accent-1 text-game-accent-1"
-                      : "border-[var(--game-grid)]",
-                  )}
-                >
-                  {answer ? formatNumber(answer.score) : `Q${i + 1}`}
-                </li>
-              );
-            })}
-          </ol>
-        </div>
-      </header>
-
-      <section
-        aria-labelledby={`q-${question.id}`}
-        className={cx(styles.panel, "flex flex-col gap-2 p-4")}
-      >
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <CategoryTag question={question} />
+    <FillScreen>
+      <div className={styles.play} data-step={step}>
+        <header className={styles.status}>
+          <Sonde pose={poseFor(step, state.pins, solved)} size={44} className="shrink-0" />
+          <div className="flex min-w-0 flex-1 flex-col gap-1">
+            <h1 className={cx(styles.display, "text-xl")}>{title}</h1>
+            <ol aria-hidden="true" className={cx(styles.mono, "flex gap-2 text-xs")}>
+              {questions.map((q, i) => {
+                const answer = state.answers[i];
+                return (
+                  <li
+                    key={q.id}
+                    className={cx(
+                      "rounded-full border px-2 py-0.5",
+                      i === state.index && state.phase !== "finished"
+                        ? "border-game-accent-1 text-game-accent-1"
+                        : "border-[var(--game-grid)]",
+                    )}
+                  >
+                    {answer ? formatNumber(answer.score) : `Q${i + 1}`}
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
           <PinsLeft
             left={state.phase === "aiming" ? state.pinsLeft : 0}
             total={PINS_PER_QUESTION}
           />
-        </div>
-        <h2 id={`q-${question.id}`} className="text-[1.0625rem] leading-snug font-semibold">
-          <span className="sr-only">{strings.question(state.index + 1, questions.length)}: </span>
-          {question.prompt}
-        </h2>
-      </section>
+        </header>
 
-      <GlobeView
-        globeRef={globeRef}
-        scene={scene}
-        initialView={startView(question)}
-        interactive={aiming}
-        reducedMotion={reducedMotion}
-        onDrop={drop}
-        onSweepEnd={() => {
-          // Only the sweep this board is waiting for (an instant reveal has shown the card already).
-          if (step === "sweep" && state.answer) showCard(state.answer, official.label);
-        }}
-      />
-
-      {state.pins.length > 0 && step !== "card" && (
-        <ol
-          aria-label={strings.log.title}
-          className={cx(styles.mono, "flex flex-col gap-1 text-sm")}
+        <section
+          aria-labelledby={`q-${question.id}`}
+          className={cx(styles.panel, styles.question, "flex flex-col items-start gap-2 px-4 py-3")}
         >
-          {state.pins.map((pin) => (
-            <li key={pin.attempt} className="flex items-center gap-2">
-              <span
-                aria-hidden="true"
-                className={styles.swatch}
-                style={
-                  {
-                    "--swatch": pin.perfect ? HEAT.hot : heatColor(pin.km / round.scopeKm),
-                  } as CSSProperties
-                }
-              />
-              <span className="font-semibold">{strings.pins.label(pin.attempt + 1)}</span>
-              <span>
-                {pin.perfect
-                  ? strings.bullseye
-                  : strings.log.miss(formatDistance(pin.km, unit), strings.heat[pin.band])}
-              </span>
-              <span className={cx(styles.muted, "ml-auto")}>
-                {strings.log.points(formatNumber(pin.points))}
-              </span>
-            </li>
-          ))}
-        </ol>
-      )}
-      {state.pins.length === 0 && step === "none" && (
-        <p className={cx(styles.muted, "text-center text-sm")}>{strings.dropHint}</p>
-      )}
+          <CategoryTag question={question} />
+          <h2 id={`q-${question.id}`} className="text-base leading-snug font-semibold">
+            <span className="sr-only">{strings.question(state.index + 1, questions.length)}: </span>
+            {question.prompt}
+          </h2>
+        </section>
 
-      {step === "card" && state.answer && (
-        <div ref={card}>
-          <Reveal question={question} answer={state.answer} unit={unit} />
+        <GlobeView
+          globeRef={globeRef}
+          scene={scene}
+          initialView={startView(question)}
+          interactive={aiming}
+          reducedMotion={reducedMotion}
+          onDrop={drop}
+          onSweepEnd={() => {
+            // Only the sweep this board is waiting for (an instant reveal has shown the card already).
+            if (step === "sweep" && state.answer) showCard(state.answer, official.label);
+          }}
+          overlay={draft && <DraftBanner className={styles.stageNote} />}
+        />
+
+        <div ref={hints} className={styles.hints}>
+          {step === "card" && state.answer ? (
+            <Reveal question={question} answer={state.answer} unit={unit} />
+          ) : state.pins.length > 0 ? (
+            <ol aria-label={strings.log.title} className={cx(styles.hintStrip, styles.mono)}>
+              {state.pins.map((pin) => {
+                const point = compassPoint(pin.bearing);
+                return (
+                  <li key={pin.attempt} className={styles.hintChip}>
+                    <span
+                      aria-hidden="true"
+                      className={styles.pinBadge}
+                      style={
+                        {
+                          "--swatch": pin.perfect
+                            ? HEAT.hot
+                            : pointsTheWay(pin)
+                              ? "var(--game-accent-1)"
+                              : heatColor(pin.km / round.scopeKm),
+                        } as CSSProperties
+                      }
+                    >
+                      {pin.attempt + 1}
+                    </span>
+                    <span className="sr-only">{strings.pins.label(pin.attempt + 1)}: </span>
+                    {pin.perfect ? (
+                      <span>{strings.bullseye}</span>
+                    ) : pointsTheWay(pin) ? (
+                      <>
+                        <span aria-hidden="true">
+                          {ARROWS[point]} {strings.compass[point].short}
+                        </span>
+                        <span className="sr-only">
+                          {strings.log.direction(strings.compass[point].name)}
+                        </span>
+                      </>
+                    ) : (
+                      <span>
+                        {strings.log.miss(formatDistance(pin.km, unit), strings.heat[pin.band])}
+                      </span>
+                    )}
+                  </li>
+                );
+              })}
+            </ol>
+          ) : (
+            <p
+              className={cx(
+                styles.hintStrip,
+                styles.muted,
+                "justify-center text-center text-[0.8125rem] leading-tight",
+              )}
+            >
+              {strings.dropHint}
+            </p>
+          )}
         </div>
-      )}
 
-      <p aria-live="polite" className="sr-only">
-        {announcement}
-      </p>
+        <div className={styles.action}>
+          {step === "card" ? (
+            <button
+              ref={nextButton}
+              type="button"
+              onClick={next}
+              className={cx(styles.bigButton, styles.primary)}
+            >
+              {state.isLast ? strings.finish : strings.next}
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={drop}
+              disabled={!aiming}
+              aria-keyshortcuts="Enter"
+              className={cx(styles.bigButton, styles.primary)}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M12 21s-6.5-6.2-6.5-11.2a6.5 6.5 0 0 1 13 0C18.5 14.8 12 21 12 21Z"
+                  fill="currentColor"
+                />
+                <circle cx="12" cy="10" r="2.4" fill="var(--game-accent-1)" />
+              </svg>
+              {strings.drop}
+            </button>
+          )}
+        </div>
 
-      <div className={styles.actionBar}>
-        {step === "card" ? (
-          <button
-            ref={nextButton}
-            type="button"
-            onClick={next}
-            className={cx(styles.bigButton, styles.primary)}
-          >
-            {state.isLast ? strings.finish : strings.next}
-          </button>
-        ) : (
-          <button
-            type="button"
-            onClick={drop}
-            disabled={!aiming}
-            aria-keyshortcuts="Enter"
-            className={cx(styles.bigButton, styles.primary)}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                d="M12 21s-6.5-6.2-6.5-11.2a6.5 6.5 0 0 1 13 0C18.5 14.8 12 21 12 21Z"
-                fill="currentColor"
-              />
-              <circle cx="12" cy="10" r="2.4" fill="var(--game-accent-1)" />
-            </svg>
-            {strings.drop}
-          </button>
-        )}
+        <p aria-live="polite" className="sr-only">
+          {announcement}
+        </p>
       </div>
-    </div>
+    </FillScreen>
   );
 }

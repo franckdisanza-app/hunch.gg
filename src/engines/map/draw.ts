@@ -1,13 +1,23 @@
-import { geoDistance, geoGraticule10, geoInterpolate, geoPath, type GeoProjection } from "d3-geo";
-import type { LineString } from "geojson";
-import type { Atlas } from "./atlas";
-import { easeOut, globeRadius, isVisible, type Camera } from "./camera";
-import { capBox, clipPolygon } from "./clip";
 import {
+  geoArea,
+  geoDistance,
+  geoGraticule10,
+  geoInterpolate,
+  geoPath,
+  type GeoProjection,
+} from "d3-geo";
+import type { LineString, Polygon } from "geojson";
+import type { Atlas } from "./atlas";
+import { easeOut, isVisible, viewAngle, type Camera } from "./camera";
+import { capBox, clipPolygon } from "./clip";
+import { MAJOR_ROAD_MAX_ZOOM, type Place, type RoadLine } from "./overlays";
+import {
+  EARTH_RADIUS_KM,
   circleIntersections,
   geodesicCircle,
   kmToDegrees,
   normalizeLon,
+  rhumbLine,
   toLonLat,
   type GeoPoint,
 } from "./geo";
@@ -32,6 +42,10 @@ export interface GlobeColors {
   pinInk: string;
   labelInk: string;
   labelBg: string;
+  /** Roads (default: the border colour). */
+  road?: string;
+  /** City and town dots (default: the label ink). */
+  place?: string;
 }
 
 export interface GlobeRing {
@@ -61,6 +75,26 @@ export interface GlobeBlip {
   label?: string;
 }
 
+/**
+ * A direction hint: a wedge fanning out from a point across `spread` degrees of map directions
+ * (rhumb lines, see geo.ts) as far as they go (a pole, or half the world east or west), fading with
+ * distance, with an arrow down its middle.
+ */
+export interface GlobeDirection {
+  id: string;
+  from: GeoPoint;
+  /** The wedge's middle: compass degrees, clockwise from north. */
+  bearing: number;
+  /** The wedge's width in degrees, e.g. 45 for one of 8 compass points. */
+  spread: number;
+  /** Defaults to the sweep colour. */
+  color?: string;
+  /** Drawn past the arrow's tip, e.g. "NE". */
+  label?: string;
+  /** performance.now() when the wedge started opening; unset: drawn open. */
+  startedAt?: number;
+}
+
 export interface GlobeArc {
   id: string;
   from: GeoPoint;
@@ -75,6 +109,7 @@ export interface GlobeScene {
   pins: readonly GlobePin[];
   blips: readonly GlobeBlip[];
   arcs?: readonly GlobeArc[];
+  directions?: readonly GlobeDirection[];
   /** Glow where fully grown rings cross. */
   glowCrossings?: boolean;
   /**
@@ -94,11 +129,23 @@ export interface SweepState {
   startedAt: number;
 }
 
+/** Margins (CSS px) along the edges of the view where labels never go, e.g. under overlays. */
+export interface LabelInsets {
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
+}
+
+export const DEFAULT_LABEL_INSETS: LabelInsets = { top: 28, right: 4, bottom: 4, left: 4 };
+
 export interface FrameInput {
   ctx: CanvasRenderingContext2D;
   width: number;
   height: number;
   dpr: number;
+  /** Where labels keep clear of the edges (default DEFAULT_LABEL_INSETS). */
+  labelInsets?: LabelInsets;
   projection: GeoProjection;
   camera: Camera;
   atlas: Atlas | null;
@@ -110,6 +157,8 @@ export interface FrameInput {
   sweep: SweepState | null;
   /** Blip id → performance.now() when it lit up. */
   lit: ReadonlyMap<string, number>;
+  /** Cities and roads for this view (overlays.ts), most important places first. */
+  overlays?: { roads: readonly RoadLine[]; places: readonly Place[] };
 }
 
 /**
@@ -127,6 +176,7 @@ export function showsOnlyBackdrop(
     scene.pins.length === 0 &&
     scene.blips.length === 0 &&
     !scene.arcs?.length &&
+    !scene.directions?.length &&
     !scene.sweep;
   const near = (a: number, b: number) => Math.abs(a - b) < 1e-6;
   return (
@@ -191,8 +241,13 @@ const around = ([x, y]: [number, number], r: number): Rect => ({
  * Draws each label at its first anchor that overlaps neither a label already drawn nor a marker
  * (pins, blips, glows), or skips it.
  */
-function placeLabels(input: FrameInput, labels: readonly Label[], obstacles: readonly Rect[]) {
+function placeLabels(
+  input: FrameInput,
+  labels: readonly Label[],
+  obstacles: readonly Rect[],
+): Rect[] {
   const { ctx, font, width, height } = input;
+  const insets = input.labelInsets ?? DEFAULT_LABEL_INSETS;
   ctx.font = `600 11px ${font}`;
   const placed: Rect[] = [...obstacles];
   for (const label of labels) {
@@ -200,8 +255,8 @@ function placeLabels(input: FrameInput, labels: readonly Label[], obstacles: rea
     const h = 18;
     for (const [x, y] of label.anchors) {
       const rect = {
-        left: Math.min(Math.max(4, x - w / 2), width - w - 4),
-        top: Math.min(Math.max(4, y - h - 6), height - h - 4),
+        left: Math.min(Math.max(insets.left, x - w / 2), width - w - insets.right),
+        top: Math.min(Math.max(insets.top, y - h - 6), height - h - insets.bottom),
         w,
         h,
       };
@@ -210,6 +265,64 @@ function placeLabels(input: FrameInput, labels: readonly Label[], obstacles: rea
       drawLabel(input, label.text, rect, label.color);
       break;
     }
+  }
+  return placed;
+}
+
+/** At most this many places get a label in one frame. */
+const MAX_PLACES = 60;
+
+/**
+ * Cities and towns: a dot and a name beside it (right, else left), most important first, each only
+ * where it overlaps nothing already on the globe (the game's labels and markers, the crosshair,
+ * other places).
+ */
+function drawPlaces(input: FrameInput, places: readonly Place[], taken: Rect[]) {
+  const { ctx, font, colors, width, height } = input;
+  const insets = input.labelInsets ?? DEFAULT_LABEL_INSETS;
+  let drawn = 0;
+  ctx.textBaseline = "middle";
+  ctx.lineJoin = "round";
+  for (const place of places) {
+    if (drawn >= MAX_PLACES) break;
+    const xy = project(input, place.point);
+    if (!xy) continue;
+    const [x, y] = xy;
+    if (x < insets.left || x > width - insets.right) continue;
+    if (y < insets.top || y > height - insets.bottom) continue;
+    ctx.font = `${place.capital ? 700 : 500} 11px ${font}`;
+    const w = ctx.measureText(place.name).width + 2;
+    const h = 14;
+    const dot = around(xy, 4);
+    const sides = [
+      { left: x + 6, top: y - h / 2, w, h },
+      { left: x - 6 - w, top: y - h / 2, w, h },
+    ];
+    const rect = sides.find(
+      (r) =>
+        r.left >= insets.left &&
+        r.left + r.w <= width - insets.right &&
+        !taken.some((other) => overlaps(r, other) || overlaps(dot, other)),
+    );
+    if (!rect) continue;
+    taken.push(rect, dot);
+    drawn++;
+
+    ctx.beginPath();
+    if (place.capital) ctx.rect(x - 3, y - 3, 6, 6);
+    else ctx.arc(x, y, 2.4, 0, Math.PI * 2);
+    ctx.fillStyle = colors.place ?? colors.labelInk;
+    ctx.fill();
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = colors.labelBg;
+    ctx.stroke();
+
+    ctx.textAlign = "left";
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = colors.labelBg;
+    ctx.strokeText(place.name, rect.left + 1, y + 0.5);
+    ctx.fillStyle = colors.labelInk;
+    ctx.fillText(place.name, rect.left + 1, y + 0.5);
   }
 }
 
@@ -230,6 +343,7 @@ function drawLabel(input: FrameInput, text: string, rect: Rect, color: string) {
 
 /** Where a ring's label may go: points of the ring in view and in front, highest first. */
 function labelAnchors(input: FrameInput, line: LineString): [number, number][] {
+  const insets = input.labelInsets ?? DEFAULT_LABEL_INSETS;
   const anchors: [number, number][] = [];
   for (const coordinate of line.coordinates) {
     const point = { lon: coordinate[0]!, lat: coordinate[1]! };
@@ -237,7 +351,7 @@ function labelAnchors(input: FrameInput, line: LineString): [number, number][] {
     const xy = input.projection(toLonLat(point));
     if (!xy) continue;
     const [x, y] = xy;
-    if (x < 0 || x > input.width || y < 28 || y > input.height) continue;
+    if (x < 0 || x > input.width || y < insets.top || y > input.height - insets.bottom) continue;
     anchors.push([x, y]);
   }
   return anchors.sort((a, b) => a[1] - b[1]);
@@ -246,6 +360,130 @@ function labelAnchors(input: FrameInput, line: LineString): [number, number][] {
 function project(input: FrameInput, point: GeoPoint): [number, number] | null {
   if (!isVisible(input.camera, point)) return null;
   return input.projection(toLonLat(point)) ?? null;
+}
+
+/** Rhumb lines across a wedge, and the step along them. */
+const WEDGE_LINES = 12;
+const WEDGE_STEP_KM = 250;
+/** Far enough for any rhumb line to reach a pole or half the world. */
+const WEDGE_REACH_KM = 4 * Math.PI * EARTH_RADIUS_KM;
+/** The arrow down a wedge's middle, CSS px. */
+const ARROW_PX = 58;
+
+/**
+ * A direction's wedge as a polygon: out along its first edge, across the ends of the rhumb lines
+ * in between, and back along the other edge. Never more than a hemisphere, so d3 fills the inside.
+ */
+export function wedgePolygon(
+  direction: Pick<GlobeDirection, "from" | "bearing" | "spread">,
+): Polygon {
+  const { from, bearing, spread } = direction;
+  const lines = Array.from({ length: WEDGE_LINES + 1 }, (_, k) =>
+    rhumbLine(
+      from,
+      bearing - spread / 2 + (spread * k) / WEDGE_LINES,
+      WEDGE_REACH_KM,
+      WEDGE_STEP_KM,
+    ),
+  );
+  const ring = [
+    ...lines[0]!,
+    ...lines.slice(1, -1).map((line) => line.at(-1)!),
+    ...[...lines.at(-1)!].reverse(),
+  ].map(toLonLat);
+  const polygon: Polygon = { type: "Polygon", coordinates: [ring] };
+  // d3 fills the smaller side of a ring wound clockwise; the other winding means the rest.
+  return geoArea(polygon) > 2 * Math.PI
+    ? { type: "Polygon", coordinates: [[...ring].reverse()] }
+    : polygon;
+}
+
+/** Wedges only change with their hint: computed once, by id. */
+const wedges = new Map<string, { key: string; polygon: Polygon }>();
+
+function wedgeFor(direction: GlobeDirection): Polygon {
+  const key = `${direction.from.lat},${direction.from.lon},${direction.bearing},${direction.spread}`;
+  const cached = wedges.get(direction.id);
+  if (cached?.key === key) return cached.polygon;
+  const polygon = wedgePolygon(direction);
+  wedges.set(direction.id, { key, polygon });
+  return polygon;
+}
+
+/**
+ * Paints a direction hint: the wedge, fading with distance from its point and opening out from it
+ * over RING_GROW_MS, then the arrow and its label. Returns true while it opens.
+ */
+function drawDirection(
+  input: FrameInput,
+  path: ReturnType<typeof geoPath>,
+  direction: GlobeDirection,
+  labels: Label[],
+): boolean {
+  const { ctx, projection, colors, now } = input;
+  const color = direction.color ?? colors.sweep;
+  const t = progress(now, direction.startedAt, RING_GROW_MS);
+  const origin = project(input, direction.from);
+  const globe = projection.scale();
+  const [cx, cy] = origin ?? projection.translate();
+  // How far out it fades: most of the globe, never much past the view when zoomed in.
+  const reach = Math.min(globe * 1.8, Math.hypot(input.width, input.height) * 0.9);
+
+  ctx.save();
+  if (t < 1) {
+    // Opening: only what a circle growing from the point has reached so far.
+    ctx.beginPath();
+    ctx.arc(cx, cy, Math.max(1, easeOut(t) * reach * 1.2), 0, Math.PI * 2);
+    ctx.clip();
+  }
+  const fade = ctx.createRadialGradient(cx, cy, 0, cx, cy, reach);
+  fade.addColorStop(0, color);
+  fade.addColorStop(0.45, color);
+  fade.addColorStop(1, "transparent");
+  ctx.beginPath();
+  path(wedgeFor(direction));
+  ctx.globalAlpha = 0.24;
+  ctx.fillStyle = fade;
+  ctx.fill();
+  ctx.globalAlpha = 0.7;
+  ctx.lineWidth = 1.2;
+  ctx.strokeStyle = fade;
+  ctx.stroke();
+  ctx.restore();
+
+  // The arrow: a short stretch of the middle rhumb line, from the point.
+  if (origin && t >= 1) {
+    const km = (ARROW_PX * EARTH_RADIUS_KM) / globe;
+    const shaft = rhumbLine(direction.from, direction.bearing, km, km / 8)
+      .map((point) => project(input, point))
+      .filter((xy): xy is [number, number] => xy !== null);
+    const tip = shaft.at(-1);
+    const back = shaft.at(-2);
+    if (tip && back && shaft.length > 2) {
+      ctx.beginPath();
+      shaft.forEach(([x, y], i) => (i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)));
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = color;
+      ctx.stroke();
+      const angle = Math.atan2(tip[1] - back[1], tip[0] - back[0]);
+      ctx.beginPath();
+      ctx.moveTo(tip[0] + Math.cos(angle) * 6, tip[1] + Math.sin(angle) * 6);
+      ctx.lineTo(tip[0] + Math.cos(angle + 2.4) * 9, tip[1] + Math.sin(angle + 2.4) * 9);
+      ctx.lineTo(tip[0] + Math.cos(angle - 2.4) * 9, tip[1] + Math.sin(angle - 2.4) * 9);
+      ctx.closePath();
+      ctx.fillStyle = color;
+      ctx.fill();
+      if (direction.label) {
+        // Centred past the tip (placeLabels puts a label's box above its anchor).
+        const x = tip[0] + Math.cos(angle) * 26;
+        const y = tip[1] + Math.sin(angle) * 26 + 15;
+        labels.unshift({ text: direction.label, color, anchors: [[x, y]] });
+      }
+    }
+  }
+  return t < 1;
 }
 
 /** Paints one frame. Returns true while something is still moving (another frame is needed). */
@@ -268,17 +506,16 @@ export function drawFrame(input: FrameInput): boolean {
   ctx.strokeStyle = colors.graticule;
   ctx.stroke();
 
+  // Only what can show: in front of the horizon and, zoomed in, inside the view.
+  const visible = viewAngle(width, height, input.camera.zoom);
+  const center = toLonLat(input.camera.center);
+  const inView = (part: { center: [number, number]; radius: number }) =>
+    geoDistance(part.center, center) - part.radius < visible;
+
   if (atlas) {
-    // Only what can show: in front of the horizon and, zoomed in, inside the view. Zoomed in,
-    // big polygons (continents) are first cut to the box around the view, so d3 projects only
-    // their visible stretch.
-    const { width: w, height: h, camera } = input;
-    const reach = Math.hypot(w, h) / 2 / globeRadius(w, h, camera.zoom);
-    const visible = (reach >= 1 ? Math.PI / 2 : Math.asin(reach)) + 0.02;
-    const center = toLonLat(camera.center);
+    // Zoomed in, big polygons (continents) are first cut to the box around the view, so d3
+    // projects only their visible stretch.
     const box = visible < 0.5 ? capBox(center, visible) : null;
-    const inView = (part: { center: [number, number]; radius: number }) =>
-      geoDistance(part.center, center) - part.radius < visible;
     ctx.beginPath();
     for (const part of atlas.parts) {
       if (!inView(part)) continue;
@@ -302,16 +539,37 @@ export function drawFrame(input: FrameInput): boolean {
     ctx.stroke();
   }
 
+  // Roads: the major ones a little bolder.
+  const roads = input.overlays?.roads ?? [];
+  if (roads.length) {
+    for (const major of [false, true]) {
+      ctx.beginPath();
+      for (const road of roads) {
+        if (road.minZoom <= MAJOR_ROAD_MAX_ZOOM === major && inView(road)) path(road.line);
+      }
+      ctx.lineWidth = major ? 1.3 : 0.8;
+      ctx.lineCap = "round";
+      ctx.strokeStyle = colors.road ?? colors.border;
+      ctx.stroke();
+    }
+  }
+
   ctx.beginPath();
   path(sphere);
   ctx.lineWidth = 1.2;
   ctx.strokeStyle = colors.rim;
   ctx.stroke();
 
-  // Rings grow from their pin to the target's distance, then freeze.
-  const grown: { center: GeoPoint; radiusKm: number }[] = [];
   const labels: Label[] = [];
   const obstacles: Rect[] = [];
+
+  // Direction hints, under the rings.
+  for (const direction of scene.directions ?? []) {
+    if (drawDirection(input, path, direction, labels)) animating = true;
+  }
+
+  // Rings grow from their pin to the target's distance, then freeze.
+  const grown: { center: GeoPoint; radiusKm: number }[] = [];
   for (const ring of scene.rings) {
     const t = progress(now, ring.startedAt, RING_GROW_MS);
     if (t < 1) animating = true;
@@ -471,7 +729,10 @@ export function drawFrame(input: FrameInput): boolean {
     }
   }
 
-  placeLabels(input, labels, obstacles);
+  const taken = placeLabels(input, labels, obstacles);
+  // Places keep clear of everything above, and of the crosshair in the middle.
+  taken.push(around([width / 2, height / 2], 26));
+  drawPlaces(input, input.overlays?.places ?? [], taken);
   return animating;
 }
 

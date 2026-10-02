@@ -5,9 +5,9 @@ import { strings } from "../strings";
 import styles from "./world.module.css";
 
 /** Shown whenever the game serves draft questions (sample: true). */
-export function DraftBanner() {
+export function DraftBanner({ className }: { className?: string }) {
   return (
-    <p role="note" className={styles.draftBanner}>
+    <p role="note" className={cx(styles.draftBanner, className)}>
       {strings.draftBanner}
     </p>
   );
@@ -29,7 +29,7 @@ export function CategoryTag({ question }: { question: Pick<Question, "category" 
 /** Pins left as three dots (filled = still to drop), with the count for screen readers. */
 export function PinsLeft({ left, total }: { left: number; total: number }) {
   return (
-    <span className="inline-flex items-center gap-2">
+    <span className="inline-flex shrink-0 items-center gap-2">
       <span aria-hidden="true" className="flex gap-1">
         {Array.from({ length: total }, (_, i) => (
           <span

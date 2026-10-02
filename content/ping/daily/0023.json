@@ -2,84 +2,79 @@
   "puzzle": 23,
   "questions": [
     {
-      "id": "sample-10",
-      "category": "rain",
-      "prompt": "Sample 10 (fake data): where is the made-up wettest spot? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up wettest spot of sample 10?",
+      "id": "cold-lowest-temperature",
+      "category": "cold",
+      "prompt": "Where was the lowest air temperature ever recorded on Earth (WMO)?",
+      "teaser": "Where was the coldest temperature ever recorded?",
       "scope": { "level": "world", "name": "the world" },
       "targets": [
         {
-          "lat": 36.5151,
-          "lon": 106.3954,
-          "label": "Fake place 10",
+          "lat": -78.4642,
+          "lon": 106.8658,
+          "label": "Vostok Station, East Antarctica",
           "official": true,
-          "value": 94.2,
-          "unit": "fake units",
-          "date": "2026-09"
+          "value": -89.2,
+          "unit": "°C",
+          "date": "1983-07-21"
         }
       ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-10",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
+      "authority": "World Meteorological Organization",
+      "turnsOut": "Vostok Station, high on the East Antarctic ice sheet: −89.2 °C (−128.6 °F) on 21 July 1983. Satellites have since found snow surfaces nearby at around −98 °C, but that is the ground, not the air the record is about.",
+      "sourceTitle": "WMO Weather and Climate Extremes Archive: records table (31 July 2025)",
+      "sourceUrl": "https://wmo.int/files/records-of-weather-and-climate-extremes-table",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
       "sample": true,
-      "surface": "land"
+      "surface": "antarctica"
     },
     {
-      "id": "sample-05",
+      "id": "geography-lowest-land",
       "category": "geography",
-      "prompt": "Sample 05 (fake data): where in Fake Continent 05 is the made-up landmark? A random spot, placed to test Ping.",
-      "teaser": "Where is the made-up landmark of sample 05?",
-      "scope": {
-        "level": "continent",
-        "name": "Fake Continent 05",
-        "bbox": [19.8368, 21.7565, 69.8368, 57.7565]
-      },
+      "prompt": "Where is the lowest land on Earth that is not under water or ice?",
+      "teaser": "Where is the lowest dry land on Earth?",
+      "scope": { "level": "world", "name": "the world" },
       "targets": [
         {
-          "lat": 34.6926,
-          "lon": 48.4029,
-          "label": "Fake place 05",
+          "lat": 31.5,
+          "lon": 35.5,
+          "label": "The shores of the Dead Sea",
           "official": true,
-          "value": 91.3,
-          "unit": "fake units",
-          "date": "2026-09"
+          "value": -441.33,
+          "unit": "m (lake level, vs sea level)",
+          "date": "2026-08-31"
         }
       ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-05",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
+      "authority": "Hydrological Service, Israel Water Authority",
+      "turnsOut": "The shores of the Dead Sea: on 31 August 2026 the lake stood 441.33 m below sea level. It drops about a metre a year as the Jordan and the Yarmouk are dammed upstream and its water is pumped away; in 1900 it stood at 392 m below.",
+      "sourceTitle": "Dead Sea level since 1976 (Israel Water Authority, data.gov.il)",
+      "sourceUrl": "https://data.gov.il/he/datasets/water_authority/https-www-data-gov-il-dataset-683",
+      "checkedOn": "2026-10-02",
+      "licence": "Open government data; fact, own wording",
       "sample": true,
       "surface": "land"
     },
     {
-      "id": "sample-15",
-      "category": "heat",
-      "prompt": "Sample 15 (fake data): where is the made-up hottest spot? A random spot, placed by a script to test how Ping lays out a long question on a small phone screen without scrolling.",
-      "teaser": "Where is the made-up hottest spot of sample 15?",
+      "id": "rain-wettest-average",
+      "category": "rain",
+      "prompt": "Where is the highest average annual rainfall in the WMO's records?",
+      "teaser": "Where does the most rain fall in a year, on average?",
       "scope": { "level": "world", "name": "the world" },
       "targets": [
         {
-          "lat": -3.5524,
-          "lon": 35.6397,
-          "label": "Fake place 15",
+          "lat": 25.3,
+          "lon": 91.5833,
+          "label": "Mawsynram, Meghalaya, India",
           "official": true,
-          "value": 94.5,
-          "unit": "fake units",
-          "date": "2026-09"
+          "value": 11872,
+          "unit": "mm a year (average)"
         }
       ],
-      "authority": "Fake Weather Office (sample)",
-      "turnsOut": "this is a random sample point, placed by a script to test Ping. It is not a real record.",
-      "sourceTitle": "Sample Source (fake)",
-      "sourceUrl": "https://example.test/ping/sample-15",
-      "checkedOn": "2026-09-30",
-      "licence": "Sample data, not a real fact",
+      "authority": "World Meteorological Organization",
+      "turnsOut": "Mawsynram, in the Khasi Hills of north-east India: 11,872 mm a year, averaged over 38 years. The WMO keeps this record by region, and Asia's is the highest. Neighbouring Cherrapunji holds the 12-month record: 26,470 mm from August 1860 to July 1861.",
+      "sourceTitle": "WMO Weather and Climate Extremes Archive: records table (31 July 2025)",
+      "sourceUrl": "https://wmo.int/files/records-of-weather-and-climate-extremes-table",
+      "checkedOn": "2026-10-02",
+      "licence": "Fact, not copyrightable; own wording",
       "sample": true,
       "surface": "land"
     }

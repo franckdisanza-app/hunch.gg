@@ -27,6 +27,7 @@ Keep this file short and current. Details live in `docs/`.
 | `pnpm db:start` / `db:reset` / `db:types`                                       | Local Supabase (needs Docker), reset with seed, regenerate types.                                |
 | `pnpm sticker-shock:build` (and `:proofs`, `:open-prices`, `:accuracy`, `:art`) | Sticker Shock's data pipeline: `docs/games/sticker-shock/`.                                      |
 | `pnpm ping:build` (and `:sample`, `:art`, `:furthest`, `:difficulty`)           | Ping's dailies and tools: `docs/games/ping/` (content guide included).                           |
+| `pnpm map:data`                                                                 | The globe's cities and roads (Natural Earth) → `public/map/v1/`, fetched only when zoomed in.    |
 
 Local crowd API without Docker: `CROWD_STORE=memory` in `.env.local`.
 
@@ -35,6 +36,7 @@ Local crowd API without Docker: `CROWD_STORE=memory` in `.env.local`.
 ```
 src/app/            routes: shelf, about, privacy, dev/, (games)/<slug>/, api/
 src/frame/          the shared chrome: GameShell, TopBar, sheets, ResultsScreen, RevealCard, ui/;
+                    FillScreen (a play screen that fills the screen, the page never scrolls);
                     game plumbing: useJson (+ early prefetch), prefs, game-route
 src/games/          types.ts (GameDefinition), registry.ts, content.ts, <slug>/ per game
 src/engines/        shared game mechanics: choice/ (Sticker Shock; next Tiptoe, Coined, Chimp),
@@ -43,7 +45,7 @@ src/lib/            daily, storage, share, sound, format, analytics/, crowd/, co
 src/styles/         tokens.css (frame tokens, light/dark)
 content/<slug>/     daily/0001.json … (read at request time, never imported)
 supabase/           config.toml, migrations/, seed.sql (fake data only)
-scripts/            new-game, validate-content, csv-to-json, check-bundle-size
+scripts/            new-game, validate-content, csv-to-json, check-bundle-size, map/, <game>/
 tests/              e2e/ (Playwright), unit/ (setup, SQL tests)
 docs/               ARCHITECTURE, ADDING_A_GAME, DEPLOY, games/<slug>.md
 ```
@@ -83,13 +85,17 @@ docs/               ARCHITECTURE, ADDING_A_GAME, DEPLOY, games/<slug>.md
   (`scopeSizeKm`): a pin inside the perfect radius scores `maxPoints` on any attempt, a miss
   `maxPoints · e^(−d / (decay × scope))` × its attempt weight, bands by fraction of the scope;
   `startMap` / `dropPin` / `nextRound` are pure and resumable (`saveMap`); `useMapGame` adds
-  callbacks and focus. `Globe` (lazy-load it: d3-geo + world-atlas never reach the shelf) is an
-  orthographic canvas globe with a fixed crosshair, drag with inertia, pinch, wheel, arrows,
-  +/− and Enter, rings, pins, target blips, arcs, a radar sweep and `flyTo`; colours may be
-  `var(--game-…)`; screen readers hear the coordinates and country under the crosshair; jump
-  cuts under reduced motion; a `backdrop` picture of the opening view spares the first draw, and
-  the 1:50m shapes wait for the player's first move. `geo.ts`: great-circle distance, geodesic circles, circle
-  crossings, antimeridian-safe boxes, km/mi. `/dev/globe` shows it with a fake target.
+  callbacks and focus; each pin carries its distance and map `bearing` to the nearest target.
+  `Globe` (lazy-load it: d3-geo + world-atlas never reach the shelf) is an orthographic canvas
+  globe with a fixed crosshair, drag with inertia, pinch, wheel, arrows, +/−, `zoomBy()` and
+  Enter, rings, direction wedges, pins, target blips, arcs, a radar sweep and `flyTo`; cities and
+  roads appear as the player zooms in (`overlays.ts`, files from `pnpm map:data`, each fetched
+  when a view needs it); colours may be `var(--game-…)`; `labelInsets` keep labels off the game's
+  overlays; screen readers hear the coordinates, country and nearest place under the crosshair;
+  jump cuts under reduced motion; a `backdrop` picture of the opening view spares the first draw,
+  and the 1:50m shapes and the overlays wait for the player's first move. `geo.ts`: great-circle
+  distance, geodesic circles, circle crossings, rhumb-line bearings and 8 compass points (map
+  directions), antimeridian-safe boxes, km/mi. `/dev/globe` shows it with a fake target.
 - **Schemas:** Zod everywhere (content, API payloads, stored state), always `zod/mini`
   (`import * as z from "zod/mini"`). Classic `zod` is banned by lint: it adds ~90 KB gzipped to any
   browser bundle it touches.
@@ -128,9 +134,10 @@ docs/               ARCHITECTURE, ADDING_A_GAME, DEPLOY, games/<slug>.md
 ## Games
 
 Sticker Shock is `live` on sample data with a placeholder `launchDate` (real prices and date to
-come: `docs/games/sticker-shock/data-guide.md`). Ping is `hidden`, fully built on 20 fake sample
-questions with a placeholder `launchDate` (real questions to come:
-`docs/games/ping/content-guide.md`). The others are `hidden`, with no code or content.
+come: `docs/games/sticker-shock/data-guide.md`). Ping is `live` with a placeholder `launchDate`,
+on 10 real records that stay drafts (`sample: true`) until verified (`docs/games/ping/drafts.md`;
+more questions: `docs/games/ping/content-guide.md`). The others are `hidden`, with no code or
+content.
 
 | slug          | Name          | Engine   | Crowd                        | Tagline                                                        |
 | ------------- | ------------- | -------- | ---------------------------- | -------------------------------------------------------------- |
