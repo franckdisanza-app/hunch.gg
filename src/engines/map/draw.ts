@@ -94,11 +94,23 @@ export interface SweepState {
   startedAt: number;
 }
 
+/** Margins (CSS px) along the edges of the view where labels never go, e.g. under overlays. */
+export interface LabelInsets {
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
+}
+
+export const DEFAULT_LABEL_INSETS: LabelInsets = { top: 28, right: 4, bottom: 4, left: 4 };
+
 export interface FrameInput {
   ctx: CanvasRenderingContext2D;
   width: number;
   height: number;
   dpr: number;
+  /** Where labels keep clear of the edges (default DEFAULT_LABEL_INSETS). */
+  labelInsets?: LabelInsets;
   projection: GeoProjection;
   camera: Camera;
   atlas: Atlas | null;
@@ -193,6 +205,7 @@ const around = ([x, y]: [number, number], r: number): Rect => ({
  */
 function placeLabels(input: FrameInput, labels: readonly Label[], obstacles: readonly Rect[]) {
   const { ctx, font, width, height } = input;
+  const insets = input.labelInsets ?? DEFAULT_LABEL_INSETS;
   ctx.font = `600 11px ${font}`;
   const placed: Rect[] = [...obstacles];
   for (const label of labels) {
@@ -200,8 +213,8 @@ function placeLabels(input: FrameInput, labels: readonly Label[], obstacles: rea
     const h = 18;
     for (const [x, y] of label.anchors) {
       const rect = {
-        left: Math.min(Math.max(4, x - w / 2), width - w - 4),
-        top: Math.min(Math.max(4, y - h - 6), height - h - 4),
+        left: Math.min(Math.max(insets.left, x - w / 2), width - w - insets.right),
+        top: Math.min(Math.max(insets.top, y - h - 6), height - h - insets.bottom),
         w,
         h,
       };
@@ -230,6 +243,7 @@ function drawLabel(input: FrameInput, text: string, rect: Rect, color: string) {
 
 /** Where a ring's label may go: points of the ring in view and in front, highest first. */
 function labelAnchors(input: FrameInput, line: LineString): [number, number][] {
+  const insets = input.labelInsets ?? DEFAULT_LABEL_INSETS;
   const anchors: [number, number][] = [];
   for (const coordinate of line.coordinates) {
     const point = { lon: coordinate[0]!, lat: coordinate[1]! };
@@ -237,7 +251,7 @@ function labelAnchors(input: FrameInput, line: LineString): [number, number][] {
     const xy = input.projection(toLonLat(point));
     if (!xy) continue;
     const [x, y] = xy;
-    if (x < 0 || x > input.width || y < 28 || y > input.height) continue;
+    if (x < 0 || x > input.width || y < insets.top || y > input.height - insets.bottom) continue;
     anchors.push([x, y]);
   }
   return anchors.sort((a, b) => a[1] - b[1]);

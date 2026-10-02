@@ -88,36 +88,38 @@ export function DailyGame() {
 
   const today = day.data;
   const entry = player.history[String(puzzle)];
-  return (
-    <div className="flex flex-col gap-4">
-      {today.sample && <DraftBanner />}
-      {entry?.finishedAt ? (
+  if (entry?.finishedAt) {
+    return (
+      <div className="flex flex-col gap-4">
+        {today.sample && <DraftBanner />}
         <DailyResults day={today} saved={savedPins(entry.answers)} celebrate={justFinished} />
-      ) : (
-        <Board
-          key={today.puzzle}
-          questions={today.questions}
-          title={strings.heading(today.puzzle)}
-          restore={savedPins(entry?.answers)}
-          onStart={() => player.start()}
-          onProgress={(saved) => player.saveProgress(saved)}
-          onQuestionDone={(question, answer) =>
-            // Fire and forget: the first pin's distance, for difficulty tuning.
-            sendGuess({
-              game: GAME_SLUG,
-              puzzle: today.puzzle,
-              itemId: question.id,
-              value: Math.round(answer.pins[0]!.km * 10) / 10,
-            })
-          }
-          onFinish={(answers, saved) => {
-            player.complete({ answers: saved, score: scoreOf(answers) });
-            setJustFinished(true);
-            window.scrollTo({ top: 0 });
-          }}
-        />
-      )}
-    </div>
+      </div>
+    );
+  }
+  return (
+    <Board
+      key={today.puzzle}
+      questions={today.questions}
+      title={strings.heading(today.puzzle)}
+      draft={today.sample}
+      restore={savedPins(entry?.answers)}
+      onStart={() => player.start()}
+      onProgress={(saved) => player.saveProgress(saved)}
+      onQuestionDone={(question, answer) =>
+        // Fire and forget: the first pin's distance, for difficulty tuning.
+        sendGuess({
+          game: GAME_SLUG,
+          puzzle: today.puzzle,
+          itemId: question.id,
+          value: Math.round(answer.pins[0]!.km * 10) / 10,
+        })
+      }
+      onFinish={(answers, saved) => {
+        player.complete({ answers: saved, score: scoreOf(answers) });
+        setJustFinished(true);
+        window.scrollTo({ top: 0 });
+      }}
+    />
   );
 }
 

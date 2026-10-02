@@ -56,6 +56,8 @@ export const strings = {
     openWater: "open water",
     aim: (coordinates: string, place: string) => `Crosshair on ${coordinates}, ${place}.`,
     loading: "Loading the globe…",
+    zoomIn: "Zoom in",
+    zoomOut: "Zoom out",
   },
   heat: {
     burning: "Burning",

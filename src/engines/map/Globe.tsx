@@ -26,11 +26,13 @@ import {
   type CameraLimits,
 } from "./camera";
 import {
+  DEFAULT_LABEL_INSETS,
   drawFrame,
   showsOnlyBackdrop,
   sweepAngle,
   type GlobeColors,
   type GlobeScene,
+  type LabelInsets,
   type SweepState,
 } from "./draw";
 import { normalizeLon, type GeoPoint } from "./geo";
@@ -52,6 +54,8 @@ export interface GlobeHandle {
   flyTo(view: Camera): Promise<void>;
   /** Jumps to a view at once. */
   setView(view: Camera): void;
+  /** Zooms in (factor > 1) or out on the crosshair with a short glide (at once under reduced motion). */
+  zoomBy(factor: number): void;
   /** Moves keyboard focus to the globe. */
   focus(): void;
 }
@@ -78,6 +82,8 @@ export interface GlobeProps {
    */
   backdrop?: { view: Camera; visible?: () => boolean };
   limits?: Partial<CameraLimits>;
+  /** Margins along the edges where labels never go: under the game's overlays. */
+  labelInsets?: Partial<LabelInsets>;
   /** False while the game animates the globe itself (e.g. during a reveal). */
   interactive?: boolean;
   reducedMotion: boolean;
@@ -115,6 +121,8 @@ const INERTIA_STOP = 0.0008;
 const INERTIA_MAX = 0.12;
 const SETTLE_MS = 450;
 const MAX_DPR = 2;
+/** How long a zoom step from zoomBy() glides. */
+const ZOOM_STEP_MS = 280;
 
 type Velocity = { lon: number; lat: number };
 type Sample = { t: number; lon: number; lat: number };
@@ -141,6 +149,7 @@ export function Globe({
   initialView,
   backdrop,
   limits: limitOverrides,
+  labelInsets,
   interactive = true,
   reducedMotion,
   label,
@@ -192,6 +201,7 @@ export function Globe({
   const painted = useRef(false);
 
   // Latest props for the frame loop and event handlers.
+  const insets: LabelInsets = { ...DEFAULT_LABEL_INSETS, ...labelInsets };
   const props = useRef({
     scene,
     colors,
@@ -200,6 +210,7 @@ export function Globe({
     interactive,
     reducedMotion,
     limits,
+    insets,
     describeAim,
   });
   const callbacks = useRef({ readout, onDrop, onSweepEnd });
@@ -212,6 +223,7 @@ export function Globe({
       interactive,
       reducedMotion,
       limits,
+      insets,
       describeAim,
     };
     callbacks.current = { readout, onDrop, onSweepEnd };
@@ -345,6 +357,7 @@ export function Globe({
           width,
           height,
           dpr,
+          labelInsets: props.current.insets,
           projection,
           camera: camera.current,
           // While the globe moves (dragged, pinched, gliding, flying) the light 1:110m shapes keep
@@ -523,6 +536,24 @@ export function Globe({
           };
           requestFrame();
         });
+      },
+      zoomBy(factor) {
+        // From where a zoom already under way is going, so quick taps add up.
+        const base = flight.current?.target ?? camera.current;
+        const target = zoomBy(base, factor, props.current.limits);
+        stopMotion();
+        if (props.current.reducedMotion) {
+          moveTo(target);
+          return;
+        }
+        engaged.current = true;
+        flight.current = {
+          path: flightPath(camera.current, target, ZOOM_STEP_MS),
+          target,
+          startedAt: performance.now(),
+          resolve: () => {},
+        };
+        requestFrame();
       },
       focus: () => containerRef.current?.focus({ preventScroll: true }),
     }),

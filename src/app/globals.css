@@ -48,6 +48,28 @@
   }
 }
 
+/* Fill screens (src/frame/FillScreen.tsx): while a game shows one, the page is exactly the screen's
+   height and never scrolls, and the game's main area loses its column width and padding. Utilities
+   layer, so these win over the shell's own utility classes. */
+@layer utilities {
+  html:has([data-frame-fill]) {
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+
+  [data-game]:has([data-frame-fill]) {
+    height: 100dvh;
+  }
+
+  [data-game] > main:has([data-frame-fill]) {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    max-width: none;
+    padding: 0;
+  }
+}
+
 @utility tabular {
   font-variant-numeric: tabular-nums;
 }

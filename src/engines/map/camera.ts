@@ -127,11 +127,12 @@ export function easeOut(t: number): number {
 /**
  * A fly-to path: the centre follows the great circle, the zoom eases out and back in (so long
  * flights pull back to show where they go). Returns the camera at t in [0, 1] and a duration in ms
- * that grows with the distance.
+ * that grows with the distance, unless `durationMs` sets it.
  */
 export function flightPath(
   from: Camera,
   to: Camera,
+  durationMs?: number,
 ): { at(t: number): Camera; durationMs: number } {
   const a = toLonLat(from.center);
   const b = toLonLat(to.center);
@@ -142,11 +143,10 @@ export function flightPath(
   const logFrom = Math.log(from.zoom);
   const logTo = Math.log(to.zoom);
   const logCruise = Math.log(cruise);
-  const durationMs = Math.round(
-    500 + 700 * Math.min(1, angle / Math.PI) + 150 * Math.abs(logTo - logFrom),
-  );
   return {
-    durationMs,
+    durationMs:
+      durationMs ??
+      Math.round(500 + 700 * Math.min(1, angle / Math.PI) + 150 * Math.abs(logTo - logFrom)),
     at(t: number): Camera {
       const e = easeInOut(Math.min(1, Math.max(0, t)));
       // Straight log-zoom blend, dipped towards the cruise zoom in the middle.

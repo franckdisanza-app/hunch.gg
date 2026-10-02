@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import type { Ref } from "react";
+import { useCallback, useRef, type ReactNode } from "react";
 import type { GlobeColors, GlobeScene } from "@/engines/map/draw";
 import { formatLatLon, type GeoPoint } from "@/engines/map/geo";
 import type { Camera } from "@/engines/map/camera";
@@ -28,6 +28,9 @@ const Globe = dynamic(() => import("@/engines/map/Globe").then((m) => m.Globe), 
 
 /** The globe picture underneath shows the world view: the canvas leaves it be until it changes. */
 const BACKDROP = { view: WORLD_VIEW, visible: globePictureVisible };
+
+/** One tap on + or − doubles or halves the zoom. */
+const ZOOM_STEP = 2;
 
 /** The globe in Ping's colours: var() references follow the light and dark themes. */
 export const GLOBE_COLORS: GlobeColors = {
@@ -59,6 +62,17 @@ function Crosshair() {
   );
 }
 
+/** The globe's area: the isobar backdrop, the opening picture, the globe and its zoom buttons. */
+export function GlobeStage({ children }: { children?: ReactNode }) {
+  return (
+    <div className={styles.stage}>
+      <Isobars className={styles.isobars} />
+      <GlobePicture />
+      {children}
+    </div>
+  );
+}
+
 export interface GlobeViewProps {
   scene: GlobeScene;
   initialView: Camera;
@@ -66,16 +80,26 @@ export interface GlobeViewProps {
   reducedMotion: boolean;
   onDrop: () => void;
   onSweepEnd: (key: string) => void;
-  globeRef: Ref<GlobeHandle>;
+  /** Receives the globe's handle (a callback ref). */
+  globeRef: (handle: GlobeHandle | null) => void;
+  /** Shown over the top of the globe's area, e.g. the draft banner. */
+  overlay?: ReactNode;
 }
 
-export function GlobeView({ globeRef, ...props }: GlobeViewProps) {
+export function GlobeView({ globeRef, overlay, ...props }: GlobeViewProps) {
+  const handle = useRef<GlobeHandle | null>(null);
+  // The board's ref and our own, for the zoom buttons.
+  const setHandle = useCallback(
+    (value: GlobeHandle | null) => {
+      handle.current = value;
+      globeRef(value);
+    },
+    [globeRef],
+  );
   return (
-    <div className={styles.globeWrap}>
-      <Isobars className={styles.isobars} />
-      <GlobePicture />
+    <GlobeStage>
       <Globe
-        ref={globeRef}
+        ref={setHandle}
         {...props}
         backdrop={BACKDROP}
         colors={GLOBE_COLORS}
@@ -88,8 +112,41 @@ export function GlobeView({ globeRef, ...props }: GlobeViewProps) {
         readout={(center) => coordinates(center)}
         readoutClassName={cx(styles.readout, styles.mono)}
         crosshair={<Crosshair />}
+        // Labels keep clear of the overlay at the top and the readout at the bottom.
+        labelInsets={{ top: overlay ? 40 : 28, bottom: 44 }}
         className={styles.globe}
       />
-    </div>
+      {/* Only while the player aims: the game moves the globe itself the rest of the time. */}
+      {props.interactive && (
+        <div className={styles.zoom}>
+          <button
+            type="button"
+            aria-label={strings.globe.zoomIn}
+            onClick={() => handle.current?.zoomBy(ZOOM_STEP)}
+            className={styles.zoomButton}
+          >
+            <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+              <path
+                d="M9 3v12M3 9h12"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+              />
+            </svg>
+          </button>
+          <button
+            type="button"
+            aria-label={strings.globe.zoomOut}
+            onClick={() => handle.current?.zoomBy(1 / ZOOM_STEP)}
+            className={styles.zoomButton}
+          >
+            <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+              <path d="M3 9h12" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+            </svg>
+          </button>
+        </div>
+      )}
+      {overlay}
+    </GlobeStage>
   );
 }
